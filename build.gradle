@@ -4,6 +4,16 @@ task('client-handler', type: GradleBuild) {
     tasks = ['packing']
 }
 
+task('rtmp2js', type: GradleBuild) {
+    buildFile = 'libraries/rtmp2js/build.gradle'
+    tasks = ['build']
+}
+
+task('media2js', type: GradleBuild) {
+    buildFile = 'libraries/media2js/build.gradle'
+    tasks = ['build']
+}
+
 task('a3client', type: GradleBuild) {
     buildFile = 'libraries/a3client/build.gradle'
     tasks = ['packing']
@@ -19,7 +29,7 @@ task('webcall-app', type: GradleBuild) {
     tasks = ['install']
 }
 
-task('build', dependsOn:['client-handler', 'a3client', 'call-library', 'webcall-app']) << {}
+task('build', dependsOn:['client-handler', 'a3client', 'rtmp2js', 'media2js', 'call-library', 'webcall-app']) << {}
 
 task('all', dependsOn: build) << { 
     println "Alias for build task" 
