@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="cleartype" content="on">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>3D лабиринт</title>
+
+
+
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+  <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.0.3/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="/lib/adapter.js"></script>
+  <script type="text/javascript" src="/lib/call-signalling.js"></script>
+  <script type="text/javascript" src="/lib/call-media.js"></script>
+  <script type="text/javascript" src="/lib/phone.js"></script>
+
+
+  <link rel="stylesheet" type="text/css" href="s/main.css" />
+
+</head>
+<body data-state="loading">
+  <style>
+    #login, #loading, #hardware-settings, #app {
+      display: none;
+      position:absolute;
+      width: 600px;
+      height: 400px;
+      background: white;
+      box-shadow: 0 0 10px #888;
+      overflow:hidden;
+      left:50%;
+      margin-left: -300px;
+      top:100px;
+      vertical-align: middle;
+      text-align: center;
+    }
+
+    body[data-state="login"]              #login               { display: block; }
+    body[data-state="loading"]            #loading             { display: block; }
+    body[data-state="hardware-settings"]  #hardware-settings   { display: block; }
+    body[data-state="app"]                #app                 { display: block; }
+  </style>
+
+  <div id="login">
+    Введите ваше имя<br/>
+    <input type="login" id="login-field"/>
+    <input type="button" id="do-login" data-event="START_SESSION" data-params="{}" value="Войти" disabled/>
+  </div>
+
+  <div id="loading">
+    Загрузка
+  </div>
+
+  <div id="hardware-settings">
+    Разрещите доступ к камере и микрофону
+  </div>
+
+  <div id="app">
+    <canvas id="underMap" width="80" height="80"></canvas>
+    <canvas id="map" width="80" height="80"></canvas>
+  
+    <div id="holder" style="clear:both;">
+      <div id="sky"></div>
+      <div id="floor"></div>
+      <canvas id="canvas" width="400" height="300"></canvas>
+    </div>
+
+    <div id="room-number-log" style="position:absolute; bottom:5px; left:5px; width:20px; height:20px;"></div>
+  </div>
+
+  <script src="a/main.js"></script>
+
+  <script>
+    var myName = "";
+
+    var phone = new Phone({
+      afterTransition: function(fromState, state, event, params) {
+        console.log("Transition ", fromState, " -> ", state, " [event=", event, params,"]");
+        switch(state) {
+          case 'LOGIN':
+            $('body').attr('data-state', 'login');
+            $('#login-field').focus();
+            break;
+          case 'LOGINING':
+            $('body').attr('data-state', 'loading');
+            break;
+          case 'INITIALIZING_MEDIA':
+          case 'HARDWARE_SETTINGS':
+            $('body').attr('data-state', 'hardware-settings');
+            break;
+          case 'HARDWARE_SETTINGS_OK':
+            $('body').attr('data-state', 'app');
+            posUpdater();
+            break;
+        }
+      },
+
+      onChatMessage: function(o) {
+        console.log("CHAT", o);
+        if(o["x-message"] === "pos") {
+          var name = o.name;
+          if(!name in PLAYERS)
+            PLAYERS[name] = {x:0, y:0};
+          PLAYERS[name] = {x: o.x, y:o.y};
+          drawCanvas();
+        }
+      }
+    });
+
+    var prevX, prevY, prevRoom;
+    function posUpdater() {
+      if(prevX !== playerPos[0] && prevY !== playerPos[1]) {
+        prevX = playerPos[0];
+        prevY = playerPos[1];
+        phone.sendChatBroadcast({"x-message": "pos", name: myName, x: playerPos[0], y:playerPos[1]})
+      }
+      if(prevRoom !== getRoom()) {
+        prevRoom = getRoom();
+        $('#room-number-log').text(prevRoom)
+        console.log("Changing room to ", prevRoom);
+        phone.startCall(prevRoom);
+      }
+      window.setTimeout(posUpdater, 1000);
+    }
+
+    jQuery(function($){
+      Array.prototype.random = function() { return this[Math.floor(this.length * Math.random())] }
+      var s = ['б', 'в', 'г','д','ж','з','к','л','м','н'];
+      var g = ['а', 'е', 'ё','и','о','у','э','я'];
+      var n = ""; for(var i = 0; i < 3; i++) n += s.random() + g.random();
+      $('#login-field').val(n).focus().keydown(function(e){ if(e.keyCode === 13) $('#do-login').click() });
+      $('#do-login').prop('disabled', false);
+
+      $('#login-field').on('input', function() { $('#do-login').prop('disabled', !$(this).val()); });
+      $('#do-login').click(function() { phone.event("ui:login", {phone: myName = $('#login-field').val(),  password:"1234"}); });
+    });
+  </script>
+  
+</body>
+</html>
+

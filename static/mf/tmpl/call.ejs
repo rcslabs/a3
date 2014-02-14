@@ -1,0 +1,15 @@
+<div class="call <%= get("video")?"video-call":"" %>">
+  <% if(get("video")) { %>
+    <video autoplay="true"></video>
+  <% } else { %>
+    <audio autoplay="true"></audio>
+  <% } %>
+  <div class="names"><%= get("bUri") %></div>
+  <div class="type">звонок на мобильный телефон</div>
+  <div class="phone"><%= get("bUri") %></div>
+  <div class="time">00:00</div>
+  <div class="mute"></div>
+  <div class="sound"></div>
+  <div class="add">добавить абонента</div>
+  <div class="hangup">закончить разговор</div>
+</div>

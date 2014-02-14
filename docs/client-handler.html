@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="main.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2>Установка</h2>
+<p>Для начала работы понадобятся установленные nodejs и npm.<br>Инструкции по установке node - <a href="http://nodejs.org/download/">http://nodejs.org/download/</a><br>Инструкции по установке npm - <a href="https://npmjs.org/">https://npmjs.org/</a>   
+
+</p>
+<p>Установка typescript транслятора. Понадобится sudo. Все оcтальное возможно без sudo.
+</p>
+<pre><code>sudo npm install -g typescript</code></pre>
+<p>Установка зависимостей. Будут установлены в директорию node_modules, которая будет создана в текущей автоматически. 
+</p>
+<pre><code>npm install</code></pre>
+<h2>Использование</h2>
+<p>Компиляция typescript кода в выполняемый javascript код.
+</p>
+<pre><code>tsc --target ES5 --out sio-server.js sio-server.ts</code></pre>
+<p>Запуск sio-server
+</p>
+<pre><code>node ./sio-server.js</code></pre>
+<p>Команда может быть запущена с аргументами.<br>Если указан аргумент --config=&lt;filename&gt;, параметры конфигурации могут быть прочитаны из него.<br>Если указаны аргументы в командной строке - они перекроют параметры (с тем же именем) из файла конфигурации.<br>Если не указано ничего - будут применены параметры запуска по умолчанию.   
+
+</p>
+<p>Возможные аргументы команды запуска
+</p>
+<pre><code>--log-level=0-3 уровень verbosity 
+--config=&lt;filename&gt; путь к файлу конфигурации.
+--host=&lt;hostname&gt; IP/hostname на котором будет запущен socket.io
+--port=&lt;port&gt; Порт, который будет слушать socket.io
+--mq=&lt;redis://host:port&gt; host/port, на котором запущен Redis</code></pre>
+
+<hr>You should run <code>node ./docgen.js</code> to generate this document.</body>
+</html>

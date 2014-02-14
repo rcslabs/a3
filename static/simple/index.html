@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="/cdn/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/phone.css">
+
+  <script type="text/javascript" src="/cdn/jquery-1.9.0.min.js"></script>
+  <script type="text/javascript" src="/cdn/bootstrap.min.js"></script>
+
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="/lib/call-signalling.js"></script>
+  <script type="text/javascript" src="/lib/call-media.js"></script>
+  <script type="text/javascript" src="/lib/phone.js"></script>
+  <script type="text/javascript" src="/lib/conference-view.js"></script>
+</head>
+<body data-state="loading">
+
+  <div id="conference-view" style="position:absolute; z-index:1; left:0; right:0; border:1px solid black; padding:0; margin:0; background: white;">
+  </div>
+
+  <style>
+    body section {
+      display: none;
+      position:absolute;
+      width: 600px;
+      height: 400px;
+      background: white;
+      box-shadow: 0 0 50px #888;
+      overflow:hidden;
+      left:50%;
+      bottom:0;
+      z-index:10;
+      
+      margin-left: -300px;
+      vertical-align: middle;
+      text-align: center;
+
+      -webkit-perspective: 1000;
+      -webkit-transform-style: preserve-3d;
+      -webkit-transform-origin: 0 0;
+
+      perspective: 1000;
+      transform-style: preserve-3d;
+      transform-origin: 0 0;
+      -webkit-transform: rotateY(180deg);
+    }
+    body[data-state="login"]              #login,
+    body[data-state="loading"]            #loading,
+    body[data-state="hardware-settings"]  #hardware-settings,
+    body[data-state="app"]                #app,
+    body[data-state="error"]              #error,
+    body[data-state="call-in-progress"]   #call-in-progress    {
+      display: block;
+      -webkit-transform: rotateY(0deg);
+      z-index:1000;
+    }
+  </style>
+
+
+  <div style="background: white; text-align: center; z-index:2; border:1px solid black; border-radius: 4px; line-height: 50px;font-weight: bold; position: absolute; right:0; top:0; font-size: 30px; width:100px; height: 50px;" id="log-phone"></div>
+
+  <div class="sections-container" style="position:absolute; left:0; right:0; top:0; height:100%; max-height:600px; ">
+	<section id="login" data-focus="#login-server">
+		<div id="login-form">
+			<label class="error">Ошибка</label>
+			<label for="login-name">Логин</label>
+			<input id="login-phone" type="text" value=""/>
+			<label for="login-password">Пароль</label>
+			<input id="login-password" type="text" value=""/>
+			<br/>
+			<input id="do-login" type="button" value="Войти"/> 
+		</div>
+	</section>
+
+  <section id="loading">
+    <img src="i/355.gif"/>
+  </section>
+
+  <section id="hardware-settings">
+    ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑<br/>
+    Разрешите доступ к камере и микрофону
+    <style>
+      .chrome-bar {
+        width:100%;
+        height: 25px;
+        border:1px solid #aaaaab;
+        text-align: left;
+        margin-top:60px;
+        background: -webkit-linear-gradient(top, #e5e5e5 0, #d9d9d9 100%);
+        color: black;
+        line-height: 25px;
+        font-size: 10px;
+      }
+      .chrome-bar button {
+        height: 18px;
+        font-size: 10px;
+        line-height:10px;
+        border : 1px solid rgb(240, 240, 240);
+        border-radius: 2px;
+      }
+      @-webkit-keyframes bounce {
+        from {
+          border-color: rgb(240, 240, 240);
+        }
+        to {
+          border-color: red;
+          
+        }
+      }
+      .chrome-bar .allow {
+        -webkit-animation-name: bounce;
+        -webkit-animation-duration: 1s;
+        -webkit-animation-iteration-count: 1000;
+        -webkit-animation-direction: alternate;
+      }
+    </style>
+    <div class="chrome-bar">
+      <img src="i/chrome-mic.png" width="10"/>
+      <span><script>document.write(location.hostname)</script> запрашивает разрешение на использование вашего микрофона</span>
+      <button class="allow">Разрешить</button> <button>Запретить</button>
+    </div>
+  </section>
+  <section id="app" data-focus="#dial-number">
+    <div id="dtmf-block">
+      <input type="text" id="dial-number"/>
+      <div class="icon-remove-sign"></div>
+      <input type="button" value="1"/>
+      <input type="button" value="2"/>
+      <input type="button" value="3"/>
+      <input type="button" value="4"/>
+      <input type="button" value="5"/>
+      <input type="button" value="6"/>
+      <input type="button" value="7"/>
+      <input type="button" value="8"/>
+      <input type="button" value="9"/>
+      <input type="button" value="#"/>
+      <input type="button" value="0"/>
+      <input type="button" value="*"/>
+      <button id="audio-call" class="start-call-button">Audio call</button>
+      <button id="video-call" class="start-call-button">Video call</button>
+      <br/>
+      <button style="margin-top:50px;" id="audio-video-call" class="start-call-button">Audio-Video call</button>
+    </div>
+  </section>
+
+  <section id="call-in-progress">
+    <img src="i/call-in-progress.jpg" width="600"/><br/>
+    <input type="button" value="Завершить" id="hangup-button" style="position:absolute; left: 50%; width:120px; margin-left:-60px;top:40px; height: 40px;"/>
+  </section>
+  
+ 	<section id="error">
+		Ой, ошибка!
+	</section>
+
+  </div>
+
+  <script>
+    var conferenceView = new ConferenceView($('#conference-view'), 200);
+
+
+    var remoteStreams = [];
+    var localStreams = [];
+    var phoneTimer = null;
+    var stopTimer = function() {
+      if(phoneTimer)  window.clearInterval(phoneTimer);
+      phoneTimer = null;
+    }
+    var startTimer = function() {
+      stopTimer();
+      var s = new Date().valueOf();
+      phoneTimer = window.setInterval(function() {
+        var e = new Date().valueOf();
+        $('#log-phone').html(Math.floor((e-s)/100)/10);
+      },100);
+    }
+
+    var phone = new Phone({
+      afterTransition: function(fromState, state, event, params) {
+        console.log("Transition ", fromState, " -> ", state, " [event=", event, params,"]");
+        switch(state) {
+          case 'LOGIN':
+            $('body').attr('data-state', 'login');
+            $('#login-phone').focus();
+            break;
+          case 'LOGINING':
+            $('body').attr('data-state', 'loading');
+            break;
+          case 'INITIALIZING_MEDIA':
+          case 'HARDWARE_SETTINGS':
+            $('body').attr('data-state', 'hardware-settings');
+            break;
+          case 'HARDWARE_SETTINGS_OK':
+            $('body').attr('data-state', 'app');
+            break;
+        }
+      },
+
+      mediaEvent: function(eventName, opt) {
+        switch(eventName) {
+          case "media:add-local-stream":
+            conferenceView.addLocalStream(opt);
+            localStreams.push(opt);
+            break;
+          case "media:add-remote-stream":
+            //var newStream = new webkitMediaStream(opt.getAudioTracks());
+            var newStream  = opt;
+
+            conferenceView.addRemoteStream(newStream);
+            remoteStreams.push(newStream);
+            break;
+
+          case "media:remove-remote-stream":
+            conferenceView.removeRemoteStream(opt);
+            break;
+        }
+      },
+      onChatMessage: function(o) {
+        //...
+      }
+    });
+
+
+    var call = null;
+
+    var callListener = {
+      afterTransition: function(fromState, state, event, params) {
+        switch(state) {
+          case "CALL_IN_PROGRESS":
+            $('body').attr('data-state', 'call-in-progress');
+            break;
+          case "CALL_FINISHED":
+            stopTimer();
+            console.log("CALL FINISHED");
+            $('body').attr('data-state', 'app');
+            $('.start-call-button').prop('disabled', false);
+            call = null;
+            break;
+          case "CALL_FAILED":
+            stopTimer();
+            break;
+        }
+      }
+    };
+
+
+    jQuery(function($){
+      try {  $('#login-phone')   .val(window.localStorage.getItem('saved-login-phone'));     }catch(e) {}                  // saved phone-password
+      try {  $('#login-password').val(window.localStorage.getItem('saved-login-password'));  }catch(e) {}
+
+      /// TEST!!!!
+      var $loginPhone = $('#login-phone')
+      if(location.href.match(/phone=(\d+)/))
+        $loginPhone.val(RegExp.$1);
+      else
+        $loginPhone.val(1000 + Math.floor(50*Math.random()));
+
+      var $pwdField = $('#login-password');
+      if(location.href.match(/pwd=(.+)(?:$|&)/))
+        $pwdField.val(RegExp.$1);
+      else
+        $pwdField.val("1234");
+
+      var $dialNumber = $('#dial-number')
+      if(location.href.match(/to=(\d+)/))
+        $dialNumber.val(RegExp.$1);
+
+
+      $('#login-phone').focus().keydown(function(e){ if(e.keyCode === 13) $('#do-login').click() });
+      $('#do-login').prop('disabled', false);
+
+      $('#login-phone').on('input', function() { $('#do-login').prop('disabled', !$(this).val()); });
+
+      $('#do-login').click(function() {
+        $('#log-phone').text($('#login-phone').val());
+        phone.event("ui:login", {phone: $('#login-phone').val(),  password:$('#login-password').val()});
+        window.localStorage.setItem( 'saved-login-phone',    $('#login-phone').val()    );
+        window.localStorage.setItem( 'saved-login-password', $('#login-password').val() );
+      });
+
+      $('#audio-call').click(function() {
+        if(call) return;
+        var b = $('#dial-number').val();
+        console.log("Call on ", b);
+        call = phone.startCall({bUri: b}, callListener);
+        $('.start-call-button').prop('disabled', true);
+        startTimer();
+      });
+      $('#video-call').click(function() {
+        if(call) return;
+        var b = $('#dial-number').val();
+        console.log("Call on ", b);
+        call = phone.startCall({bUri: b, vv: [false, true]}, callListener);
+        $('.start-call-button').prop('disabled', true);
+        startTimer();
+      });
+      $('#audio-video-call').click(function() {
+        if(call) return;
+        var b = $('#dial-number').val();
+        console.log("Call on ", b);
+        call = phone.startCall({bUri: b, vv: [true, true]}, callListener);
+        $('.start-call-button').prop('disabled', true);
+        startTimer();
+      });
+
+      $('#hangup-button').click(function(){
+        if(call) {
+          phone.hangup(call);
+        }
+      });
+
+      $('#dtmf-block input[type="button"]').click(function() {
+        var $field = $('#dtmf-block input[type="text"]');
+        $field.val( $field.val() + $(this).val() ).focus();
+      });
+
+      $('#dtmf-block .icon-remove-sign').click(function() { $('#dtmf-block input[type="text"]').val('') });
+    });
+  </script>
+
+  
+</body>
+</html>
+
+
+
+<span style="font-family: consolas; color: #aaa; position:absolute; z-index:0; left:0; right:0; bottom:0; top:0; overflow: hidden;">
+config: mq=redis://192.168.1.38/YouDial-MC
+config: ip=192.168.1.36
+redis
+192.168.1.38
+None
+YouDial-MC
+ [x] Received '{"type":"CREATE_MEDIA_POINT","sender":"YouDial-APP","vv":[true,fa                                                     lse],"bUri":"sip:1016@192.168.1.249","sessionId":"7a56cdab-e07b-43a6-ad48-9a711c                                                     496771","pointId":"WRTC-21b08405-9ed5-49c2-a49d-5b905a499d78","aUri":"1015","cal                                                     lId":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5","cc":{"userAgent":"Chrome","audio":[                                                     "PCMU/8000"],"profile":"RTP/SAVPF","ice":true,"ssrcRequired":true}}'
+Execure command: agents/stun-agent
+[stun] received: OPEN_PORT
+[stun] Received: type=OPEN_PORT
+ [x] Received '{"type":"CREATE_MEDIA_POINT","sender":"YouDial-APP","vv":[true,fa                                                     lse],"bUri":"sip:1016@192.168.1.249","sessionId":"7a56cdab-e07b-43a6-ad48-9a711c                                                     496771","pointId":"SIP-d40d9d2e-2c16-4cbf-93a0-5d7b7029ec90","aUri":"1015","call                                                     Id":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5","cc":{"audio":["PCMU/8000"],"ice":fal                                                     se,"profile":"RTP/AVP"}}'
+[stun] Sending type=OPEN_PORT_OK iface=0.0.0.0 port=65442
+[stun] received: OPEN_PORT
+[stun] Received: type=OPEN_PORT
+[stun] Listening...
+RECEIVED FROM STUN : [('type', 'OPEN_PORT_OK'), ('iface', '0'), ('port', '65442'                                                     )]
+ [y] sending <u'YouDial-APP'> '{"sdp": "v=0\\r\\no=- 3229174452 2 IN IP4 192.168.1.36\\r\\ns=-\\r\\nt=0 0\\r\\nm=audio 65442 RTP/AVP 0\\r\\nc=IN IP4 192.168.1.3                                                     6\\r\\na=sendrecv\\r\\na=rtcp-mux\\r\\na=rtpmap:0 PCMU/8000\\r\\n", "sender": "Y                                                     ouDial-MC", "cc": {"profile": "RTP/AVP", "audio": ["PCMU/8000"], "ice": false},                                                      "callId": "95b30fb9-7aef-4e6b-90e9-a397c5d313e5", "bUri": "sip:1016@192.168.1.24                                                     9", "pointId": "SIP-d40d9d2e-2c16-4cbf-93a0-5d7b7029ec90", "sessionId": "7a56cda                                                     b-e07b-43a6-ad48-9a711c496771", "vv": [true, false], "type": "SDP_OFFER", "aUri"                                                     : "1015"}'
+[stun] Sending type=OPEN_PORT_OK iface=0.0.0.0 port=65443
+[stun] Listening...
+RECEIVED FROM STUN : [('type', 'OPEN_PORT_OK'), ('iface', '0'), ('port', '65443'                                                     )]
+ [y] sending <u'YouDial-APP'> '{"sdp": "v=0\\r\\no=- 3229174452 2 IN IP4 127.0.0.1\\r\\ns=-\\r\\nt=0 0\\r\\nm=audio 1 RTP/SAVPF 0\\r\\nc=IN IP4 0.0.0.0\\r\\na=i                                                     ce-ufrag:t30SYofTJD1E8XWx\\r\\na=ice-pwd:648/NXzChHKfDJP09wIHe5B0\\r\\na=ice-opt                                                     ions:google-ice\\r\\na=sendrecv\\r\\na=candidate:3354082314 1 udp 1677729535 192                                                     .168.1.36 65443 typ srflx generation 0\\r\\na=rtcp-mux\\r\\na=crypto:1 AES_CM_12                                                     8_HMAC_SHA1_80 inline:DOUXfgs9sLB4F16vvCksVKUptM7IptAStkjNS7ky\\r\\na=rtpmap:0 P                                                     CMU/8000\\r\\na=ssrc:4113987973 cname:mHMVNu9cEZzzEqs5\\r\\n", "sender": "YouDia                                                     l-MC", "cc": {"profile": "RTP/SAVPF", "userAgent": "Chrome", "audio": ["PCMU/800                                                     0"], "ssrcRequired": true, "ice": true}, "callId": "95b30fb9-7aef-4e6b-90e9-a397                                                     c5d313e5", "bUri": "sip:1016@192.168.1.249", "pointId": "WRTC-21b08405-9ed5-49c2                                                     -a49d-5b905a499d78", "sessionId": "7a56cdab-e07b-43a6-ad48-9a711c496771", "vv":                                                      [true, false], "type": "SDP_OFFER", "aUri": "1015"}'
+ [x] Received '{"type":"SDP_ANSWER",
+                "sender":"YouDial-APP",
+                "sessionId":"7a56cdab-e07b-43a6-ad48-9a711c496771",
+                "pointId":"WRTC-21b08405-9ed5-49c2-a49d-5b905a499d78",
+                "callId":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5",
+                "sdp":"v\\u003d0\\r\\no\\u003dFreeSWITCH 1361507785 1361507786 IN IP4 192.168.1.249\\r\\ns\\u003dFreeSWITCH\\r\\nc\\u003dIN IP4 192.168.1.249\\r\\nt\\u003d0 0\\r\\nm\\u003daudio 55134 RTP/AVP 0\\r\\na\\u003drtpmap:0 PCMU/8000\\r\\na\\u003dsilenceSupp:off - - - -\\r\\na\\u003dptime:20\\r\\n"}'
+REMOTE addr= {'remote-ip': u'192.168.1.249', 'remote-port': 55134}
+[stun]  [y] sending <u'YouDial-APP'> '{"sender": "YouDial-MC", "cc": {"profile":                                                      "RTP/SAVPF", "userAgent": "Chrome", "audio": ["PCMU/8000"], "ssrcRequired": tru                                                     e, "ice": true}, "callId": "95b30fb9-7aef-4e6b-90e9-a397c5d313e5", "bUri": "sip:                                                     1016@192.168.1.249", "preceived: remote-ip=192.168.1.249 sub=tmp/2166611771 remo                                                     te-port=55134 pub=tmp/2003207884 type=ADD_POINT port=65443ointId": "WRTC-21b0840                                                     5-9ed5-49c2-a49d-5b905a499d78", "sessionId": "7a56cdab-e07b-43a6-ad48-9a711c4967                                                     71", "vv": [true, false], "type": "CREATE_MEDIA_POINT_OK", "aUri": "1015"}'
+
+[stun] Received: type=ADD_POINT port=65443 pub=tmp/2003207884 remote-ip=192.168.1.249 remote-port=55134 sub=tmp/2166611771
+[stun] Adding point : pub=tmp/2003207884 sub=tmp/2166611771
+ [x] Received '{"type":"SDP_ANSWER",
+                "sender":"YouDial-APP",
+                "sessionId":"7a56cdab-e07b-43a6-ad48-9a711c496771",
+                "pointId":"SIP-d40d9d2e-2c16-4cbf-93a0-5d7b7029ec90",
+                "callId":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5",
+                "sdp":"v\\u003d0\\r\\no\\u003dFreeSWITCH 1361507785 1361507786 IN IP4 192.168.1.249\\r\\ns\\u003dFreeSWITCH\\r\\nc\\u003dIN IP4 192.168.1.249\\r\\nt\\u003d0 0\\r\\nm\\u003daudio 55134 RTP/AVP 0\\r\\na\\u003drtpmap:0 PCMU/8000\\r\\na\\u003dsilenceSupp:off - - - -\\r\\na\\u003dptime:20\\r\\n"}'
+
+
+REMOTE addr= {'remote-ip': u'192.168.1.249', 'remote-port': 55134}
+ [y] sending <u'YouDial-APP'> '{"sender": "YouDial-MC", "cc": {"profile": "RTP/AVP", "audio": ["PCMU/8000"], "ice": false}, "callId": "95b30fb9-7aef-4e6b-90e9-a                                                     397c5d313e5", "bUri": "sip:1016@192.168.1.249", "pointId": "SIP-d40d9d2e-2c16-4c                                                     bf-93a0-5d7b7029ec90", "sessionId": "7a56cdab-e07b-43a6-ad48-9a711c496771", "vv"                                                     : [true, false], "type": "CREATE_MEDIA_POINT_OK", "aUri": "1015"}'
+[stun] Point has ip and port: 192.168.1.249:55134
+ [x] Received '{"type":"JOIN_ROOM","sender":"YouDial-MC","vv":[true,false],"bUri                                                     ":"sip:1016@192.168.1.249","sessionId":"7a56cdab-e07b-43a6-ad48-9a711c496771","r                                                     oomId":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5","aUri":"1015","pointId":"WRTC-21b0                                                     8405-9ed5-49c2-a49d-5b905a499d78","callId":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5                                                     ","cc":{"profile":"RTP/SAVPF","userAgent":"Chrome","audio":["PCMU/8000"],"ssrcRe                                                     quired":true,"ice":true}}'
+Execure command: agents/room-agent
+[stun] received: remote-ip=192.168.1.249 sub=tmp/2671699831 remote-port=55134 pu                                                     b=tmp/2928289181 type=ADD_POINT port=65442
+[stun] Received: type=ADD_POINT port=65442 pub=tmp/2928289181 remote-ip=192.168.                                                     1.249 remote-port=55134 sub=tmp/2671699831
+[stun] Adding point : pub=tmp/2928289181 sub=tmp/2671699831
+[stun] Point has ip and port: 192.168.1.249:55134
+[stun] Listening...
+[stun] Listening...
+ [x] Received '{"type":"JOIN_ROOM","sender":"YouDial-MC","vv":[true,false],"bUri                                                     ":"sip:1016@192.168.1.249","sessionId":"7a56cdab-e07b-43a6-ad48-9a711c496771","r                                                     oomId":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5","aUri":"1015","pointId":"SIP-d40d9                                                     d2e-2c16-4cbf-93a0-5d7b7029ec90","callId":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5"                                                     ,"cc":{"profile":"RTP/AVP","audio":["PCMU/8000"],"ice":false}}'
+[room] received: sub=tmp/2003207884 pub=tmp/2166611771 pubSsrc=4113987973 type=J                                                     OIN id=WRTC-21b08405-9ed5-49c2-a49d-5b905a499d78
+[room] Received: type=JOIN id=WRTC-21b08405-9ed5-49c2-a49d-5b905a499d78 pub=tmp/                                                     2166611771 pubSsrc=4113987973 sub=tmp/2003207884
+[room] Sending type=JOIN_OK id=WRTC-21b08405-9ed5-49c2-a49d-5b905a499d78 pub=tmp                                                     /2166611771 pubSsrc=4113987973 sub=tmp/2003207884
+[room] Listening...
+[room] received: sub=tmp/2928289181 pub=tmp/2671699831 type=JOIN id=SIP-d40d9d2e                                                     -2c16-4cbf-93a0-5d7b7029ec90
+[room] Received: type=JOIN id=SIP-d40d9d2e-2c16-4cbf-93a0-5d7b7029ec90 pub=tmp/2                                                     671699831 sub=tmp/2928289181
+[room] Sending type=JOIN_OK id=SIP-d40d9d2e-2c16-4cbf-93a0-5d7b7029ec90 pub=tmp/                                                     2671699831 sub=tmp/2928289181
+[room] Listening...
+[stun] Received message [112] from domain AF_INET port 65449 internet address 19                                                     2.168.1.36
+
+[stun] Check magic
+[stun] Seems to be stun message
+[stun] Really stun message
+[stun] Binding request for unknown user
+[stun] Received message [112] from domain AF_INET port 65449 internet address 19                                                     2.168.1.36
+
+[stun] Check magic
+[stun] Seems to be stun message
+[stun] Really stun message
+[stun] Binding request for unknown user
+[stun] Received message [112] from domain AF_INET port 65449 internet address 19                                                     2.168.1.36
+
+[stun] Check magic
+[stun] Seems to be stun message
+[stun] Really stun message
+[stun] Binding request for unknown user
+
+
+
+"label":0,"id":"audio","candidate":"a=candidate:2896278100 1 udp 2113937151 192.168.1.36   53319 typ host generation 0\r\n"
+"label":0,"id":"audio","candidate":"a=candidate:2896278100 2 udp 2113937151 192.168.1.36   53319 typ host generation 0\r\n"
+"label":0,"id":"audio","candidate":"a=candidate:1521601408 2 udp 1845501695 194.8.172.178  53319 typ srflx raddr 192.168.1.36 rport 53319 generation 0\r\n"
+"label":0,"id":"audio","candidate":"a=candidate:1521601408 1 udp 1845501695 194.8.172.178  53319 typ srflx raddr 192.168.1.36 rport 53319 generation 0\r\n"
+"label":0,"id":"audio","candidate":"a=candidate:3793899172 1 tcp 1509957375 192.168.1.36   51040 typ host generation 0\r\n"
+
+"label":1,"id":"video","candidate":"a=candidate:2896278100 1 udp 2113937151 192.168.1.36   53319 typ host generation 0\r\n"
+"label":1,"id":"video","candidate":"a=candidate:2896278100 2 udp 2113937151 192.168.1.36   53319 typ host generation 0\r\n"
+"label":1,"id":"video","candidate":"a=candidate:1521601408 2 udp 1845501695 194.8.172.178  53319 typ srflx raddr 192.168.1.36 rport 53319 generation 0\r\n"
+"label":1,"id":"video","candidate":"a=candidate:1521601408 1 udp 1845501695 194.8.172.178  53319 typ srflx raddr 192.168.1.36 rport 53319 generation 0\r\n"
+"label":1,"id":"video","candidate":"a=candidate:3793899172 1 tcp 1509957375 192.168.1.36   51040 typ host generation 0\r\n"
+
+
+
+
+
+

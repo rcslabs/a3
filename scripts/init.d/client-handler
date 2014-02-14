@@ -1,0 +1,72 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides: client-handler
+### END INIT INFO
+
+#chkconfig: 345 20 80
+#description: alena client-handler
+
+set -e 
+
+NAME=client-handler
+RUN_AS=alena:alena
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/opt/alena/$NAME.sh
+
+DAEMON_NAME=$NAME
+DAEMON_DESC=$NAME
+DAEMON_PIDFILE=/var/run/$DAEMON_NAME
+DAEMON_LOGFILE=/var/log/alena/$NAME.log
+
+case "$1" in
+    start)
+      echo -n "Starting $DAEMON_DESC: "
+      touch $DAEMON_PIDFILE
+      chown $RUN_AS $DAEMON_PIDFILE
+
+      if [ ! -f $DAEMON_LOGFILE ]
+      then
+        touch $DAEMON_LOGFILE
+        chown $RUN_AS $DAEMON_LOGFILE
+      fi
+
+      if start-stop-daemon --background --make-pidfile --start --pidfile $DAEMON_PIDFILE --chuid $RUN_AS --exec $DAEMON
+      then
+        echo "$DAEMON_NAME started."
+      else
+        echo "failed"
+      fi
+      ;;                                                                                                                          
+    stop)
+      echo -n "Stopping $DAEMON_DESC: "
+      if start-stop-daemon --stop --quiet --oknodo --pidfile $DAEMON_PIDFILE
+          then
+            echo "$DAEMON_NAME stopped."
+            rm $DAEMON_PIDFILE
+          else
+            echo "failed"
+          fi
+      rm -f $DAEMON_PIDFILE          
+      ;;
+    restart)
+      ${0} stop
+      ${0} start
+      ;;
+    status)
+      echo -n "$DAEMON_DESC is "
+      if start-stop-daemon --stop --quiet --signal 0 --pidfile $DAEMON_PIDFILE
+      then
+        echo "running"
+      else
+        echo "not running"
+        #exit 1
+      fi
+      ;;
+    *)
+      echo "Usage: /etc/init.d/$NAME {start|stop|restart|status}" >&2
+      exit 1
+      ;;
+esac
+
+exit 0  

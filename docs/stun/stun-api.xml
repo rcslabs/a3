@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="docgen.xsl"?>
+<ru.rcslabs.api xmlns:html="http://www.w3.org/1999/xhtml">
+	<messages>
+		<message>
+			<param name="type" type="string" value="OPEN_PORT" required="true">oi</param>
+			<param name="port" type="number" required="false"/>
+			<param name="proto" type="string" required="false" value="TCP|UDP"/>
+
+			<description>
+				Команда на открытие порта. Если порт не указан, то будет открыт свободный порт, выданный ОС. По умолчанию открывает UDP.
+			</description>
+		</message>
+	
+		<message>
+			<param name="type" type="string" value="OPEN_PORT_OK" required="true">oi</param>
+			<param name="port" type="number" required="true" />
+			<param name="proto" type="string" required="true" value="TCP|UDP"/>
+
+			<description>
+				Результат успешного открытия порта. Возвращает номер открытого порта
+			</description>
+		</message>
+
+		<message>
+			<param name="type" type="string" value="OPEN_PORT_FAILED" required="true">oi</param>
+			<param name="port" type="number" required="true" />
+			<param name="error_code" type="number" required="true" />
+			<param name="reason" type="string" required="true" />
+
+			<description>
+				Ошибка при открытии порта. 
+			</description>
+			
+			<comments>
+				TODO: перечислить <html:b>error_code</html:b>
+			</comments>
+		</message>
+
+		<message>
+			<param name="type"            type="string"  value="ADD_POINT" required="true"/>
+			<param name="uuid"            type="string"  description="Уникальный идентификатор соединения (client_id + call_id)"/>
+			<param name="port"            type="number"  value=""/>
+			<param name="remoteIceUfrag"  type="string"  value=""/>
+			<param name="remoteIcePwd"    type="string"  value=""/>
+			<param name="localIceUfrag"   type="string"  value=""/>
+			<param name="localIcePwd"     type="string"  value=""/>
+			<param name="socket"          type="string"  description="TODO: уточнить формат (internet/unix, server/client) "/>
+
+			<description>
+				Добавляет запись в таблицу активных соединений. После получения этого сообщения компонент будет правильно отвечать на STUN-запросы
+				от указанного клиента и пересылать media-трафик на указанный сокет. 
+			</description>
+		</message>
+
+		<message>
+			<param name="type" type="string" value="REMOVE_POINT" required="true"/>
+			<param name="uuid" type="string" value=""/>
+
+			<description>
+				Удаляет клиента из таблицы активных соединений. После получения этого сообщения компонент не будет отвечать на STUN запросы и игнорировать media
+				трафик.
+			</description>
+		</message>
+	</messages>
+</ru.rcslabs.api>

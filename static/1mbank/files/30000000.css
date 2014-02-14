@@ -1,0 +1,589 @@
+/* Copiny */
+@media (max-width: 767px) {
+  #copiny-widget-tab {
+    display: none;
+  }
+}
+
+/* Разное */
+.nowrap {
+  white-space: nowrap;
+}
+
+/* Bootstrap*/
+ul.inline > li,
+ol.inline > li {
+  *display: inline;
+}
+.modal-backdrop {
+  background-color: white;
+  opacity: 0.7;
+}
+.modal-header {
+  background: #84bceb url('1_header.jpg') no-repeat 80% 50%;
+  color: white;
+}
+.ie7 .modal-header {
+  padding-top: 0px;
+}
+@media (max-width: 767px) {
+  .modal-header {
+    background: #84bceb;
+  }
+}
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold;
+  line-height: 20px;
+  margin: 5px 0px 15px 0px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 40px;
+}
+h2 {
+  font-size: 22px;
+}
+h3 {
+  font-size: 18px;
+}
+h4, h5, h6 {
+  font-size: 15px;
+  font-style: italic;
+}
+.page-header {
+  margin: 0px 0px 19px 0px;
+}
+.page-header h1,
+.page-header h2,
+.page-header h3,
+.page-header h4,
+.page-header h5,
+.page-header h6 {
+  margin: 0px;
+}
+.well {
+  -webkit-box-shadow: #dedede 2px 2px 2px;
+  -moz-box-shadow: #dedede 2px 2px 2px;  
+  box-shadow: 2px 2px 2px #dedede;
+  border: 1px solid #EEEEEE;
+  padding: 20px;
+  background: #fbfbfb;
+}
+.nav-tabs a,
+.nav-pills a {
+  outline: none;
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+  padding: 0px;
+  height: 20px;
+  margin: -20px 0px 0px 0px;
+  background: none;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  font-size: 11px;
+}
+.breadcrumb > li {
+  display: inline-block;
+  *display: inline;
+  /* IE7 inline-block hack */
+  *zoom: 1;
+  text-shadow: 0 0 0 #ffffff;
+}
+.breadcrumb > li > .divider {
+  padding: 0 5px;
+  color: #cccccc;
+}
+.breadcrumb > .active {
+  color: #cccccc;
+}
+.breadcrumb a:link,
+.breadcrumb a:visited {
+  color: #cccccc;
+  text-decoration: none;
+}
+.breadcrumb a:active,
+.breadcrumb a:hover {
+  color: #d92b32;
+  text-decoration: underline;
+}
+
+/* Иконки */
+.icon-file-image,
+.icon-file-office,
+.icon-file-word,
+.icon-file-excel,
+.icon-file-powerpoint,
+.icon-file-archive,
+.icon-file-text,
+.icon-file-web,
+.icon-file-pdf,
+.icon-file-any {
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  margin: -1px 0px;
+}
+.icon-file-image {
+  background: url('http://1mbank.ru/file/97_page_white_picture.png') no-repeat top left;
+}
+.icon-file-office {
+  background: url('http://1mbank.ru/file/90_page_white_office.png') no-repeat top left;
+}
+.icon-file-word {
+  background: url('http://1mbank.ru/file/93_page_white_word.png') no-repeat top left;
+}
+.icon-file-excel {
+  background: url('http://1mbank.ru/file/94_page_white_excel.png') no-repeat top left;
+}
+.icon-file-powerpoint {
+  background: url('http://1mbank.ru/file/96_page_white_powerpoint.png') no-repeat top left;
+}
+.icon-file-archive {
+  background: url('http://1mbank.ru/file/95_page_white_compressed.png') no-repeat top left;
+}
+.icon-file-text {
+  background: url('http://1mbank.ru/file/98_page_white_text.png') no-repeat top left;
+}
+.icon-file-web {
+  background: url('http://1mbank.ru/file/99_page_white_world.png') no-repeat top left;
+}
+.icon-file-pdf {
+  background: url('http://1mbank.ru/file/92_page_white_acrobat.png') no-repeat top left;
+}
+.icon-file-any {
+  background: url('http://1mbank.ru/file/100_page_white.png') no-repeat top left;
+}
+
+/* Скачивание файлов */
+.file-download {
+  margin-bottom: 20px;
+}
+.file-download-icon {
+  width: 32px;
+  float: left;
+}
+.file-download-description {
+  margin-left: 40px;
+}
+.file-download-description small {
+  white-space: nowrap;
+}
+
+/* Выбор местоположения */
+#locations .form-search {
+  margin-bottom: 10px;
+}
+#locations .modal-body {
+  height: 220px;
+}
+
+/* Шапка */
+.header {
+  height: 130px;
+  background: #5292c9 url('1_header.jpg') no-repeat top center;
+  padding-top: 40px;
+  margin-bottom: -20px;
+}
+@media (max-width: 767px) {
+  .header {
+    background: #5292c9;
+    height: auto;
+    padding: 20px;
+    margin-right: -20px;
+    margin-left: -20px;
+  }
+  .header-nav {
+    margin-bottom: 20px;
+  }
+  .header-logo {
+    margin-bottom: 10px;
+  }
+  #header_phone_and_internet_bank{
+    margin-bottom: 10px; 
+  }
+}
+.header-nav ul,
+.header-nav li {
+  margin: 0px;
+  padding: 0px;
+  list-style: none;
+  font-size: 14px;
+  color: white;
+  line-height: 30px;
+}
+.header-nav a:link,
+.header-nav a:visited {
+  text-decoration: underline;
+  color: white;
+}
+.header-nav a:active,
+.header-nav a:hover {
+  color: white;
+  text-decoration: none;
+}
+.header-nav-region {
+  background: url('3_header.gif') no-repeat 100% 60%;
+  padding-right: 12px;
+}
+.header-nav-region-value {
+  border-bottom: 1px dashed white;
+  cursor: pointer;
+}
+.header-nav-region-value:hover {
+  border-bottom: 0px;
+}
+@media (max-width: 767px) {
+  .header-nav-region-value:hover {
+    color: white;
+    border-bottom: 1px dashed white;
+  }
+}
+.header-services-phone-number
+{
+  font-size: 26px;
+  line-height: 30px;
+  color: white;
+  border-bottom: 1px dashed white;
+  cursor: pointer;
+}
+.header-services-phone-number:hover
+{
+  border-bottom: 0px;
+}
+.header-services-phone-comment
+{
+  display: block;
+  font-size: 11px;
+  color: white;
+}
+.header-services-internetbank {
+  margin-top: 10px;
+}
+.header-services-internetbank .popover {
+  z-index: 2000;
+}
+@media (min-width: 768px) and (max-width: 979px) {
+  .header-services-phone-number {
+    font-size: 16px;
+  }
+  .header-services-phone-comment {
+    display: none;
+  }
+}
+
+/* Вход в интернет-банк */
+.header-services .icon-internet-bank {
+  width: 16px;
+  height: 16px;
+  margin: -1px 4px -1px 0px;
+  background: url('348_inte.png') no-repeat top left;
+  position: relative;
+  top: -2px;
+}
+.header-services .internet-bank-content {
+  margin-bottom: 0px;
+}
+.header-services .popover-title {
+  display: none;
+}
+
+/* Навигация */
+.navigation,
+.navigation dl,
+.navigation dt,
+.navigation dd,
+.navigation ul,
+.navigation li {
+  margin: 0px;
+  padding: 0px;
+}
+.navigation {
+  position: relative;
+  margin: 0px -20px 40px -20px;
+  background: #FBFBFB url('4_nav_ba.jpg') repeat-x;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-box-shadow: #c6c6c6 2px 2px 2px;
+  -moz-box-shadow: #c6c6c6 2px 2px 2px;
+  box-shadow: 2px 2px 2px #c6c6c6;
+}
+.navigation dl {
+  margin: 0px 10px;
+}
+.navigation dt {
+  float: left;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: normal;
+  color: #414141;
+  line-height: 30px;
+  padding: 10px;
+}
+.navigation dt a:link,
+.navigation dt a:visited {
+  display: inline-block;
+  position: static;
+  text-decoration: underline;
+  color: #414141;
+}
+.navigation dt a:hover,
+.navigation dt a:active {
+  color: #ED1C24;
+}
+.navigation dt.active {
+  padding: 10px 0px;
+}
+.navigation dt.active a:link,
+.navigation dt.active a:visited {
+  padding: 0px 10px;
+  color: white;
+  background: url('http://1mbank.ru/file/5_nav_background_active.jpg') repeat-x;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  color: white;
+  text-decoration: none;
+}
+.navigation dd {
+  display: none;
+  float: right;
+  width: 100%;
+  margin: 50px 0px 0px -100%;
+  font-style: normal;
+}
+.navigation dd.active {
+  display: block;
+}
+.navigation dd ul {
+  margin: 10px 0px;
+}
+.navigation dd ul.inline li {
+  padding: 0px 10px;
+}
+.navigation dd ul.inline {
+  *margin-left: 20px;
+}
+.navigation dd li.active a:link,
+.navigation dd li.active a:visited {
+  color: #414141;
+  font-weight: bold;
+}
+.navigation-search {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+.navigation-search input.search-query {
+  width: 170px;
+  padding-left: 28px;
+  background: white url("6_nav_se.png") no-repeat 10px 7px;
+}
+@media (min-width: 980px) and (max-width: 1199px) {
+  .navigation-search input.search-query {
+    width: 120px;
+  }
+}
+@media (min-width: 768px) and (max-width: 979px) {
+  .navigation-search input.search-query {
+    width: 65px;
+  }
+}
+@media (max-width: 767px) {
+  .navigation {
+    position: static;
+    background: #F5F5F5;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    padding: 0px 20px;
+  }
+  .navigation dl {
+    margin: 20px 0px;
+  }
+  .navigation dt,
+  .navigation dt.active {
+    float: none;
+    line-height: 20px;
+    padding: 0px;
+  }
+  .navigation dt a:link,
+  .navigation dt a:visited,
+  .navigation dt.active a:link,
+  .navigation dt.active a:visited {
+    color: #414141;
+    background: none;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    padding: 0px;
+    text-decoration: underline;
+  }
+  .navigation dd {
+    float: none;
+    margin: 0px;
+    width: auto;
+  }
+  .navigation dd ul.inline {
+    margin: 0px 0px 10px 10px;
+  }
+  .navigation dd ul.inline li {
+    margin: 0px;
+    padding: 0px 10px 0px 0px;
+    font-size: 13px;
+  }
+}
+
+/* Всплывающий блок "Связь с банком" */
+.contact-with-us {
+  border-left: 2px solid #EEEEEE;
+  padding-left: 20px;
+}
+.contact-with-us img {
+  width: 24px;
+}
+.contact-with-us ul img {
+  width: 16px;
+}
+.skype_contact_list_collapsible {
+  display:none;
+}
+.skype_contact_list_collapsible li {
+  list-style-image:none;
+  list-style-type:none;
+}
+#megafon-button-wrapper {
+  display: inline-block; 
+  width: 25px; 
+  height: 26px;
+  vertical-align: middle;
+}
+
+/* Подвал */
+.footer {
+  padding: 20px 0px;
+  position: relative;
+  margin: 40px 0px 0px 0px;
+  background: #5292c9 url('1_header.jpg') no-repeat top center;
+}
+@media (max-width: 767px) {
+  .footer {
+    background: #5292c9;
+    padding: 20px;
+    margin: 20px -20px 0px -20px;
+  }
+}
+.footer-copyright {
+  color: white;
+  font-size: 12px;
+}
+.footer-social {
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+.footer-social ul {
+  white-space: nowrap;
+}
+.footer-social ul,
+.footer-social li {
+  margin: 0px;
+  padding: 0px;
+  list-style: none;
+  display: block;
+  float: left;
+}
+.footer-social li {
+  margin: 0px 4px 0px 0px;
+}
+.footer-social img {
+  position: relative;
+  top: -2px;
+}
+
+/* JQuery UI Slider Horizontal */
+.ui-slider-horizontal {
+  background: url('http://1mbank.ru/file/311_slider_bg.png') repeat-x #dcdcdc;
+  border: 0px;
+  color: #dcdcdc;
+  height: 7px;
+  line-height: 7px;
+}
+.ui-slider-horizontal .ui-slider-range {
+  background: url('http://1mbank.ru/file/312_slider_bg_active.png') repeat-x #828282;
+}
+.ui-slider-horizontal .ui-slider-handle {
+  display: block;
+  width: 18px;
+  height: 18px;
+  background: url('http://1mbank.ru/file/313_slider_point.png') no-repeat;
+  border: 0px;
+  color: #bfbfbf;
+  border-radius: 9px;
+  top: -5px;
+  margin-left: -9px;
+  outline: none;
+}
+.ui-slider-horizontal .ui-slider-range {
+  border-radius: 4px;
+}
+
+/* Шаги */
+.steps {
+  background: #FBFBFB;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #EEEEEE;
+  border-radius: 5px;
+  box-shadow: 2px 2px 2px #DEDEDE;
+  margin-bottom: 20px;
+}
+.steps .row-fluid {
+  position: relative;
+}
+.steps .steps-arrows {
+  margin: -250px 0px 0px 0px;
+  position: absolute;
+  top: 50%;
+}
+.steps-arrows-triangle {
+  height: 500px;
+}
+.steps-arrows-triangle-light,
+.steps-arrows-triangle-dark {
+  border-color: transparent transparent transparent #EEEEEE;
+  border-style: dotted dotted dotted solid;
+  border-style: solid\0/;
+  border-width: 250px 0px 250px 50px;
+  height: 0px;
+  width: 0px;
+  margin: 0px -20px -500px -30px;
+  float: right;
+}
+.steps-arrows-triangle-light {
+  border-color: transparent transparent transparent #FBFBFB;
+  position: relative;
+  left: -1px;
+}
+.steps-step {
+  padding: 20px 20px 10px 20px;
+  z-index: 100;
+}
+@media (max-width: 767px) {
+  .steps {
+    padding: 20px 20px 10px 20px;
+  }
+  .steps .steps-arrows {
+    display: none;
+  }
+  .steps-step {
+    padding: 0px;
+    z-index: auto;
+  }
+}

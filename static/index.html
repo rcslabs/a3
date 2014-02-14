@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="/cdn/css/bootstrap.min.css">
+  <link rel="stylesheet" href="simple/css/phone.css">
+
+  <script type="text/javascript" src="/cdn/jquery-1.9.0.min.js"></script>
+  <script type="text/javascript" src="/cdn/bootstrap.min.js"></script>
+
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="/lib/call-signalling.js"></script>
+  <script type="text/javascript" src="/lib/call-media.js"></script>
+  <script type="text/javascript" src="/lib/phone.js"></script>
+  <script type="text/javascript" src="/lib/conference-view.js"></script>
+</head>
+<body data-state="loading">
+
+  <div id="conference-view" style="position:absolute; z-index:1; left:0; right:0; border:1px solid black; padding:0; margin:0; background: white;">
+  </div>
+
+  <style>
+    body section {
+      display: none;
+      position:absolute;
+      width: 600px;
+      height: 400px;
+      background: white;
+      box-shadow: 0 0 50px #888;
+      overflow:hidden;
+      left:50%;
+      bottom:0;
+      z-index:10;
+
+      margin-left: -300px;
+      vertical-align: middle;
+      text-align: center;
+
+      -webkit-perspective: 1000;
+      -webkit-transform-style: preserve-3d;
+      -webkit-transform-origin: 0 0;
+
+      perspective: 1000;
+      transform-style: preserve-3d;
+      transform-origin: 0 0;
+      -webkit-transform: rotateY(180deg);
+    }
+    body[data-state="login"]              #login,
+    body[data-state="loading"]            #loading,
+    body[data-state="hardware-settings"]  #hardware-settings,
+    body[data-state="app"]                #app,
+    body[data-state="error"]              #error,
+    body[data-state="call-in-progress"]   #call-in-progress    {
+      display: block;
+      -webkit-transform: rotateY(0deg);
+      z-index:1000;
+    }
+  </style>
+
+
+  <div style="background: white; text-align: center; z-index:2; border:1px solid black; border-radius: 4px; line-height: 50px;font-weight: bold; position: absolute; right:0; top:0; font-size: 30px; width:100px; height: 50px;" id="log-phone"></div>
+
+  <div class="sections-container" style="position:absolute; left:0; right:0; top:0; height:100%; max-height:600px; ">
+	<section id="login" data-focus="#login-server">
+		<div id="login-form">
+			<label class="error">Ошибка</label>
+			<label for="login-name">Логин</label>
+			<input id="login-phone" type="text" value=""/>
+			<label for="login-password">Пароль</label>
+			<input id="login-password" type="text" value=""/>
+			<br/>
+			<input id="do-login" type="button" value="Войти"/> 
+		</div>
+	</section>
+
+  <section id="loading">
+    <img src="simple/i/355.gif"/>
+  </section>
+
+  <section id="hardware-settings">
+    ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑<br/>
+    Разрешите доступ к камере и микрофону
+    <style>
+      .chrome-bar {
+        width:100%;
+        height: 25px;
+        border:1px solid #aaaaab;
+        text-align: left;
+        margin-top:60px;
+        background: -webkit-linear-gradient(top, #e5e5e5 0, #d9d9d9 100%);
+        color: black;
+        line-height: 25px;
+        font-size: 10px;
+      }
+      .chrome-bar button {
+        height: 18px;
+        font-size: 10px;
+        line-height:10px;
+        border : 1px solid rgb(240, 240, 240);
+        border-radius: 2px;
+      }
+      @-webkit-keyframes bounce {
+        from {
+          border-color: rgb(240, 240, 240);
+        }
+        to {
+          border-color: red;
+          
+        }
+      }
+      .chrome-bar .allow {
+        -webkit-animation-name: bounce;
+        -webkit-animation-duration: 1s;
+        -webkit-animation-iteration-count: 1000;
+        -webkit-animation-direction: alternate;
+      }
+    </style>
+    <div class="chrome-bar">
+      <img src="simple/i/chrome-mic.png" width="10"/>
+      <span><script>document.write(location.hostname)</script> запрашивает разрешение на использование вашего микрофона</span>
+      <button class="allow">Разрешить</button> <button>Запретить</button>
+    </div>
+  </section>
+  <section id="app" data-focus="#dial-number">
+    <div id="dtmf-block">
+      <input type="text" id="dial-number"/>
+      <div class="icon-remove-sign"></div>
+      <input type="button" value="1"/>
+      <input type="button" value="2"/>
+      <input type="button" value="3"/>
+      <input type="button" value="4"/>
+      <input type="button" value="5"/>
+      <input type="button" value="6"/>
+      <input type="button" value="7"/>
+      <input type="button" value="8"/>
+      <input type="button" value="9"/>
+      <input type="button" value="#"/>
+      <input type="button" value="0"/>
+      <input type="button" value="*"/>
+      <button id="audio-call" class="start-call-button" style="	left :25%; right : 25%;">Call</button>
+      <!--<button id="video-call" class="start-call-button">Video call</button>
+      <br/>
+      <button style="margin-top:50px;" id="audio-video-call" class="start-call-button">Audio-Video call</button>
+    </div>-->
+  </section>
+
+  <section id="call-in-progress">
+    <br/>
+    <audio id="remote-audio" autoplay="autoplay" controls="controls"></audio>
+    <input type="button" value="Завершить" id="hangup-button" style="position:absolute; left: 50%; width:120px; margin-left:-60px;top:80px; height: 40px;"/>
+  </section>
+  
+  <section id="error">
+    ошибка!
+  </section>
+
+  </div>
+
+  <script>
+    var conferenceView = new ConferenceView($('#conference-view'), 200);
+
+
+    var remoteStreams = [];
+    var localStreams = [];
+
+    var phone = new Phone({
+      vv : [true, false],
+      afterTransition: function(fromState, state, event, params) {
+        console.log("Transition ", fromState, " -> ", state, " [event=", event, params,"]");
+        switch(state) {
+          case 'LOGIN':
+            $('body').attr('data-state', 'login');
+            $('#login-phone').focus();
+            break;
+          case 'LOGINING':
+            $('body').attr('data-state', 'loading');
+            break;
+          case 'INITIALIZING_MEDIA':
+          case 'HARDWARE_SETTINGS':
+            $('body').attr('data-state', 'hardware-settings');
+            break;
+          case 'HARDWARE_SETTINGS_OK':
+            $('body').attr('data-state', 'app');
+            break;
+        }
+      },
+
+      mediaEvent: function(eventName, opt) {
+        switch(eventName) {
+          case "media:add-local-stream":
+            //conferenceView.addLocalStream(opt);
+            //localStreams.push(opt);
+            break;
+          case "media:add-remote-stream":
+            var newStream  = opt;
+            attachMediaStream(document.getElementById("remote-audio"), newStream);
+            //conferenceView.addRemoteStream(newStream);
+            //remoteStreams.push(newStream);
+            break;
+
+          case "media:remove-remote-stream":
+            //conferenceView.removeRemoteStream(opt);
+            break;
+        }
+      },
+      onChatMessage: function(o) {
+        //...
+      }
+    });
+
+
+    var call = null;
+
+    var callListener = {
+      afterTransition: function(fromState, state, event, params) {
+        switch(state) {
+          case "CALL_IN_PROGRESS":
+            $('body').attr('data-state', 'call-in-progress');
+            break;
+          case "CALL_FINISHED":
+            console.log("CALL FINISHED");
+            $('body').attr('data-state', 'app');
+            $('.start-call-button').prop('disabled', false);
+            call = null;
+            break;
+        }
+      }
+    };
+
+
+    jQuery(function($){
+      try {  $('#login-phone')   .val(window.localStorage.getItem('saved-login-phone'));     }catch(e) {}                  // saved phone-password
+      try {  $('#login-password').val(window.localStorage.getItem('saved-login-password'));  }catch(e) {}
+
+      /// TEST!!!!
+      var $loginPhone = $('#login-phone');
+      if(location.href.match(/phone=(\d+)/))
+        $loginPhone.val(RegExp.$1);
+
+      var $pwdField = $('#login-password');
+      if(location.href.match(/pwd=(.+)(?:$|&)/))
+        $pwdField.val(RegExp.$1);
+
+      var $dialNumber = $('#dial-number')
+      if(location.href.match(/to=(\d+)/))
+        $dialNumber.val(RegExp.$1);
+
+
+      $('#login-phone').focus().keydown(function(e){ if(e.keyCode === 13) $('#do-login').click() });
+      $('#do-login').prop('disabled', false);
+
+      $('#login-phone').on('input', function() { $('#do-login').prop('disabled', !$(this).val()); });
+
+      $('#do-login').click(function() {
+        $('#log-phone').text($('#login-phone').val());
+        phone.event("ui:login", {phone: $('#login-phone').val(),  password:$('#login-password').val()});
+        window.localStorage.setItem( 'saved-login-phone',    $('#login-phone').val()    );
+        window.localStorage.setItem( 'saved-login-password', $('#login-password').val() );
+      });
+
+      $('#audio-call').click(function() {
+        if(call) return;
+        var b = $('#dial-number').val();
+        console.log("Call on ", b);
+        call = phone.startCall({bUri: b}, callListener);
+        $('.start-call-button').prop('disabled', true);
+      });
+      $('#video-call').click(function() {
+        if(call) return;
+        var b = $('#dial-number').val();
+        console.log("Call on ", b);
+        call = phone.startCall({bUri: b, vv: [false, true]}, callListener);
+        $('.start-call-button').prop('disabled', true);
+      });
+      $('#audio-video-call').click(function() {
+        if(call) return;
+        var b = $('#dial-number').val();
+        console.log("Call on ", b);
+        call = phone.startCall({bUri: b, vv: [true, true]}, callListener);
+        $('.start-call-button').prop('disabled', true);
+      });
+
+      $('#hangup-button').click(function(){
+        if(call) {
+          phone.hangup(call);
+        }
+      });
+
+      $('#dtmf-block input[type="button"]').click(function() {
+        var $field = $('#dtmf-block input[type="text"]');
+        $field.val( $field.val() + $(this).val() ).focus();
+      });
+
+      $('#dtmf-block .icon-remove-sign').click(function() { $('#dtmf-block input[type="text"]').val('') });
+    });
+  </script>
+
+  
+</body>
+</html>

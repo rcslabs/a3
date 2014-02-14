@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+
+  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="fonts.css" type="text/css" charset="utf-8" />
+  <link rel="stylesheet/less" href="css/main.css">
+  <script src="js/vendor/modernizr-2.6.2.min.js"></script>
+  <script src="js/vendor/less-1.3.3.min.js" type="text/javascript"></script>
+
+</head>
+<body>
+  <!--[if lt IE 7]>
+    <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+  <![endif]-->
+
+  <!-- Add your site or application content here -->
+  <div id="multifon-content" class="multifon-content show-login">
+
+      <header>
+        <img src="img/mf-small-logo.png"/>МегаФон
+        <span class="settings-button">
+          Настройки
+        </span>
+        <div class="settings-block">
+            <h2>Личные данные</h2>
+            <ul>
+              <li><legend>Никнейм</legend>Сашка Наташка</li>
+              <li><legend>Имя и фамилия</legend>Александра Апполинариева-Соломонова</li>
+              <li><legend>Адрес электронной почты</legend>sashkanatashka182@mail.yandex.ru</li>
+            </ul>
+            <hr/>
+            <h3>Привязать аккаунт социальных сетей:</h3>
+            <hr/>
+            <a class="mf-button">изменить личные данные</a>
+            <a class="mf-button">изменить данные доступа</a>
+          </div>
+      </header>
+
+      <div class="mf-screen mf-login-screen">
+        <h1>Добро пожаловать<br/> в МультиФон</h1>
+        <p>
+          МультиФон &ndash; приложение, позволяющее Вам общаться со своими друзьями<br/>
+          даже тогда, когда у Вас отключен телефон. Сервис предназначен<br/>
+          для абонентов сети МегаФон.
+        </p>
+        <p class="register">
+          Вы &ndash; новый пользователь? <a href="http://www.rcslabs.ru">Зарегистрируйтесь бесплатно!</a>
+        </p>
+        <form method="POST" action="#main/contacts">
+          <fieldset>
+            <legend>Войти в МультиФон</legend>
+            <label for="login-phone">Ваш номер телефона:</label>
+            <input id="login-phone" name="login-phone" type="text" placeholder="+7 (___) ___ __ __"/>
+
+            <label for="login-password">Пароль: </label>
+            <input id="login-password" name="login-password" type="password" placeholder="*************"/>
+
+            <label for="login-remember-me">Запомнить пароль</label>
+            <input id="login-remember-me" name="login-remember-me" type="checkbox"/>
+
+            <input type="button" class="mf-button" value="Войти в МультиФон" disabled id="login-button"/>
+
+            <span class="error">Ошибка входа</span>
+          </fieldset>
+          <ul class="links">
+            <li>Подробно об услуге</li>
+            <li>Инструкция пользователя</li>
+            <li>Тарифы и планы</li>
+            <li>Установить на компьютер</li>
+          </ul>
+        </form>
+      </div>
+
+      <div class="mf-screen mf-main-screen">
+        <!-- tab headers -->
+        <ul class="tab-header">
+          <li class="tab-header-call-log">  <a href="#main/call-log"> Журнал событий       </a></li>
+          <li class="tab-header-dial">      <a href="#main/dial">     Набрать номер        </a></li>
+          <li class="tab-header-contacts">  <a href="#main/contacts"> Контакты и разговоры </a></li>
+        </ul>
+
+        <div id="presence">
+          <img src="img/avatar.png"/>
+          <div>
+            <span class="contact-name">Сашка Наташка</span>
+            <p>Всем привет! Мне тут хорошо, валяюсь на солнышке!</p>
+          </div>
+        </div>
+
+        <div id="contact-list">
+          <input type="text" class="search" placeholder="поиск контакта"/>
+
+          <span class="group-name opened">Активные разговоры (20)</span>
+          <div class="contact-group">
+            <div class="contact online">
+              <img src="img/avatar-belov.png"/>
+              <span class="name">Сергей Белов</span>
+              <span class="status">ты меня не любишь</span>
+              <span class="remove"></span>
+            </div>
+            <div class="contact online focused">
+              <img src="img/avatar-lisin.png"/>
+              <span class="name">Владимир Лисин</span>
+              <span class="remove"></span>
+            </div>
+            <div class="contact online">
+              <img src="img/avatar-mitrych.png"/>
+              <span class="name">Михаил Митрич</span>
+              <span class="remove"></span>
+            </div>
+            <div class="contact offline">
+              <img src="img/avatar-mitrych.png"/>
+              <span class="name">Алексей Анненков</span>
+              <span class="remove"></span>
+            </div>
+          </div>
+          
+          <span class="group-name">Показать все контакты (500)</span>
+          <div class="contact-group">
+            <div class="contact online">
+              <img src="img/avatar-belov.png"/>
+              <span class="name">Сергей Белов</span>
+              <span class="remove"></span>
+            </div>
+          </div>
+
+          <span class="group-name">Заблокированные (25)</span>
+          <div class="contact-group">
+            <div class="contact online">
+              <img src="img/avatar-belov.png"/>
+              <span class="name">Сергей Белов</span>
+              <span class="remove"></span>
+            </div>
+          </div>
+        </div>
+
+        <div id="contacts-controls">
+          <span>+ контакт</span>
+          <span>+ группа</span>
+        </div>
+
+        <!-- tab contents -->
+        <div id="contacts-tab" class="tab-content contacts-tab">
+          <div class="talk">
+            <ul id="calls-list" class="calls-list">
+            </ul>
+            <div id="chat">
+            </div>
+          </div>
+        </div> <!-- /contacts-tab -->
+
+        <div id="dial-tab" class="tab-content dial-tab">
+          <input type="text" class="msisdn" placeholder="введите номер телефона" id="dial-number"/>
+          <table class="pad">
+            <tr><td><button><span>1</span><legend>      </legend></button></td><td><button><span>2</span><legend>abc</legend></button></td><td><button><span>3</span><legend>def   </legend></button></td></tr>
+            <tr><td><button><span>4</span><legend>ghi   </legend></button></td><td><button><span>5</span><legend>jkl</legend></button></td><td><button><span>6</span><legend>mno   </legend></button></td></tr>
+            <tr><td><button><span>7</span><legend>pqrs  </legend></button></td><td><button><span>8</span><legend>tuv</legend></button></td><td><button><span>9</span><legend>wxyz  </legend></button></td></tr>
+            <tr><td><button><span>*</span><legend>&nbsp;</legend></button></td><td><button><span>0</span><legend> + </legend></button></td><td><button><span>#</span><legend>&nbsp;</legend></button></td></tr>
+            <tr class="small-buttons">
+              <td>
+                <button id="do-call">&nbsp;<legend>звонок</legend></button>
+              </td>
+              <td>
+                <button id="do-video-call">&nbsp;<legend>видео</legend></button></td><td><button>&nbsp;<legend>sms</legend></button></td></tr>
+          </table>
+          <ul class="recent-calls">
+            <li class="out"   ><span class="time">22:40</span>Владимир Лисин</li>
+            <li class="in"    ><span class="time">22:35</span>Сергей Сергеич</li>
+            <li class="broken active"><span class="time">22:30</span>Владимир Лисин</li>
+            <li class="in"    ><span class="time">21:20</span>Михаил Митрич</li>
+            <li class="out"   ><span class="time">21:10</span>Константин Константинович Константинопольский</li>
+            <li class="out"   ><span class="time">22:40</span>Владимир Лисин</li>
+            <li class="in"    ><span class="time">22:35</span>Сергей Сергеич</li>
+            <li class="broken"><span class="time">22:30</span>Владимир Лисин</li>
+            <li class="in"    ><span class="time">21:20</span>Михаил Митрич</li>
+            <li class="out"   ><span class="time">21:10</span>Константин Константинович Константинопольский</li>
+            <li class="out"   ><span class="time">22:40</span>Владимир Лисин</li>
+            <li class="in"    ><span class="time">22:35</span>Сергей Сергеич</li>
+            <li class="broken"><span class="time">22:30</span>Владимир Лисин</li>
+            <li class="in"    ><span class="time">21:20</span>Михаил Митрич</li>
+            <li class="out"   ><span class="time">21:10</span>Константин Константинович Константинопольский</li>
+          </ul>
+        </div> <!-- /dial-tab -->
+
+        <div id="call-log-tab" class="tab-content call-log-tab">
+          Call log
+        </div> <!-- /call-log-tab -->
+
+        <footer>
+          <div class="controls">
+            <span>переадресация</span>
+            <span class="inactive">автоответчик</span>
+          </div>
+          <div class="adv">
+            
+          </div>
+        </footer>
+      </div> <!-- /mf-main-screen -->
+  </div>
+  
+  
+  
+
+
+  <script src="/cdn/jquery-1.9.1.min.js"></script>
+  <!-- script>window.jQuery || document.write('<script src="js/vendor/jquery-1.9.0.min.js"><\/script>')</script -->
+
+  <!-- require.js -->
+
+
+  <script src="js/vendor/underscore-min.js"></script>
+  <script src="js/vendor/backbone-min.js"></script>
+  <script src="js/vendor/ejs_production.js"></script>
+
+  <script src="js/plugins.js"></script>
+  <script src="js/main.js"></script>
+
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="/lib/call-signalling.js"></script>
+  <script type="text/javascript" src="/lib/call-media.js"></script>
+  <script type="text/javascript" src="/lib/phone.js"></script>
+
+  <script src="js/model.js"></script>
+  <script src="js/view.js"></script>
+  <script src="js/controller.js"></script>
+
+  <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+  <!-- script>
+    var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+    s.parentNode.insertBefore(g,s)}(document,'script'));
+  </script -->
+
+
+  <!-- debug -->
+  <div style="position:absolute; right:0; top:0; width:50px;" id="debug">
+    <script>
+      for(var i = 1; i < 25; i++) {
+        document.writeln('<div>' + (i < 10?'0':'') + i + '</div>')
+      }
+    </script>
+  </div>
+  <style>
+    #debug div {
+      width : 30px;
+      height: 20px;
+      border:1px solid blue;
+      margin:10px 5px;
+      cursor:pointer;
+      text-align: center;
+      vertical-align: middle;
+      z-index: 20000;
+    }
+    #debug div.active {
+      background: #00dd00;
+    }
+  </style>
+  <script>
+    jQuery(function($){
+      var $d = $('<img style="position:absolute; left:0; top:0; margin:0; padding:0; display: none; opacity:1; z-index:100000" src=""/>').appendTo('body');
+      $('#debug > div').click(function(e) {
+        var imgUrl = "original-images/design_12_07_2012/" + $(this).text() + ".png";
+        if($d.attr('src') == imgUrl) {
+          $d.toggle();
+          $(this).toggleClass('active');
+        } else {
+          $('#debug > div').removeClass('active');
+          $(this).addClass('active');
+          $d.attr('src', imgUrl).show();
+        }
+        e.preventDefault();
+        return false;
+      })
+    });
+  </script>
+  <!-- /debug -->
+
+</body>
+</html>

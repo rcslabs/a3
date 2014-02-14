@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html class lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE">
+
+    <title>Главная - Банк Первомайский (ЗАО)</title>    
+    <link rel="shortcut icon" href="files/favicon0.ico">
+
+    <link href="files/jquery-u.css" rel="stylesheet">
+    <link href="files/bootstra.css" rel="stylesheet">
+    <link href="files/30000000.css" rel="stylesheet">
+    <link href="files/10000000.css" rel="stylesheet">
+
+    <script src="files/jquery-1.js"></script>
+    <script src="files/undersco.js"></script>
+    <script src="files/jquery-u.js"></script>
+    <script src="files/jquery00.js"></script>
+    <script src="files/bootstra.js"></script>
+    <script src="files/30000000.js"></script>
+    <script src="files/10000000.js"></script>
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <script src="/vendor/pie/PIE.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/lib/adapter.js"></script>
+    <script type="text/javascript" src="/lib/call-signalling.js"></script>
+    <script type="text/javascript" src="/lib/call-media.js"></script>
+    <script type="text/javascript" src="/lib/phone.js"></script>
+    
+    <script type="text/javascript" src="raphael-min.js"></script>
+    <style >
+      svg {
+        z-index:1000000;
+      }
+    </style>
+  </head>
+<body>
+  
+  <header class="header">
+    <div class="container">
+      <div class="row">
+        <div class="header-logo span3">
+          <a href="http://1mbank.ru/"><img src="files/2_header.png"></a>
+        </div>
+        <div class="header-nav span3">
+          <ul>
+            <li>Регион: <span class="header-nav-region"><span class="header-nav-region-value" data-toggle="modal" href="#locations">Краснодар</span></span></li>
+            <li class="hidden-phone"><a href="http://1mbank.ru/branches-and-atms?type=branch">Отделения</a> и <a href="http://1mbank.ru/branches-and-atms?type=atm">банкоматы</a></li>
+          </ul>
+        </div>
+        <div class="header-nav span3 hidden-phone">
+          <ul>
+            <li><a href="http://1mbank.ru/app">Заявки и калькуляторы</a></li>
+            <li><a href="http://1mbank.ru/jobs">Вакансии</a></li>
+          </ul>
+        </div>
+        <div class="header-services span3" id="header_phone_and_internet_bank">
+          <div class="header-services-phone">
+            <span href="#contacts-modal" data-toggle="modal" class="header-services-phone-number">8 (800) 100-5-100</span>
+            <span class="header-services-phone-comment">Для всех регионов России - бесплатно</span>
+          </div>
+          <div class="header-services-internetbank">
+            <a href="http://1mbank.ru/#" class="btn btn-small btn-danger" id="internet-bank"><i class="icon-internet-bank"></i> Интернет-банк</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="navigation pie clearfix" id="navigation">
+      <div class="navigation-search hidden-phone">
+        <form class="form-search" action="http://1mbank.ru/search" method="GET">
+          <input type="hidden" name="searchid" value="2010474">
+          <input type="hidden" name="web" value="0">
+          <input type="text" class="search-query" name="text">
+          <button type="submit" class="btn">OK</button>
+        </form>
+      </div>
+      <dl>
+        <dt class><a href="http://1mbank.ru/individual/crediting">Частным лицам</a></dt>
+        <dd class id="page26">
+          <ul class="inline">
+            <li class><a href="http://1mbank.ru/individual/crediting">Кредитование</a></li>
+            <li class><a href="http://1mbank.ru/individual/deposit">Вклады</a></li>
+            <li class><a href="http://1mbank.ru/individual/other">Другие услуги</a></li>
+          </ul>
+        </dd>
+        <dt class><a href="http://1mbank.ru/corporate">Бизнесу и предпринимателям</a></dt>
+        <dd class id="page98">
+          <ul class="inline">
+            <li class><a href="http://1mbank.ru/corporate/crediting">Кредитование</a></li>
+            <li class><a href="http://1mbank.ru/corporate/deposit">Депозиты</a></li>
+            <li class><a href="http://1mbank.ru/corporate/other">Другие услуги</a></li>
+          </ul>
+        </dd>
+        <dt class><a href="http://1mbank.ru/about/bank">О банке</a></dt>
+        <dd class id="page2">
+          <ul class="inline">
+            <li class><a href="http://1mbank.ru/about/bank">Информация</a></li>
+            <li class><a href="http://1mbank.ru/about/direction">Управление и акционеры</a></li>
+            <li class><a href="http://1mbank.ru/about/departments">Связь с отделами</a></li>
+            <li class><a href="http://1mbank.ru/about/requisites">Реквизиты</a></li>
+            <li class><a href="http://1mbank.ru/about/information-disclosure">Раскрытие информации</a></li>
+            <li class><a href="http://1mbank.ru/about/ratings">Рейтинги</a></li>
+            <li class><a href="http://1mbank.ru/about/financial-statement">Финансовая отчетность</a></li>
+            <li class><a href="http://1mbank.ru/about/tenders">Тендеры</a></li>
+          </ul>
+        </dd>
+        <dt class><a href="http://1mbank.ru/map">Весь сайт</a></dt>
+      </dl>
+    </div>
+  </div>
+
+<div class="container">
+    <section class="content">
+      
+    <div class="page-header">
+      <h1>Главная</h1>
+    </div>
+    <div id="carousel" class="carousel pie slide hidden-phone">
+  
+  <div class="carousel-inner">
+    
+    <div class="item active">
+      <img src="files/291_slid.jpg" alt="">
+      <div class="carousel-caption pie calculator-credit-consumer">
+        <form method="get" action="http://1mbank.ru/individual/crediting/consumer" onsubmit="if (window.yaCounter7234684) window.yaCounter7234684.reachGoal('slider_1_1'); return true;">
+          <div class="row-fluid">
+            <div class="span6">
+              <h3>Сумма</h3>
+              <input class="input-block-level" type="text" name="credit-amount" placeholder="укажите сумму">
+              <span class="help-block">до 300 000 руб.</span>
+            </div>
+            <div class="span6">
+              <h3>Срок</h3>
+              <select class="input-block-level" name="credit-period">
+                <option value>-- выберите срок --</option>
+                <option value="7d">7 дней</option>
+                <option value="14d">14 дней</option>
+                <option value="1m">1 месяц</option>
+                <option value="2m">2 месяца</option>
+                <option value="3m">3 месяца</option>
+                <option value="6m">6 месяцев</option>
+                <option value="12m">1 год</option>
+                <option value="24m">2 года</option>
+                <option value="36m">3 года</option>
+              </select>
+              <span class="help-block">до 3х лет</span>
+            </div>
+          </div>
+          <p>
+            <button class="btn btn-large btn-danger" type="submit">Рассчитать</button>
+            <span style="white-space: nowrap;">или <a href="http://1mbank.ru/individual/crediting/consumer" onclick="if (window.yaCounter7234684) window.yaCounter7234684.reachGoal('slider_1'); return true;">узнать условия</a></span>
+          </p>
+        </form>
+      </div>
+    </div>
+    
+    <div class="item">
+      <img src="files/289_slid.jpg" alt="">
+      <div class="carousel-caption pie calculator-credit-bisiness">
+        <p><strong>Наши кредиты стали проще!</strong></p>
+        <p>Вы выбираете сумму, мы делаем все остальное!</p>
+        <ul class="unstyled">
+          <li>Процентные ставки – от 10% годовых!</li>
+          <li>Cумма кредита – от 20 000 до 10 000 000 рублей.</li>
+          <li>Срок кредитования – до 36 месяцев.</li>
+        </ul>
+        <p><a href="http://1mbank.ru/corporate/crediting" class="btn btn-large btn-danger" onclick="if (window.yaCounter7234684) window.yaCounter7234684.reachGoal('slider_2'); return true;">Подробнее</a></p>
+      </div>
+    </div>
+    
+    <div class="item">
+      <img src="files/498_slid.jpg" alt="">
+      <div class="carousel-caption pie calculator-deposit-individual">
+        <p><strong>Гарантированный доход до 11% годовых!</strong></p>
+        <p>Банк «Первомайский» предлагает срочные рублевые и валютные вклады.</p>
+        <p><a href="http://1mbank.ru/individual/deposit" class="btn btn-large btn-danger" onclick="if (window.yaCounter7234684) window.yaCounter7234684.reachGoal('slider_3'); return true;">Подробнее</a></p>
+      </div>
+    </div>
+    
+    <div class="item">
+      <img src="files/290_slid.jpg" alt="">
+      <div class="carousel-caption pie calculator-deposit-bisiness">
+        <p><strong>Индивидуальный подход к каждому клиенту!</strong></p>
+        <p>Депозит на любой срок: от 1 дня до 2 лет.</p>
+        <p class="additional">Выбор срока депозита с точностью до 1 дня, что позволит Вам спланировать денежные потоки и эффективно использовать средства.</p>
+        <p><a href="http://1mbank.ru/corporate/deposit" class="btn btn-large btn-danger" onclick="if (window.yaCounter7234684) window.yaCounter7234684.reachGoal('slider_4'); return true;">Подробнее</a></p>
+      </div>
+    </div>
+    
+    <div class="item">
+      <img src="files/333_slid.jpg" alt="">
+      <div class="carousel-caption pie calculator-money-delivery">
+        <p><strong>Воспользуйтесь бесплатной услугой «Деньги на дом» прямо сейчас!</strong></p>
+        <p>Больше не нужно никуда ехать, стоять в очередях, чтобы получить кредит.</p>
+        <p><a href="http://1mbank.ru/app/credit-consumer" class="btn btn-large btn-danger" onclick="if (window.yaCounter7234684) window.yaCounter7234684.reachGoal('slider_5'); return true;">Отправить заявку</a></p>
+      </div>
+    </div>
+    
+  </div>
+  <!-- Carousel nav -->
+  <a class="carousel-control left" href="http://1mbank.ru/#carousel" data-slide="prev"><img src="files/462_slid.gif" alt=""></a>
+  <a class="carousel-control right" href="http://1mbank.ru/#carousel" data-slide="next"><img src="files/464_slid.gif" alt=""></a>
+</div>
+
+<div class="row">
+  <div class="span3 hidden-phone">
+    <div class="banner-block pie">
+      <a href="http://1mbank.ru/special-offer"><img src="files/330_bann.jpg" alt=""></a>
+    </div>
+  </div>
+  <div class="span3 hidden-phone">
+    <div class="banner-block pie">
+      <a href="http://1mbank.ru/individual/other/cards/helper"><img src="files/331_bann.jpg" alt=""></a>
+    </div>
+  </div>
+  <div class="span3 hidden-phone">
+    <div class="banner-block pie">
+      <a href="http://1mbank.ru/app/check-status"><img src="files/332_bann.jpg" alt=""></a>
+    </div>
+  </div>
+  <div class="span3 currencies-block">
+    
+    <div class="currencies">
+      <div class="currencies-rates" id="currencies-rates">
+        <a href="http://1mbank.ru/#" id="currencies-rates-toggle" class="currencies-rates-toggle pull-right">Калькулятор</a>
+        <h4>Курсы валют</h4>
+        
+                
+                                        
+                                            
+                                                                        
+                <table>
+          <caption>23 февраля 2013</caption>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Покупка</th>
+              <th>Продажа</th>
+              <th colspan="2">ЦБ РФ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="currencies-rates-currency">USD</td>
+              <td>30.20</td>
+              <td>30.60</td>
+              <td>30.36</td>
+              <td class="currencies-rates-diff">
+                                                <span class="text-success">0.13</span>
+                              </td>
+            </tr>
+            <tr>
+              <td class="currencies-rates-currency">EUR</td>
+              <td>39.85</td>
+              <td>40.35</td>
+              <td>40.11</td>
+              <td class="currencies-rates-diff">
+                                                <span class="text-success">0.04</span>
+                              </td>
+            </tr>
+            <tr>
+              <td class="currencies-rates-currency">GBP</td>
+              <td>45.40</td>
+              <td>47.50</td>
+              <td>46.39</td>
+              <td class="currencies-rates-diff">
+                                                <span class="text-success">0.46</span>
+                              </td>
+            </tr>
+          </tbody>
+        </table>
+                
+      </div>
+      <div class="currencies-calculator" id="currencies-calculator" style="display: none;">
+        <a href="http://1mbank.ru/#" id="currencies-calculator-toggle" class="currencies-calculator-toggle pull-right">Курсы валют</a>
+        <h4>Калькулятор</h4>
+        
+        <div class="input-append">
+          <input class="currencies-calculator-value" id="currencies-calculator-from-amount" type="text" placeholder="Из">
+          <div class="btn-group">
+            <button class="btn dropdown-toggle" data-toggle="dropdown">
+              <span id="currencies-calculator-from-currency">RUR</span>
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu currencies-calculator-select" id="currencies-calculator-from-currencies">
+              <li><a href="http://1mbank.ru/#" currency="RUR">RUR</a></li>
+              <li><a href="http://1mbank.ru/#" currency="USD">USD</a></li>
+              <li><a href="http://1mbank.ru/#" currency="EUR">EUR</a></li>
+              <li><a href="http://1mbank.ru/#" currency="GBP">GBP</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="input-append">
+          <input class="currencies-calculator-value" id="currencies-calculator-to-amount" type="text" placeholder="В">
+          <div class="btn-group">
+            <button class="btn dropdown-toggle" data-toggle="dropdown">
+              <span id="currencies-calculator-to-currency">USD</span>
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu currencies-calculator-select" id="currencies-calculator-to-currencies">
+              <li><a href="http://1mbank.ru/#" currency="RUR">RUR</a></li>
+              <li><a href="http://1mbank.ru/#" currency="USD">USD</a></li>
+              <li><a href="http://1mbank.ru/#" currency="EUR">EUR</a></li>
+              <li><a href="http://1mbank.ru/#" currency="GBP">GBP</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <script>
+          var calculatorRates = {
+            'RUR': 1,
+            'USD': 30.2000,
+            'EUR': 39.8500,
+            'GBP': 45.4000
+          };
+        </script>
+        
+      </div>
+    </div>
+    
+  </div>
+</div>
+  </section>
+  
+
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-social span3 pull-right hidden-phone">
+        <ul>
+          <li><span>Мы в интернете:</span></li>
+          <li><a target="_blank" href="http://www.odnoklassniki.ru/group/51283978879128"><img src="files/9_odnokl.png" alt=""></a></li>
+          <li><a target="_blank" href="http://vk.com/1mbank"><img src="files/7_vkonta.png" alt=""></a></li>
+          <li><a target="_blank" href="http://www.facebook.com/1mbank"><img src="files/10_faceb.png" alt=""></a></li>
+          <li><a target="_blank" href="https://twitter.com/1mbank"><img src="files/8_twitte.png" alt=""></a></li>
+        </ul>
+      </div>
+      <div class="footer-copyright">
+        © 1990-2013 Банк «Первомайский» (ЗАО). Генеральная лицензия Банка России № 518 от 03.08.12.
+      </div>
+      <noindex><!-- PromoPark Counter starts --><script src="files/d_code00.htm" type="text/javascript"></script><!-- PromoPark Counter ends --></noindex>
+    </div>
+  </footer>
+
+  <script type="text/javascript">
+  // Местоположения
+  var locationsData = [{"id":"5","title":"\u0433. \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"6","title":"\u043f. \u0410\u0434\u043b\u0435\u0440, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"7","title":"\u0433. \u0410\u043d\u0430\u043f\u0430, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"8","title":"\u0433. \u0410\u0440\u043c\u0430\u0432\u0438\u0440, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"9","title":"\u0433. \u0411\u0435\u043b\u043e\u0440\u0435\u0447\u0435\u043d\u0441\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"10","title":"\u0433. \u0413\u0435\u043b\u0435\u043d\u0434\u0436\u0438\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"11","title":"\u0433. \u0413\u043e\u0440\u044f\u0447\u0438\u0439 \u043a\u043b\u044e\u0447, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"12","title":"\u0441\u0442. \u0414\u0438\u043d\u0441\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"13","title":"\u0433. \u0415\u0439\u0441\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"14","title":"\u0433. \u041a\u0440\u043e\u043f\u043e\u0442\u043a\u0438\u043d, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"15","title":"\u0433. \u041a\u0440\u044b\u043c\u0441\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"16","title":"\u0433. \u041b\u0430\u0431\u0438\u043d\u0441\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"17","title":"\u0433. \u041d\u043e\u0432\u043e\u0440\u043e\u0441\u0441\u0438\u0439\u0441\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"18","title":"\u0433. \u0421\u043b\u0430\u0432\u044f\u043d\u0441\u043a-\u043d\u0430-\u041a\u0443\u0431\u0430\u043d\u0438, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"19","title":"\u0433. \u0421\u043e\u0447\u0438, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"20","title":"\u0433. \u0422\u0435\u043c\u0440\u044e\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"21","title":"\u0433. \u0422\u0438\u043c\u0430\u0448\u0435\u0432\u0441\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"22","title":"\u0433. \u0422\u0438\u0445\u043e\u0440\u0435\u0446\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"23","title":"\u0433. \u0422\u0443\u0430\u043f\u0441\u0435, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"24","title":"\u0433. \u0423\u0441\u0442\u044c-\u041b\u0430\u0431\u0438\u043d\u0441\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"25","title":"\u0441. \u0423\u0441\u043f\u0435\u043d\u0441\u043a\u043e\u0435, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"26","title":"\u043f. \u0414\u0430\u0433\u043e\u043c\u044b\u0441, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"43","title":"\u0441\u0442. \u041a\u0430\u043d\u0435\u0432\u0441\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"44","title":"\u0441\u0442. \u041b\u0435\u043d\u0438\u043d\u0433\u0440\u0430\u0434\u0441\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"45","title":"\u0433. \u041a\u0443\u0440\u0433\u0430\u043d\u0438\u043d\u0441\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"46","title":"\u0433. \u0410\u043f\u0448\u0435\u0440\u043e\u043d\u0441\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"47","title":"\u0441\u0442. \u0422\u0431\u0438\u043b\u0438\u0441\u0441\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"48","title":"\u0433. \u041a\u043e\u0440\u0435\u043d\u043e\u0432\u0441\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"49","title":"\u043f. \u041d\u043e\u0432\u043e\u043c\u0438\u0445\u0430\u0439\u043b\u043e\u0432\u0441\u043a\u0438\u0439, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"50","title":"\u0433. \u041d\u043e\u0432\u043e\u043a\u0443\u0431\u0430\u043d\u0441\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"51","title":"\u0433. \u0413\u0443\u043b\u044c\u043a\u0435\u0432\u0438\u0447\u0438, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"52","title":"\u0441\u0442. \u0421\u0442\u0430\u0440\u043e\u0449\u0435\u0440\u0431\u0438\u043d\u043e\u0432\u0441\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"53","title":"\u0441\u0442. \u041f\u043e\u043b\u0442\u0430\u0432\u0441\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"54","title":"\u0441\u0442. \u0411\u0440\u044e\u0445\u043e\u0432\u0435\u0446\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"55","title":"\u0433. \u0410\u0431\u0438\u043d\u0441\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"56","title":"\u0441\u0442. \u0421\u0435\u0432\u0435\u0440\u0441\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"57","title":"\u0441\u0442. \u041e\u0442\u0440\u0430\u0434\u043d\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"58","title":"\u0441\u0442. \u041a\u0443\u0449\u0435\u0432\u0441\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"59","title":"\u0441\u0442. \u0412\u044b\u0441\u0435\u043b\u043a\u0438, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"60","title":"\u043f. \u041c\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u043e\u0439, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"61","title":"\u0433. \u0425\u0430\u0434\u044b\u0436\u0435\u043d\u0441\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"66","title":"\u0433. \u041f\u0440\u0438\u043c\u043e\u0440\u0441\u043a\u043e-\u0410\u0445\u0442\u0430\u0440\u0441\u043a, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"67","title":"\u043f. \u0410\u0444\u0438\u043f\u0441\u043a\u0438\u0439, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"68","title":"\u043f. \u0418\u043b\u044c\u0441\u043a\u0438\u0439, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"69","title":"\u0441. \u0411\u0435\u043b\u0430\u044f \u0413\u043b\u0438\u043d\u0430, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"70","title":"\u0441\u0442. \u0410\u043d\u0430\u0441\u0442\u0430\u0441\u0438\u0435\u0432\u0441\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"71","title":"\u0441\u0442. \u041a\u0430\u043b\u0438\u043d\u0438\u043d\u0441\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"72","title":"\u0441\u0442. \u041a\u0440\u044b\u043b\u043e\u0432\u0441\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"73","title":"\u0441\u0442. \u041d\u043e\u0432\u043e\u043f\u043e\u043a\u0440\u043e\u0432\u0441\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"74","title":"\u0441\u0442. \u041f\u0430\u0432\u043b\u043e\u0432\u0441\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"75","title":"\u0441\u0442. \u0421\u0442\u0430\u0440\u043e\u043c\u0438\u043d\u0441\u043a\u0430\u044f, \u041a\u0440\u0430\u0441\u043d\u043e\u0434\u0430\u0440\u0441\u043a\u0438\u0439 \u043a\u0440\u0430\u0439"},{"id":"27","title":"\u0433. \u0420\u043e\u0441\u0442\u043e\u0432-\u043d\u0430-\u0414\u043e\u043d\u0443, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"28","title":"\u0433. \u0410\u0437\u043e\u0432, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"29","title":"\u0433. \u0412\u043e\u043b\u0433\u043e\u0434\u043e\u043d\u0441\u043a, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"30","title":"\u0433. \u0413\u0443\u043a\u043e\u0432\u043e, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"31","title":"\u0433. \u0414\u043e\u043d\u0435\u0446\u043a, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"32","title":"\u0433. \u0417\u0435\u0440\u043d\u043e\u0433\u0440\u0430\u0434, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"33","title":"\u0433. \u041d\u043e\u0432\u043e\u0448\u0430\u0445\u0442\u0438\u043d\u0441\u043a, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"34","title":"\u0433. \u0421\u0430\u043b\u044c\u0441\u043a, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"35","title":"\u0433. \u0428\u0430\u0445\u0442\u044b, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"76","title":"\u0433. \u0410\u043a\u0441\u0430\u0439, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"77","title":"\u0433. \u0411\u0430\u0442\u0430\u0439\u0441\u043a, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"78","title":"\u0433. \u0411\u0435\u043b\u0430\u044f \u041a\u0430\u043b\u0438\u0442\u0432\u0430, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"79","title":"\u0433. \u0417\u0432\u0435\u0440\u0435\u0432\u043e, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"80","title":"\u0433. \u041a\u0430\u043c\u0435\u043d\u0441\u043a-\u0428\u0430\u0445\u0442\u0438\u043d\u0441\u043a\u0438\u0439, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"81","title":"\u0433. \u041a\u0440\u0430\u0441\u043d\u044b\u0439 \u0421\u0443\u043b\u0438\u043d, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"82","title":"\u0433. \u041c\u0438\u043b\u043b\u0435\u0440\u043e\u0432\u043e, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"83","title":"\u0433. \u041c\u043e\u0440\u043e\u0437\u043e\u0432\u0441\u043a, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"84","title":"\u0433. \u041d\u043e\u0432\u043e\u0447\u0435\u0440\u043a\u0430\u0441\u0441\u043a, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"85","title":"\u0433. \u0421\u0435\u043c\u0438\u043a\u0430\u0440\u0430\u043a\u043e\u0440\u0441\u043a, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"86","title":"\u0433. \u0422\u0430\u0433\u0430\u043d\u0440\u043e\u0433, \u0420\u043e\u0441\u0442\u043e\u0432\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"36","title":"\u0433. \u0412\u043e\u043b\u0433\u043e\u0433\u0440\u0430\u0434, \u0412\u043e\u043b\u0433\u043e\u0433\u0440\u0430\u0434\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"37","title":"\u0433. \u0412\u043e\u043b\u0436\u0441\u043a\u0438\u0439, \u0412\u043e\u043b\u0433\u043e\u0433\u0440\u0430\u0434\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"38","title":"\u0433. \u041a\u0430\u043c\u044b\u0448\u0438\u043d, \u0412\u043e\u043b\u0433\u043e\u0433\u0440\u0430\u0434\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"39","title":"\u0433. \u041c\u0438\u0445\u0430\u0439\u043b\u043e\u0432\u043a\u0430, \u0412\u043e\u043b\u0433\u043e\u0433\u0440\u0430\u0434\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"40","title":"\u0433. \u0423\u0440\u044e\u043f\u0438\u043d\u0441\u043a, \u0412\u043e\u043b\u0433\u043e\u0433\u0440\u0430\u0434\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"62","title":"\u0433. \u041a\u0430\u043b\u0430\u0447-\u043d\u0430-\u0414\u043e\u043d\u0443, \u0412\u043e\u043b\u0433\u043e\u0433\u0440\u0430\u0434\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"63","title":"\u0433. \u0413\u043e\u0440\u043e\u0434\u0438\u0449\u0435, \u0412\u043e\u043b\u0433\u043e\u0433\u0440\u0430\u0434\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"64","title":"\u0433. \u041a\u043e\u0442\u043e\u0432\u043e, \u0412\u043e\u043b\u0433\u043e\u0433\u0440\u0430\u0434\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"65","title":"\u0433. \u0424\u0440\u043e\u043b\u043e\u0432\u043e, \u0412\u043e\u043b\u0433\u043e\u0433\u0440\u0430\u0434\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"41","title":"\u0433. \u0410\u0441\u0442\u0440\u0430\u0445\u0430\u043d\u044c, \u0410\u0441\u0442\u0440\u0430\u0445\u0430\u043d\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"},{"id":"42","title":"\u0433. \u0410\u0445\u0442\u0443\u0431\u0438\u043d\u0441\u043a, \u0410\u0441\u0442\u0440\u0430\u0445\u0430\u043d\u0441\u043a\u0430\u044f \u043e\u0431\u043b\u0430\u0441\u0442\u044c"}];
+  </script>
+
+  <div id="locations" class="modal hide fade">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3>Ваше местоположение</h3>
+    </div>
+    <div class="modal-body">
+      <p>
+        Для улучшение качества предоставляемых нами услуг 
+        мы просим Вас указать ваше географическое положение.
+      </p>
+      <form class="form-search">
+        <input class="search-query" autocomplete="off" id="locations_location" type="text" data-provide="typeahead" placeholder="Ваше местоположение">
+        <button type="button" id="locations_button" class="btn">Выбрать</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal hide fade" id="contacts-modal">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3>Связь с банком</h3>
+    </div>
+    <div class="modal-body">
+
+    
+      <!-- RCSLabs  -->
+      <h2>Оператор Евгений</h2>
+      
+      
+      <div class="row-fluid">
+        <div class="span6">
+          <img src="img/operator.jpg"/>
+        </div>
+        <div class="span6">
+          <input type="button" value="Позвонить" id="do-call" style="display: none">
+        </div>
+      </div>
+      Оператор поможет вам решить все ваши вопросы, утешит и развлечет
+      <script>
+        jQuery(function($) {
+
+          var OPERATOR = document.location.href.indexOf('operator') != -1;
+          console.log(OPERATOR ? 'I am operator' : 'I am client');
+          var $btn = $('#do-call');
+
+          var paper;
+          var currentPath = null, path = null;
+
+
+          var phone = new Phone({
+            afterTransition: function(fromState, state, event, params) {
+              console.log("Transition ", fromState, " -> ", state, " [event=", event, params,"]");
+              switch(state) {
+                case 'LOGIN':
+                  if(OPERATOR)
+                    phone.event("ui:login", {phone: "operator",  password:"1234"});
+                  break;
+                case 'LOGINING':
+                  break;
+                case 'INITIALIZING_MEDIA':
+                case 'HARDWARE_SETTINGS':
+                  break;
+                case 'HARDWARE_SETTINGS_OK':
+                  if(OPERATOR) {
+                    phone.startCall("bank-room");
+                  } else {
+                    $btn.show();
+                  }
+                  break;
+              }
+            },
+
+            onChatMessage: function(o) {
+              console.log("CHAT", o);
+              if(!OPERATOR) {
+                if(o["x-message"] === "mousedown")
+                  mousedown(o.x, o.y);
+                if(o["x-message"] === "mouseup")
+                  mouseup(o.x, o.y);
+                if(o["x-message"] === "mousemove")
+                  mousemove(o.x, o.y);
+              }
+            }
+          });
+
+
+          function mousedown(x, y) {
+            currentPath = paper.path();
+            path = ["M" + x + " " + y];
+            currentPath.attr({stroke:'#C00',"stroke-width":5});
+            currentPath.glow({color:'#f00', width:40});
+            currentPath.attr('path', path.join(''));
+          }
+          function mousemove(x,y){
+            if(currentPath && path) {
+              path.push("L" + x + " " + y);
+              currentPath.attr('path', path.join(''));
+            }
+          }
+          function mouseup(x,y) {
+            if(currentPath && path) {
+              console.log(path.join(''));
+              currentPath = null;
+              path = null;
+            }
+          }
+
+          if(!OPERATOR)
+            $('span[href="#contacts-modal"]').click(function() {
+              phone.event("ui:login", {phone: "client",  password:"1234"});
+            });
+
+          function initCanvas() {
+            var w = $('body').width(),  h = $('body').height();
+            paper = Raphael(0, 0,w,h);
+          }
+
+          if(!OPERATOR) {
+            $('#do-call').click(function() {
+              $('.modal-backdrop').hide();
+              $('#contacts-modal').css({left:0, top:0, marginLeft:0, width:300});
+              $(this).hide();
+              initCanvas();
+              phone.startCall("bank-room");
+            });
+          } else {
+            initCanvas();
+            $('svg').mousedown(function(event){
+              mousedown(event.clientX, event.clientY);
+              phone.sendChatBroadcast({"x-message": "mousedown", x: event.clientX, y: event.clientY});
+            });
+            $('svg').mousemove(function(event){
+              mousemove(event.clientX, event.clientY);
+              phone.sendChatBroadcast({"x-message": "mousemove", x: event.clientX, y: event.clientY});
+            });
+            $('svg').mouseup(function(event){
+              mouseup(event.clientX, event.clientY);
+              phone.sendChatBroadcast({"x-message": "mouseup", x: event.clientX, y: event.clientY});
+            });
+          }
+
+
+            //(function(){
+            //  window.add_js=function(s){
+            //    var k=(document.getElementsByTagName('head')[0]||document.body).appendChild(document.createElement('script'));
+            //    k.src=s;
+            //    k.type='text/javascript';
+            //    k.markup='97ddecf3-7db0-11e2-913b-fac11f1adc9e'
+            //  };
+            //  window.MarkUp=window.MarkUp||{};
+            //  add_js('markup.js')
+            //})();
+        });
+      </script>
+
+    </div>
+  </div>
+
+ 
+  </body>
+</html>

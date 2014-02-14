@@ -1,0 +1,356 @@
+/* Формы */
+.carousel .control-label {
+  font-size: 16px;
+  text-align: left;
+}
+
+/* Скрываем заголовок страницы */
+.page-header {
+  display: none;
+}
+
+/* Слайдер */
+.carousel {
+  overflow: hidden;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-box-shadow: #dedede 2px 2px 2px;
+  -moz-box-shadow: #dedede 2px 2px 2px;
+  box-shadow: 2px 2px 2px #dedede;
+}
+.carousel-control {
+  width: 54px;
+  height: 54px;
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  background: none;
+}
+.carousel-control img {
+  -webkit-border-radius: 25px;
+  -moz-border-radius: 25px;
+  border-radius: 25px;
+  -webkit-box-shadow: silver 2px 2px 2px;
+  -moz-box-shadow: silver 2px 2px 2px;
+  box-shadow: 2px 2px 2px silver;
+}
+.carousel-control:link,
+.carousel-control:visited {
+  outline: none;
+}
+.carousel-caption {
+  display: block;
+  width: 360px;
+  height: auto;
+  left: auto;
+  bottom: auto;
+  top: 0px;
+  right: 80px;
+  background: #fafafa;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-box-shadow: silver 0px 2px 2px;
+  -moz-box-shadow: silver 0px 2px 2px;
+  box-shadow: 0px 2px 2px silver;
+  padding: 20px 30px;
+  color: #333333;
+}
+.carousel-caption h3,
+.carousel-caption p {
+  margin: 10px 0px;
+  color: #333333;
+}
+.carousel-caption .btn-large {
+  padding: 6px 14px;
+}
+@media (min-width: 980px) and (max-width: 1199px) {
+  .carousel-control {
+    width: 45px;
+    height: 45px;
+  }
+  .carousel-caption {
+    right: 65px;
+    width: 300px;
+    padding: 10px 20px;
+  }
+  .carousel-control.left {
+    left: 10px;
+  }
+  .carousel-control.right {
+    right: 10px;
+  }
+}
+@media (min-width: 768px) and (max-width: 979px) {
+  .carousel-control {
+    width: 35px;
+    height: 35px;
+  }
+  .carousel-caption {
+    right: 45px;
+    width: 240px;
+    padding: 0px 15px;
+  }
+  .carousel-control.left {
+    left: 5px;
+  }
+  .carousel-control.right {
+    right: 5px;
+  }
+}
+
+/* Калькулятор потребительского кредитования */
+.calculator-credit-consumer {
+  top: 65px;
+}
+.ie7 .calculator-credit-consumer,
+.ie8 .calculator-credit-consumer {
+  width: 250px;
+  top: 30px;
+  padding-bottom: 0px;
+}
+.ie7 .calculator-credit-consumer .input-block-level {
+  width: 90%;
+  min-height: auto;
+  height: 20px;
+}
+.ie7 .calculator-credit-consumer select {
+  position: relative;
+  top: 5px;
+  line-height: 20px;
+}
+.ie8 .calculator-credit-consumer .input-block-level {
+  width: 90%;
+  min-height: auto;
+  height: 30px;
+}
+@media (min-width: 980px) and (max-width: 1199px) {
+  .calculator-credit-consumer {
+    top: 40px;
+  }
+}
+@media (min-width: 768px) and (max-width: 979px) {
+  .calculator-credit-consumer {
+    top: 10px;
+  }
+}
+
+/* Кредиты для бизнеса */
+.calculator-credit-bisiness {
+  top: 55px;
+}
+.ie7 .calculator-credit-bisiness {
+  width: 280px;
+  top: 15px;
+  padding-bottom: 10px;
+}
+.ie8 .calculator-credit-bisiness {
+  width: 280px;
+  top: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+@media (min-width: 980px) and (max-width: 1199px) {
+  .calculator-credit-bisiness {
+    top: 15px;
+  }
+}
+@media (min-width: 768px) and (max-width: 979px) {
+  .calculator-credit-bisiness ul {
+    display: none;
+  }
+  .calculator-credit-bisiness {
+    top: 35px;
+  }
+}
+
+/* Вклады для физ лиц */
+.calculator-deposit-individual {
+  top: 80px;
+}
+.ie7 .calculator-deposit-individual {
+  width: 280px;
+  top: 45px;
+  padding-bottom: 10px;
+}
+.ie8 .calculator-deposit-individual {
+  width: 280px;
+  top: 50px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+@media (min-width: 980px) and (max-width: 1199px) {
+  .calculator-deposit-individual {
+    top: 60px;
+  }
+}
+@media (min-width: 768px) and (max-width: 979px) {
+  .calculator-deposit-individual {
+    top: 20px;
+  }
+}
+
+/* Вклады для физ лиц */
+.calculator-deposit-bisiness {
+  top: 50px;
+}
+.ie7 .calculator-deposit-bisiness {
+  width: 280px;
+  top: 15px;
+  padding-bottom: 10px;
+}
+.ie8 .calculator-deposit-bisiness {
+  width: 280px;
+  top: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+@media (min-width: 980px) and (max-width: 1199px) {
+  .calculator-deposit-bisiness {
+    top: 15px;
+  }
+}
+@media (min-width: 768px) and (max-width: 979px) {
+  .calculator-deposit-bisiness .additional {
+    display: none;
+  }
+  .calculator-deposit-bisiness {
+    top: 30px;
+  }
+}
+
+/* Деньги на дорм */
+.calculator-money-delivery {
+  width: 340px;
+  top: 70px;
+}
+.ie7 .calculator-money-delivery {
+  width: 250px;
+  top: 35px;
+  padding-bottom: 10px;
+}
+.ie8 .calculator-money-delivery {
+  width: 250px;
+  top: 40px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+@media (min-width: 980px) and (max-width: 1199px) {
+  .calculator-money-delivery {
+    width: 280px;
+    top: 50px;
+  }
+}
+@media (min-width: 768px) and (max-width: 979px) {
+  .calculator-money-delivery {
+    width: 230px;
+    top: 10px;
+  }
+  .calculator-money-delivery p {
+    font-size: 13px;
+  }
+}
+
+/* Баннеры */
+.banner-block img {
+  width: 100%;
+}
+.banner-block:hover {
+  position: relative;
+  top: 2px;
+}
+.banner-block {
+  overflow: hidden;
+  -webkit-box-shadow: #dedede 2px 2px 2px;
+  -moz-box-shadow: #dedede 2px 2px 2px;
+  box-shadow: 2px 2px 2px #dedede;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+/* Блок курсов валют */
+.currencies-block h4 {
+  margin: 0px 0px 5px 0px;
+}
+.currencies-rates table {
+  width: 100%;
+}
+.currencies-rates caption {
+  font-size: 12px;
+  text-align: left;
+  font-style: italic;
+  color: gray;
+}
+.currencies-rates th {
+  font-size: 12px;
+  font-weight: normal;
+  padding: 0px;
+  border: 0px;
+  text-align: left;
+}
+.currencies-rates td {
+  font-size: 12px;
+  padding: 0px 5px 0px 0px;
+  border: 0px;
+}
+.currencies-rates-currency {
+  width: 20%;
+  font-weight: bold;
+}
+.currencies-rates-diff {
+  width: 15%;
+  text-align: right;
+  padding: 0px;
+}
+@media (min-width: 768px) and (max-width: 979px) {
+  .currencies-rates h4 {
+    margin: 0px;
+    font-size: 13px;
+  }
+  .currencies-rates-toggle {
+    font-size: 11px;
+  }
+  .currencies-rates th {
+    font-size: 11px;
+  }
+}
+@media (max-width: 767px) {
+  .currencies-rates table {
+    max-width: 300px;
+  }
+}
+
+/* Конвертер */
+.currencies-calculator-value {
+  width: 190px;
+}
+.ie7 .currencies-calculator-value,
+.ie8 .currencies-calculator-value {
+  width: 140px;
+}
+.currencies-calculator-select {
+  width: auto;
+  min-width: auto;
+}
+@media (min-width: 980px) and (max-width: 1199px) {
+  .currencies-calculator-value {
+    width: 140px;
+  }
+}
+@media (min-width: 768px) and (max-width: 979px) {
+  .currencies-calculator h4 {
+    margin: 0px;
+    font-size: 13px;
+  }
+  .currencies-calculator-toggle {
+    font-size: 11px;
+  }
+  .currencies-calculator-value {
+    width: 90px;
+  }
+}

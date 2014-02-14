@@ -1,0 +1,102 @@
+html, body {
+	width   : 100%;
+	height  : 100%;
+	margin  : 0;
+	padding : 0;
+	background-color: white;
+}
+
+section {
+}
+
+
+
+#loading {
+	vertical-align: middle;
+	text-align: center;
+}
+
+#login #login-form {
+	position:absolute;
+	left: 50%;
+	margin-left:-150px;
+	top:20px;
+	padding: 20px;
+	border: 1px #ddd outset;
+	width:250px;
+}
+#login .image-loading {
+	margin-left : 10px;
+	visibility  : hidden;
+	height      : 60px;
+}
+#login .error {
+	color       : #dd2222;
+	position    : absolute;
+	top         : 2px;
+	left        : 20px;
+	display     : none;
+}
+#login-port {
+	padding-top    : 0;
+	padding-bottom : 0;
+}
+
+
+#video-block {
+	position          : relative;
+	height            : 300px;
+	width             : 400px;
+	background-color  : #cccccc;
+	margin            : 10px;
+	padding           : 0;
+	border            : 1px #ddd outset;
+	float             : left;
+}
+
+
+#dtmf-block {
+	padding       : 0;
+	position      : absolute;
+	width         : 200px;
+	height        : 300px;
+	left          : 50%;
+	top           : 10px;
+	border        : 1px solid #cccccc;
+	margin-left   : -100px;
+	box-sizing    : border-box;
+}
+#dtmf-block input[type="button"] {
+	width         : 30%;
+	height        : 30px;
+	margin-right  : 1%;
+	margin-left   : 1%;
+	margin-bottom : 5px;
+	box-sizing    : border-box;
+}
+#dtmf-block input[type="text"] {
+	width: 100%;
+	height: 30px;
+	margin-bottom:20px;
+	box-sizing: border-box;
+}
+#dtmf-block .icon-remove-sign {
+	position : absolute;
+	right    : 15px;
+	top      : 6px;
+	cursor   : pointer;
+}
+#dtmf-block #audio-call {
+	position : absolute;
+	left     : 5%;
+	right    : 55%;
+	height   : 30px;
+	top      : 200px;
+}
+#dtmf-block #video-call {
+	position : absolute;
+	left     : 55%;
+	right    : 5%;
+	height   : 30px;
+	top      : 200px;
+}

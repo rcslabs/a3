@@ -1,0 +1,68 @@
+
+group = 'com.rcslabs'
+version = '1.0'
+buildDir = 'target'
+
+apply plugin: 'java'
+apply plugin: 'jaxb'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'no.entitas.gradle.jaxb:gradle-jaxb-plugin:2.0'
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    schema1 {
+        jaxb {
+            srcDir 'src/main/resources'
+            exclude 'conference-info.xsd'
+        }
+    }
+    schema2 {
+        jaxb {
+            srcDir 'src/main/resources'
+            include 'conference-info.xsd'
+        }
+    }
+}
+
+dependencies {
+    jaxb 'com.sun.xml.bind:jaxb-xjc:2.1.12'
+}
+
+jar {
+    from { sourceSets.schema1.output }
+    from { sourceSets.schema2.output }
+
+    manifest = project.manifest {
+        attributes(
+            "Created-By": "Gradle " + gradle.gradleVersion,
+            "Built-By":  System.getProperty("user.name"),
+            "Build-Jdk": System.getProperty('java.version'),
+            "Implementation-Title": "Generated classes based on XSDs", 
+            "Implementation-Version": version
+        )
+    }    
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }        
+    }
+
+    repositories {
+        maven { url 'http://repo.rcslabs.ru/archiva/repository/internal/' }
+    }
+}
