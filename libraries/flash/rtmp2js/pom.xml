@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<parent>
+		<groupId>ru.rcslabs.webcall</groupId>
+		<artifactId>client-core-parent-pom</artifactId>
+		<version>1.0.1-SNAPSHOT</version>
+	</parent>
+
+	<scm>
+		<developerConnection>scm:svn:https://svn.rcslabs.ru/subversion/rcslabs/SOURCES/trunk/libraries/flash/client-call-library/rtmp2js</developerConnection>	
+	</scm>
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>rtmp-signaling-jsbridge</artifactId>
+	<version>2.1.1-SNAPSHOT</version>
+	<name>Flash RTMP signaling to JS bridge</name>
+	<packaging>swf</packaging>
+
+	<build>		
+		<sourceDirectory>src</sourceDirectory>	
+		<plugins>			
+			<plugin>
+				<groupId>org.sonatype.flexmojos</groupId>
+				<artifactId>flexmojos-maven-plugin</artifactId>
+				<version>${flexmojos.version}</version>
+				<extensions>true</extensions>              
+				<configuration>
+					<iKnowWhatImDoingPleaseBreakMyBuildIwontBlameFlexmojosForStopWorking>true</iKnowWhatImDoingPleaseBreakMyBuildIwontBlameFlexmojosForStopWorking>
+					<sourceFile>./RTMP2JS.as</sourceFile>
+					<finalName>RTMP2JS</finalName>							
+					<debug>true</debug>  
+					<actionscriptFileEncoding>UTF-8</actionscriptFileEncoding>
+					<allowSourcePathOverlap>true</allowSourcePathOverlap>
+					<staticLinkRuntimeSharedLibraries>true</staticLinkRuntimeSharedLibraries>
+					<targetPlayer>11</targetPlayer>
+					<swfVersion>13</swfVersion>
+					<incremental>false</incremental>
+					<metadata>
+						<contributors>
+							<contributor>RCS Labs</contributor>
+						</contributors>
+						<creators>
+							<creator>RCS Labs</creator>
+						</creators>
+						<publishers>
+							<publisher>RCS Labs</publisher>
+						</publishers>
+						<description>VERSION:${project.version}.${buildNumber}</description>							
+					</metadata>	
+					<defines>
+						<property>
+							<name>WEBCALL::APP_VERSION</name>
+							<value>"${project.version}.${buildNumber}"</value>
+						</property>
+					</defines>								
+				</configuration>						
+			</plugin>
+		</plugins>        
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>ru.rcslabs.webcall</groupId>
+			<artifactId>client-core-swc</artifactId>
+			<version>2.2.0-SNAPSHOT</version>
+			<type>swc</type>
+		</dependency>						
+	</dependencies>	
+</project>
