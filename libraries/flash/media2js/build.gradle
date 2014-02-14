@@ -1,0 +1,58 @@
+apply plugin: 'gradlefx'
+apply plugin: 'maven'
+
+version = '3.1.0-SNAPSHOT'
+
+new ByteArrayOutputStream().withStream { os ->
+    def result = exec {
+        executable = 'svn'
+        args = ['info']
+        standardOutput = os
+    }
+    def rev = (os.toString() =~ /Last Changed Rev: (\d+)/)
+    project.ext.revision = rev[0][1];
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.gradlefx:gradlefx:0.8.1'
+    }
+}
+
+repositories {
+	ivy {
+		name 'Apache'
+		artifactPattern 'http://apache.cu.be/flex/[revision]/binaries/[module]-[revision]-bin.[ext]'
+	}
+    maven{ url 'http://repo.rcslabs.ru/archiva/repository/internal/'}
+    maven{ url 'http://repo.rcslabs.ru/archiva/repository/snapshots/'}
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+	flexSDK 'org.apache:apache-flex-sdk:4.11.0@tar.gz'
+    internal 'ru.rcslabs.webcall:client-core-swc:2.2.0-SNAPSHOT@swc'
+    internal 'com.bit101:minimalcomps:1.0@swc'
+}
+
+sdkAutoInstall {
+	showPrompts	= false
+}
+
+type = 'swf'
+srcDirs	= ['src']
+frameworkLinkage = 'rsl'
+mainClass = 'MEDIA2JS.as'
+output = 'MEDIA2JS'
+
+additionalCompilerOptions = [
+  '-target-player=11.1',
+  '-swf-version=14',
+  '-debug=false',
+  '-incremental=false',
+  "-define+=WEBCALL::APP_VERSION,'${version}-${project.ext.revision}'"
+]
