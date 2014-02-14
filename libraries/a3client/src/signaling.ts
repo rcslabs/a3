@@ -203,7 +203,6 @@ module a3 {
 			var signalingCallback = '__'+Math.round(Math.random()*Math.pow(10,16));
 			this._flashVars['cbSignaling'] = signalingCallback;
 			window[signalingCallback] = (e) => { this.onSignalingMessage(e.type, e); }
-			this._flashVars['logLevel'] = 'DEBUG';
 		}
 
 		start() {

@@ -103,7 +103,6 @@ module a3 {
 			var mediaCallback = '__'+Math.round(Math.random()*Math.pow(10,16));
 			this._flashVars['cbMedia'] = mediaCallback;
 			window[mediaCallback] = (e) => { this._listener.onMediaMessage(e.type, e); }
-			this._flashVars['logLevel'] = 'NONE';
 		}
 
 		start() {
