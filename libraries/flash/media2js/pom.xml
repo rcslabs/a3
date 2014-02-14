@@ -67,10 +67,10 @@
 			<type>swc</type>
 		</dependency>
 		<dependency>
-			<groupId>ru.rcslabs.webcall</groupId>
-			<artifactId>settings-panel-swc</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
-			<type>swc</type>
+		   <groupId>com.bit101</groupId>
+		   <artifactId>minimalcomps</artifactId>
+		   <version>1.0</version>
+		   <type>swc</type>
 		</dependency>								
 	</dependencies>		
 </project>

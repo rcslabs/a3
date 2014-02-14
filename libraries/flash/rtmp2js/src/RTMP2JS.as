@@ -48,7 +48,7 @@ package
 		
 		private var data:Object;
 		
-		private static const JSHANDLER:String = "webcallMessageHandler";
+		private static var JSHANDLER:String = null;
 		
 		public function RTMP2JS()
 		{
@@ -64,16 +64,24 @@ package
 		private function runInBrowser():void
 		{
 			var p:Object = loaderInfo.parameters;		
-			if(undefined == p['endpoint']){throw new Error("Endpoint not defined");}
 			Logger.init(undefined != p['logLevel'] ? p['logLevel'] : "NONE");
 			
+			if(undefined == p['cbSignaling']){
+				Log.getLogger(Logger.DEFAULT_CATEGORY).error("Callback 'cbSignaling' undefined");	
+				throw new Error("You have to define 'cbSignaling' on flashVars");	
+			}else{
+				JSHANDLER = p['cbSignaling'];
+			}
+
+			if(undefined == p['cbReady']){
+				Log.getLogger(Logger.DEFAULT_CATEGORY).error("Callback 'cbReady' undefined");	
+				throw new Error("You have to define 'cbReady' on flashVars");	
+			}
+
 			info = ClientInfoVO.createInfo();
-			
 			conn = new RTMPConnector();
-			conn.addEndpoint( p['endpoint'] );
 			conn.reuseSuccessOnly = true;
 			conn.addConnectionListener(this);
-			
 			callService = new CallService();
 			callService.serviceName = "callService";
 			callService.connector = conn;
@@ -84,12 +92,15 @@ package
 			conn.addMessageHandler('onConnectionEvent', onSessionEvent);
 			conn.addMessageHandler('onVerificationFailed', onVerificationFailed);
 			
-			ExternalInterface.addCallback("getVersion", getVersion);				
-			ExternalInterface.addCallback("webcallRequest", webcallRequest);				
+			ExternalInterface.addCallback("getVersion", getVersion);
+			ExternalInterface.addCallback("addEndpoint", addEndpoint);	
+			ExternalInterface.addCallback("connect", connect);	
+			ExternalInterface.addCallback("close", close);		
+			ExternalInterface.addCallback("notifyMessage", notifyMessage);				
 			ExternalInterface.addCallback("storage", storage);
 			ExternalInterface.addCallback("setClientInfo", setClientInfo);
-			ExternalInterface.call("swfReady", "ru.rcslabs.webcall.SignalTransport");
-						
+			ExternalInterface.call(loaderInfo.parameters.cbReady);
+			
 			if(Log.isDebug()){
 				Log.getLogger(Logger.DEFAULT_CATEGORY).debug(loaderInfo.url);
 				Log.getLogger(Logger.DEFAULT_CATEGORY).debug(info.pageUrl);				
@@ -115,7 +126,7 @@ package
 			conn.addMessageHandler('onVerificationFailed', onVerificationFailed);
 			
 			info = new ClientInfoVO();
-			webcallRequest("open", {phone : "1010", password : "1234"});		
+			//webcallRequest("open", {phone : "1010", password : "1234"});		
 		}
 		
 		// JS->AS
@@ -139,63 +150,77 @@ package
 			return s;
 		}
 		
-		private function webcallRequest(name:String, params:Object=null):void
+		private function addEndpoint(url:String):void{
+			conn.addEndpoint(url);
+		}
+		
+		private function connect():void{
+			conn.connect();
+		}
+
+		private function close():void{
+			callService.close(); 
+		}
+
+		private function notifyMessage(message:Object):void
 		{
-			switch(name)
+			switch(message.type)
 			{
-				case("open"): 
+				case("START_SESSION"): 
 					credentials = {
-						username : params.phone, 
-						password : params.password,
+						username : message.username, 
+						password : message.password,
 						captcha : null
 					}; 
 					
-					if(undefined != params.challenge && undefined != params.code){
+					if(undefined != message.challenge && undefined != message.code){
 						var p:CaptchaParamsVO = new CaptchaParamsVO();
-						p.challenge = params.challenge;
-						p.response = params.code;
+						p.challenge = message.challenge;
+						p.response = message.code;
 						credentials.captcha = p;
 					}	
 					
 					data = {};
 					
-					for(var k:String in params){
+					for(var k:String in message){
 						if(-1 == ["phone", "password", "challenge", "code"].indexOf(k)){
-							Log.getLogger(Logger.DEFAULT_CATEGORY).info("Additional parameter " + k + "=" + params[k]);
-							data[k] = params[k];
+							Log.getLogger(Logger.DEFAULT_CATEGORY).info("Additional parameter " + k + "=" + message[k]);
+							data[k] = message[k];
 						}
 					}
 					
-					conn.connect();
+					if(!credentials.captcha){
+						callService.open(credentials.username, credentials.password, info, data);
+					} else {
+						callService.open(credentials.username, credentials.password, info, data, credentials.captcha);
+					}
 					break;
 				
-				case("close"): 		
-					callService.close(); 
+				case("START_CALL"): 
+					var av_params:String = (message.vv[1] ? "video" : "audio");		
+					callService.startCall(message.bUri, av_params); 
+					break;
+
+				case("ACCEPT_CALL"): 	
+					var av_params:String = (message.vv[1] ? "video" : "audio");
+					callService.acceptCall(message.callId, av_params); 
 					break;
 				
-				case("accept"): 	
-					callService.acceptCall(params.callId, params.av_params); 
+				case("REJECT_CALL"): 	
+					callService.declineCall(message.callId); 
 					break;
 				
-				case("decline"): 	
-					callService.declineCall(params.callId); 
+				case("HANGUP_CALL"): 	
+					if(callService.getCallById(message.callId)) 
+						callService.hangupCall(message.callId); 
 					break;
 				
-				case("hangup"): 	
-					if(callService.getCallById(params.callId)) 
-						callService.hangupCall(params.callId); 
-					break;
-				
-				case("call"): 		
-					callService.startCall(params.destination, params.av_params); 
-					break;
-				
-				case("dtmf"): 		
-					callService.sendDTMF(params.callId, params.dtmf); 
+				case("SEND_DTMF_SIGNAL"): 		
+					callService.sendDTMF(message.callId, message.dtmf); 
 					break;
 				
 				default: 
-					throw new Error("Unknown request name {"+name+"}");
+					Log.getLogger(Logger.DEFAULT_CATEGORY).warn("Unknown message type "+message.type);
 			}
 		}
 		
@@ -222,62 +247,98 @@ package
 		}
 		
 		/** IConnectorListener */
-		
+
 		public function onConnectionConnect(connector:IConnector):void
 		{
 			if(ExternalInterface.available)
-				ExternalInterface.call(JSHANDLER, new SessionEvent(SessionEvent.CONNECTING));
+				ExternalInterface.call(JSHANDLER, new SessionEvent("CONNECTING"));
 		}
 		
 		public function onConnectionConnected(connector:IConnector):void
 		{
-			userStorage = new UserDataStorage(credentials.username);
-			if(!credentials.captcha){
-				callService.open(credentials.username, credentials.password, info, data);
-			} else {
-				callService.open(credentials.username, credentials.password, info, data, credentials.captcha);
-			}
-			
 			callService.getServiceVersion();
+			if(ExternalInterface.available)
+				ExternalInterface.call(JSHANDLER, new SessionEvent("CONNECTED"));
 		}
 		
 		public function onConnectionFailed(connector:IConnector):void
 		{
 			if(ExternalInterface.available)			
-				ExternalInterface.call(JSHANDLER, new SessionEvent(SessionEvent.CONNECTION_FAILED));
+				ExternalInterface.call(JSHANDLER, new SessionEvent("CONNECTION_FAILED"));
 		}
 		
 		public function onConnectionClosed(connector:IConnector):void
 		{
 			if(ExternalInterface.available)			
-				ExternalInterface.call(JSHANDLER, new SessionEvent(SessionEvent.CONNECTION_BROKEN));
+				ExternalInterface.call(JSHANDLER, new SessionEvent("CONNECTION_FAILED"));
 		}		
 		
 		/** ICallClient */
 		
 		public function onCallEvent(event:CallEvent):void
 		{
+			var event2:Object = {
+				sessionId : event.connectionUid,
+				type : event.type,
+				callId : event.callId,
+				playUrlVideo: event.playUrlVideo,
+				playUrlVoice: event.playUrlVoice,
+				publishUrlVideo: event.publishUrlVideo,
+				publishUrlVoice: event.publishUrlVoice
+			} 
+
+			if(event['message'] != undefined && null != event.message) event2.reason  = event.message;
+			if(event['stage'] != undefined   && null != event.stage)   event2.stage   = event.stage;
+			if(event['timeBeforeFinish'] != undefined && event.timeBeforeFinish) event2.timeBeforeFinish = event.timeBeforeFinish;
+
 			if(ExternalInterface.available)			
-				ExternalInterface.call(JSHANDLER, event);
+				ExternalInterface.call(JSHANDLER, event2);
 		}
-		
+
 		public function onSessionEvent(event:SessionEvent):void
 		{
-			if(SessionEvent.CONNECTED == event.type){
-				callService.connector.connectionUid = event.connectionUid;
+			var compatibleType:String = "UNKNOWN";
+
+			switch (event.type)
+			{
+				case SessionEvent.CONNECTING:
+					compatibleType = "SESSION_STARTING";
+					break;
+
+				case SessionEvent.CONNECTED:
+					userStorage = new UserDataStorage(credentials.username);
+					callService.connector.connectionUid = event.connectionUid;
+					compatibleType = "SESSION_STARTED";
+					break;
+
+				case SessionEvent.CONNECTION_BROKEN:
+				case SessionEvent.CONNECTION_FAILED:
+				case SessionEvent.CONNECTION_ERROR:
+					compatibleType = "SESSION_FAILED";
+					break;
 			}
 			
+			var event2:Object = {
+				sessionId : event.connectionUid,
+				type : compatibleType,
+				message : event.message
+			} 
+
 			if(ExternalInterface.available)			
-				ExternalInterface.call(JSHANDLER, event);			
+				ExternalInterface.call(JSHANDLER, event2);			
 		}
 		
 		public function onVerificationFailed(uid:String, reason:String, message:String):void
 		{
-			var event:SessionEvent = new SessionEvent("VERIFICATION_FAILED");
-			event.connectionUid = conn.connectionUid;
-			event.message = message;
-			
-			if(ExternalInterface.available)
+			var event:Object = {
+				type : "VERIFICATION_FAILED",
+				sessionId : uid,
+				reason : reason,
+				message : message,
+				message : event.message
+			} 
+
+			if(ExternalInterface.available)			
 				ExternalInterface.call(JSHANDLER, event);
 		}
 		

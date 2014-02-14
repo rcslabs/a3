@@ -1,36 +1,27 @@
 package ru.rcslabs.webcall
 {
-	import flash.display.BitmapData;
-	import flash.display.Stage;
-	import flash.events.TimerEvent;
 	import flash.external.ExternalInterface;
-	import flash.media.Camera;
-	import flash.media.Microphone;
-	import flash.system.Security;
-	import flash.system.SecurityPanel;
-	import flash.utils.Timer;
 	
 	import mx.logging.Log;
 	
-	import ru.rcslabs.config.IConfig;
-	import ru.rcslabs.config.IMediaConfig;
 	import ru.rcslabs.net.NetStreamer;
 	import ru.rcslabs.utils.Logger;
+	import ru.rcslabs.utils.monitor.IMonitorDelegate;
+	import ru.rcslabs.utils.monitor.MicMonitor;
 	import ru.rcslabs.webcall.events.HardwareEvent;
 	import ru.rcslabs.webcall.events.MediaTransportEvent;
 
-	public class MediaTransportJS extends MediaTransport
+	public class MediaTransportJS extends MediaTransport implements IMonitorDelegate
 	{				
 		private var ctx:MEDIA2JS;
 		
-		public function MediaTransportJS()
+		public function MediaTransportJS(context:MEDIA2JS)
 		{
-			super();			
-			registerCallbacks();
-		}
-		
-		public function setAppContext(context:MEDIA2JS):void{
+			super();	
 			this.ctx = context;
+			if(ExternalInterface.available){
+				registerCallbacks();
+			}
 		}
 		
 		override public function onPublish(streamer:NetStreamer):void{
@@ -52,15 +43,12 @@ package ru.rcslabs.webcall
 			ExternalInterface.addCallback("publish", publish);
 			ExternalInterface.addCallback("unpublish", unpublish);
 			ExternalInterface.addCallback("subscribe", subscribe);
-			ExternalInterface.addCallback("unsubscribe", unsubscribe);
-			
+			ExternalInterface.addCallback("unsubscribe", unsubscribe);			
 			ExternalInterface.addCallback("muteMicrophone", __muteMicrophone);
 			ExternalInterface.addCallback("microphoneVolume", __microphoneVolume);
 			ExternalInterface.addCallback("muteSound", __muteSound);
 			ExternalInterface.addCallback("soundVolume", __soundVolume);
-			
-			ExternalInterface.addCallback("getHardwareState", __getHardwareState);
-			
+			ExternalInterface.addCallback("checkHardware", __getHardwareState);
 			ExternalInterface.addCallback("getVersion", getVersion);
 			
 			addEventListener(HardwareEvent.HARDWARE_STATE, hwHandler);
@@ -83,8 +71,10 @@ package ru.rcslabs.webcall
 		}
 		
 		private function __getHardwareState():void
-		{
-			super.getHardwareState(ctx.stage);			
+		{			
+			ctx.hw.run();
+			dispatchHardwareStateEvent(false);
+			// super.getHardwareState(ctx.stage);			
 		}
 		
 		private function __muteMicrophone(value:Boolean):void{
@@ -107,13 +97,36 @@ package ru.rcslabs.webcall
 			Log.getLogger(Logger.DEFAULT_CATEGORY).debug("soundVolume:"+value);
 		}
 		
+		public function onMonitorStateChanged(value:int):void{
+			// see states in MicMonitor
+			// CHECK_MIC_STATE:int = 0;
+			//trace(value);
+			switch(value)
+			{	
+				case MicMonitor.OK_LEVEL_STATE: 	
+					dispatchHardwareStateEvent(true);			
+					break;
+			}
+		}
+		
+		private function dispatchHardwareStateEvent(isUserDefined:Boolean):void
+		{
+			var event:HardwareEvent = new HardwareEvent(HardwareEvent.HARDWARE_STATE);
+			event.data = {microphone:{}, camera:{}, userDefined:isUserDefined};
+			event.data.microphone.name = ctx.hw.micName;
+			event.data.microphone.state = ctx.hw.micState;
+			event.data.camera.name = (camera ? camera.name : null);
+			event.data.camera.state = (!camera ? "absent" : (camera.muted ? "disabled" : "enabled"));
+			dispatchEvent(event);
+		}
+		
 		private function mHandler(e:MediaTransportEvent):void{
-			ExternalInterface.call("mediaHandler", e.toObject());	
+			ExternalInterface.call(ctx.CALLBACK, e.toObject());	
 		}
 		
 		private function hwHandler(e:HardwareEvent):void
 		{
-			ExternalInterface.call("mediaHandler", e.toObject());	
+			ExternalInterface.call(ctx.CALLBACK, e.toObject());	
 		}
 	}
 }

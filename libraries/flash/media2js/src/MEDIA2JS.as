@@ -10,26 +10,16 @@ package
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
-	import flash.events.MouseEvent;
-	import flash.events.TimerEvent;
 	import flash.external.ExternalInterface;
 	import flash.geom.Rectangle;
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
-	import flash.net.URLRequest;
-	import flash.net.navigateToURL;
-	import flash.system.Capabilities;
 	import flash.system.Security;
-	import flash.text.TextField;
-	import flash.text.TextFormat;
-	import flash.utils.Timer;
-	import flash.utils.setTimeout;
 	
 	import mx.logging.Log;
 	
-	import ru.rcslabs.components.ImageLoader;
+	import ru.rcslabs.components.HardwareTest;
 	import ru.rcslabs.components.VideoContainer;
-	import ru.rcslabs.components.settings.SettingsPanel;
 	import ru.rcslabs.config.Config;
 	import ru.rcslabs.utils.DragHelper;
 	import ru.rcslabs.utils.Logger;
@@ -37,27 +27,25 @@ package
 	import ru.rcslabs.webcall.events.MediaTransportEvent;
 	import ru.rcslabs.webcall.vo.ClientInfoVO;
 	
-	[SWF(width="216", height="180", frameRate="30")]
+	[SWF(width="220", height="140", frameRate="30")]
 	public class MEDIA2JS extends Sprite
 	{
+		public var hw:HardwareTest;
+		
 		public var subCont:VideoContainer;
 		
 		public var pubCont:VideoContainer;
 		
-		private var config:AppConfig;
+		private var config:Config;
 		
 		private var mt:MediaTransportJS;
-		
-		private var bg:ImageLoader;
-		
+				
 		private var dm:DragHelper;
-		
-		private var tf:TextField;
-		
-		private var tmr:Timer;
 		
 		private var dialSoundChannel:SoundChannel;
 		
+		public var CALLBACK:String = null;
+
 		public function MEDIA2JS()
 		{
 			super();
@@ -74,6 +62,18 @@ package
 				
 				Logger.init(config.logLevel);
 
+				if(undefined == loaderInfo.parameters['cbMedia']){
+					Log.getLogger(Logger.DEFAULT_CATEGORY).error("Callback 'cbMedia' undefined");	
+					throw new Error("You have to define 'cbMedia' on flashVars");	
+				}else{
+					CALLBACK = loaderInfo.parameters['cbMedia'];
+				}
+
+				if(undefined == loaderInfo.parameters['cbReady']){
+					Log.getLogger(Logger.DEFAULT_CATEGORY).error("Callback 'cbReady' undefined");	
+					throw new Error("You have to define 'cbReady' on flashVars");	
+				}
+
 				if(Log.isDebug()){
 					var info:ClientInfoVO = ClientInfoVO.createInfo();
 					Log.getLogger(Logger.DEFAULT_CATEGORY).debug(loaderInfo.url);
@@ -82,102 +82,46 @@ package
 					Log.getLogger(Logger.DEFAULT_CATEGORY).debug("MEDIA2JS " + WEBCALL::APP_VERSION);
 					Log.getLogger(Logger.DEFAULT_CATEGORY).debug(config.toString());
 				}
-				
-				mt = new MediaTransportJS();
-				mt.setAppContext(this);								
-				mt.init(config);
-				
-				mt.addEventListener(MediaTransportEvent.PUBLISHED, pubHandler);
-				mt.addEventListener(MediaTransportEvent.UNPUBLISHED, unpubHandler);
-				mt.addEventListener(MediaTransportEvent.SUBSCRIBED, subHandler);
-				mt.addEventListener(MediaTransportEvent.UNSUBSCRIBED, unsubHandler);
-				
-				bg = addChild(new ImageLoader) as ImageLoader;
-				
-				if(config.clickTag){
-					bg.addEventListener(MouseEvent.CLICK, function(e:MouseEvent):void{
-						navigateToURL(new URLRequest(config.clickTag), "_blank");	
-					});
-				}
-				
-				subCont = addChild(new VideoContainer) as VideoContainer;
-				subCont.setSizeAndPositionAsRectangle(config.subscriberRect);
-				subCont.visible = false;
 
-				pubCont = addChild(new VideoContainer) as VideoContainer;
-				pubCont.setSizeAndPositionAsRectangle(config.publisherRect);
-				pubCont.visible = false;
-
-				if(0 != config.callTimerX){
-					tmr = new Timer(1000);
-					tmr.addEventListener(TimerEvent.TIMER, tmrHandler);					
-					tf = createTimerTextField();
-					addChild(tf);
-				}
-				
 				dm = new DragHelper();
-				dm.allowDrag(pubCont, new Rectangle(
+				/*dm.allowDrag(pubCont, new Rectangle(
 					config.subscriberRect.x, 
 					config.subscriberRect.y,
 					config.subscriberRect.width - config.publisherRect.width,
 					config.subscriberRect.height - config.publisherRect.height
-				));
+				));*/
 				
 				ExternalInterface.marshallExceptions = true;
 				
 				ExternalInterface.addCallback("muteSubscriber", muteSubscriber);
 				ExternalInterface.addCallback("playDialingSound", playDialingSound);
 				ExternalInterface.addCallback("stopDialingSound", stopDialingSound);
-				ExternalInterface.addCallback("showSettingsPanel", showSettingsPanel);
-				ExternalInterface.addCallback("hideSettingsPanel", hideSettingsPanel);
-				ExternalInterface.addCallback("loadImage", loadImage);
-				ExternalInterface.addCallback("setViewState", setViewState);
-				ExternalInterface.call("swfReady", "ru.rcslabs.webcall.MediaTransport");
+				ExternalInterface.call(loaderInfo.parameters.cbReady);
 			}
+
+			mt = new MediaTransportJS(this);								
+			mt.init(config);
+			
+			mt.addEventListener(MediaTransportEvent.PUBLISHED, pubHandler);
+			mt.addEventListener(MediaTransportEvent.UNPUBLISHED, unpubHandler);
+			mt.addEventListener(MediaTransportEvent.SUBSCRIBED, subHandler);
+			mt.addEventListener(MediaTransportEvent.UNSUBSCRIBED, unsubHandler);
+			
+			subCont = addChild(new VideoContainer) as VideoContainer;
+			subCont.setSizeAndPositionAsRectangle(config.subscriberRect);
+			subCont.visible = false;
+			
+			pubCont = addChild(new VideoContainer) as VideoContainer;
+			pubCont.setSizeAndPositionAsRectangle(config.publisherRect);
+			pubCont.visible = false;
+			
+			hw = addChild(new HardwareTest(mt)) as HardwareTest;
 			
 			stage.addEventListener(Event.RESIZE, resizeHandler);
 			resizeHandler();
-		}
-		
-		
-		private function setViewState(state:String):void
-		{
-			if('default' == state){ 
-				if(tf) tf.text = ''; 
-			}else if('timerOn' == state){
-				if(tmr) {tmr.reset(); tmr.start();}
-			}else if('timerOff' == state){
-				if(tmr) { tmr.stop(); }
-			}
-		}
-		
-		public function tmrHandler(event:TimerEvent):void
-		{
-			if(!tf) return;
-			var d:Date = new Date();
-			d.time = event.target.currentCount * 1000;
-			var s:String = String(d.secondsUTC < 10 ? "0"+d.secondsUTC : d.secondsUTC);
-			var m:String = String(d.minutesUTC < 10 ? "0"+d.minutesUTC : d.minutesUTC);
-			var h:String = String(d.hoursUTC);
-			if(d.hoursUTC){
-				tf.text = h.concat(":", m, ":", s);
-			}else{
-				tf.text = "".concat(m, ":", s);
-			}
-		}
-		
-		private function createTimerTextField():TextField
-		{
-			var ttf:TextFormat = new TextFormat();
-			ttf.size = config.callTimerFontSize;
-			ttf.color = config.callTimerFontColor;
-
-			var tf:TextField = new TextField();
-			tf.x = config.callTimerX;
-			tf.y = config.callTimerY;
-			tf.selectable = false;
-			tf.defaultTextFormat = ttf;
-			return tf;
+			
+			// test case
+			if(!ExternalInterface.available) hw.run();
 		}
 		
 		private function resizeHandler(event:Event=null):void
@@ -199,31 +143,6 @@ package
 			if(null == dialSoundChannel){ return; }
 			dialSoundChannel.stop();
 			dialSoundChannel = null;
-		}
-		
-		private function showSettingsPanel(centerPanel:Boolean=false, index:int=0):void
-		{
-			var sp:SettingsPanel = SettingsPanel.show(stage, index);
-			
-			if(centerPanel){
-				setTimeout(function():void{
-					sp.x = int((stage.stageWidth-sp.width)/2);
-					sp.y = int((stage.stageHeight-sp.height)/2);				
-				}, 300);
-			}
-		}
-		
-		private function hideSettingsPanel():void{
-			SettingsPanel.hide();
-		}
-		
-		private function loadImage(url:String=null):void
-		{
-			if(null == url){
-				bg.unload();
-			}else{
-				bg.load(url);
-			}
 		}
 		
 		private function pubHandler(e:MediaTransportEvent):void
