@@ -114,7 +114,7 @@ class SimpleCommunicator extends a3.Communicator {
 
   constructor() {
     super();
-    this._graph = new CommunicatorGraph(document.getElementById("communicator-graph"));
+    this._graph = new CommunicatorGraph(document.getElementById("communicator-graph-paper"));
   }
   initAll() {
     this._initAll = true;
@@ -158,16 +158,16 @@ class SimpleCommunicator extends a3.Communicator {
 
   // signaling connection
   onConnecting() {
-    $("#connect-status").text("Connecting").addClass("working");
+    $("#connect-status").text("Connecting")[0].className = "working";
     this._graph.onConnecting();
   }
   onConnected() {
-    $("#connect-status").text("Connected").addClass("done");
+    $("#connect-status").text("Connected")[0].className = "done";
     this._graph.onConnected();
     if(this._initAll) this.open();
   }
   onConnectionFailed() {
-    $("#connect-status").text("Failed").addClass("failed");
+    $("#connect-status").text("Failed")[0].className = "failed";
     this._graph.onConnectionFailed();
   }
 
@@ -225,7 +225,7 @@ class SimpleCommunicator extends a3.Communicator {
     super.onSignalingConnectionFailed(o);
   }
   onMediaReady(opt) {
-    $("#media-status").text("Media ready").addClass("done");
+    $("#media-status").text("Media ready")[0].className = "done";
     this._graph.onMediaReady(opt);
     super.onMediaReady(opt);
   }
@@ -240,11 +240,18 @@ var communicator = new SimpleCommunicator();
 $("#init-all").click(() => { communicator.initAll(); });
 $("#start").click(() => { communicator.start(); });
 $("#connect").click(() => { communicator.connect(); });
-$("#disconnect").click(() => { });
+$("#disconnect").click(() => { alert("Not implemented")});
 $("#start-session").click(() => { communicator.open(); });
+$("#stop-session").click(() => { alert("Not implemented") });
 $("#start-call").click(() => { communicator.startCall(); });
 $("#check-hardware").click(() => { communicator.checkHardware(); });
 
 if(config.isInitAutomatically()) {
   $("#init-all").click();
 }
+
+$("#communicator-graph-mark").click(() => {
+  $("#communicator-graph").toggleClass("hidden");
+  config.applyData();
+  config.save();
+});

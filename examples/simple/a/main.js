@@ -143,7 +143,7 @@ var SimpleCommunicator = (function (_super) {
     function SimpleCommunicator() {
         _super.call(this);
         this._initAll = false;
-        this._graph = new CommunicatorGraph(document.getElementById("communicator-graph"));
+        this._graph = new CommunicatorGraph(document.getElementById("communicator-graph-paper"));
     }
     SimpleCommunicator.prototype.initAll = function () {
         this._initAll = true;
@@ -188,17 +188,17 @@ var SimpleCommunicator = (function (_super) {
 
     // signaling connection
     SimpleCommunicator.prototype.onConnecting = function () {
-        $("#connect-status").text("Connecting").addClass("working");
+        $("#connect-status").text("Connecting")[0].className = "working";
         this._graph.onConnecting();
     };
     SimpleCommunicator.prototype.onConnected = function () {
-        $("#connect-status").text("Connected").addClass("done");
+        $("#connect-status").text("Connected")[0].className = "done";
         this._graph.onConnected();
         if (this._initAll)
             this.open();
     };
     SimpleCommunicator.prototype.onConnectionFailed = function () {
-        $("#connect-status").text("Failed").addClass("failed");
+        $("#connect-status").text("Failed")[0].className = "failed";
         this._graph.onConnectionFailed();
     };
 
@@ -258,7 +258,7 @@ var SimpleCommunicator = (function (_super) {
         _super.prototype.onSignalingConnectionFailed.call(this, o);
     };
     SimpleCommunicator.prototype.onMediaReady = function (opt) {
-        $("#media-status").text("Media ready").addClass("done");
+        $("#media-status").text("Media ready")[0].className = "done";
         this._graph.onMediaReady(opt);
         _super.prototype.onMediaReady.call(this, opt);
     };
@@ -277,9 +277,13 @@ $("#connect").click(function () {
     communicator.connect();
 });
 $("#disconnect").click(function () {
+    alert("Not implemented");
 });
 $("#start-session").click(function () {
     communicator.open();
+});
+$("#stop-session").click(function () {
+    alert("Not implemented");
 });
 $("#start-call").click(function () {
     communicator.startCall();
@@ -291,4 +295,10 @@ $("#check-hardware").click(function () {
 if (config.isInitAutomatically()) {
     $("#init-all").click();
 }
+
+$("#communicator-graph-mark").click(function () {
+    $("#communicator-graph").toggleClass("hidden");
+    config.applyData();
+    config.save();
+});
 //# sourceMappingURL=main.js.map

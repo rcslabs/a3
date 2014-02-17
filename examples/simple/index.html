@@ -62,7 +62,7 @@
       </td>
       <td>
         <button id="start-session" class="btn btn-success btn-small">start session</button><br/>
-        <button class="btn btn-danger btn-small">stop session</button>
+        <button id="stop-session" class="btn btn-danger btn-small">stop session</button>
         <label id="session-status">Session NOT started</label>
       </td>
       <td>
@@ -84,8 +84,9 @@
 
   </div>
 
-  <div id="communicator-graph">
-
+  <div id="communicator-graph-mark">GRAPH</div>
+  <div id="communicator-graph" data-config="graph">
+    <div id="communicator-graph-paper"></div>
   </div>
 
 <!--

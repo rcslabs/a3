@@ -43,8 +43,10 @@ var Config = (function () {
             var value = _this._data[key];
             if (el.tagName.toLowerCase() === "input" && ($el.attr("type") === "radio" || $el.attr("type") === "checkbox")) {
                 $el.prop("checked", value);
-            } else if (el.tagName.toLowerCase() === "input") {
+            } else if (el.tagName.toLowerCase() === "input" || el.tagName.toLowerCase() === "textarea") {
                 $el.val(value);
+            } else {
+                $el.get(0).className = value;
             }
         });
     };
@@ -55,8 +57,10 @@ var Config = (function () {
             var value;
             if (el.tagName.toLowerCase() === "input" && ($el.attr("type") === "radio" || $el.attr("type") === "checkbox")) {
                 value = $el.prop("checked");
-            } else {
+            } else if (el.tagName.toLowerCase() === "input" || el.tagName.toLowerCase() === "textarea") {
                 value = $el.val();
+            } else {
+                value = $el.get(0).className;
             }
             _this._data[key] = value;
         });

@@ -73,6 +73,31 @@ input[type="text"] {
   top: 100px;
   border: 1px solid #003399;
   background: white;
+  overflow:hidden;
+}
+#communicator-graph-paper {
+  width: 300px;
+  height: 400px;
+}
+#communicator-graph.hidden {
+  width:0;
+}
+#communicator-graph-mark {
+  content: "GRAPH";
+  position:absolute;
+  right:-20px;
+  top:100px;
+  width: 50px;
+  height: 20px;
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(-90deg);
+  background: #cccccc;
+  border: 1px solid #888;
+  cursor: pointer;
+  z-index: 1;
 }
 
 
