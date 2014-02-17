@@ -3,65 +3,91 @@
 <head>
   <title></title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" href="/cdn/css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/phone.css">
+  <link rel="stylesheet" href="../cdn/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/simple.css">
 
-  <script type="text/javascript" src="/cdn/jquery-1.9.0.min.js"></script>
-  <script type="text/javascript" src="/cdn/bootstrap.min.js"></script>
 
-  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
-  <script type="text/javascript" src="/lib/call-signalling.js"></script>
-  <script type="text/javascript" src="/lib/call-media.js"></script>
-  <script type="text/javascript" src="/lib/phone.js"></script>
-  <script type="text/javascript" src="/lib/conference-view.js"></script>
+  <!--<script type="text/javascript" src="../lib/call-signalling.js"></script>
+  <script type="text/javascript" src="../lib/call-media.js"></script>
+  <!--<script type="text/javascript" src="/lib/phone.js"></script>
+  <script type="text/javascript" src="/lib/conference-view.js"></script>-->
 </head>
 <body data-state="loading">
 
+  <table class="config" >
+    <tr>
+      <td colspan="4"><h4>Config: </h4></td>
+    </tr>
+    <tr>
+      <td>Signaling:</td>
+      <td>Endpoints:</td>
+      <td>Media:</td>
+      <td>Session:</td>
+    </tr>
+    <tr>
+      <td><label><input type="radio" name="signaling" data-config="sio-signaling"/>socket.io signaling</label></td>
+      <td><input type="text" data-config="sio-signaling-endpoint"/></td>
+      <td><label><input type="radio" name="media" data-config="webrtc-media"/>webrtc media</label></td>
+      <td rowspan="2">
+        <!-- Service -->
+        <table>
+          <tr><td>service: </td><td><input type="text" data-config="service"/></td></tr>
+          <tr><td>username:</td><td><input type="text" data-config="username"/></td></tr>
+          <tr><td>password:</td><td><input type="text" data-config="password"/></td></tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td><label><input type="radio" name="signaling" data-config="flash-signaling" />flash (RTMP2JS) signaling</label></td>
+      <td><textarea name="signaling" data-config="flash-signaling-endpoint"></textarea></td>
+      <td><label><input type="radio" name="media" data-config="flash-media"/>Flash (MEDIA2JS) media</label></td>
+    </tr>
+  </table>
+
+  <table class="controls">
+    <tr>
+      <td>
+        <button id="init-all" class="btn btn-primary btn-small">init all</button>
+      </td>
+      <td>
+        <button id="start" class="btn btn-success btn-small">start</button>
+        <label id="signaling-status">Signaling NOT ready</label>
+        <label id="media-status">Media NOT ready</label>
+      </td>
+      <td>
+        <button id="connect" class="btn btn-success btn-small">connect</button><br/>
+        <button id="disconnect" class="btn btn-danger btn-small">disconnect</button>
+        <label id="connect-status">Disconnected</label>
+      </td>
+      <td>
+        <button id="start-session" class="btn btn-success btn-small">start session</button><br/>
+        <button class="btn btn-danger btn-small">stop session</button>
+        <label id="session-status">Session NOT started</label>
+      </td>
+    </tr>
+  </table>
+
+  <div class="call">
+    <button class="btn btn-primary btn-small">start call</button>
+    bUri: <input type="text" data-config="b-uri"/>
+  </div>
+  <div id="media-container" class="media-container">
+
+  </div>
+
+  <div id="communicator-graph">
+
+  </div>
+
+<!--
   <div id="conference-view" style="position:absolute; z-index:1; left:0; right:0; border:1px solid black; padding:0; margin:0; background: white;">
   </div>
 
-  <style>
-    body section {
-      display: none;
-      position:absolute;
-      width: 600px;
-      height: 400px;
-      background: white;
-      box-shadow: 0 0 50px #888;
-      overflow:hidden;
-      left:50%;
-      bottom:0;
-      z-index:10;
-      
-      margin-left: -300px;
-      vertical-align: middle;
-      text-align: center;
-
-      -webkit-perspective: 1000;
-      -webkit-transform-style: preserve-3d;
-      -webkit-transform-origin: 0 0;
-
-      perspective: 1000;
-      transform-style: preserve-3d;
-      transform-origin: 0 0;
-      -webkit-transform: rotateY(180deg);
-    }
-    body[data-state="login"]              #login,
-    body[data-state="loading"]            #loading,
-    body[data-state="hardware-settings"]  #hardware-settings,
-    body[data-state="app"]                #app,
-    body[data-state="error"]              #error,
-    body[data-state="call-in-progress"]   #call-in-progress    {
-      display: block;
-      -webkit-transform: rotateY(0deg);
-      z-index:1000;
-    }
-  </style>
 
 
   <div style="background: white; text-align: center; z-index:2; border:1px solid black; border-radius: 4px; line-height: 50px;font-weight: bold; position: absolute; right:0; top:0; font-size: 30px; width:100px; height: 50px;" id="log-phone"></div>
-
-  <div class="sections-container" style="position:absolute; left:0; right:0; top:0; height:100%; max-height:600px; ">
+-->
+  <!--<div class="sections-container" style="position:absolute; left:0; right:0; top:0; height:100%; max-height:600px; ">
 	<section id="login" data-focus="#login-server">
 		<div id="login-form">
 			<label class="error">Ошибка</label>
@@ -318,106 +344,29 @@
       $('#dtmf-block .icon-remove-sign').click(function() { $('#dtmf-block input[type="text"]').val('') });
     });
   </script>
+  -->
 
-  
+  <script type="text/javascript" src="../cdn/jquery-1.9.0.min.js"></script>
+  <script type="text/javascript" src="../cdn/bootstrap.min.js"></script>
+  <script type="text/javascript" src="../cdn/socket.io-0.9.16.js"></script>
+  <script type="text/javascript" src="../cdn/swfobject-2.2.js"></script>
+  <script type="text/javascript" src="../cdn/raphael-2.1.2.min.js"></script>
+
+  <script>
+    window.DEBUG = true;
+    window.LOG = console.log.bind(console);
+  </script>
+
+  <script type="text/javascript" src="a/config.js"></script>
+  <script type="text/javascript" src="a/signaling.js"></script>
+  <script type="text/javascript" src="a/media.js"></script>
+  <script type="text/javascript" src="a/communicator.js"></script>
+  <script type="text/javascript" src="a/main.js"></script>
+
+
+
 </body>
 </html>
-
-
-
-<span style="font-family: consolas; color: #aaa; position:absolute; z-index:0; left:0; right:0; bottom:0; top:0; overflow: hidden;">
-config: mq=redis://192.168.1.38/YouDial-MC
-config: ip=192.168.1.36
-redis
-192.168.1.38
-None
-YouDial-MC
- [x] Received '{"type":"CREATE_MEDIA_POINT","sender":"YouDial-APP","vv":[true,fa                                                     lse],"bUri":"sip:1016@192.168.1.249","sessionId":"7a56cdab-e07b-43a6-ad48-9a711c                                                     496771","pointId":"WRTC-21b08405-9ed5-49c2-a49d-5b905a499d78","aUri":"1015","cal                                                     lId":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5","cc":{"userAgent":"Chrome","audio":[                                                     "PCMU/8000"],"profile":"RTP/SAVPF","ice":true,"ssrcRequired":true}}'
-Execure command: agents/stun-agent
-[stun] received: OPEN_PORT
-[stun] Received: type=OPEN_PORT
- [x] Received '{"type":"CREATE_MEDIA_POINT","sender":"YouDial-APP","vv":[true,fa                                                     lse],"bUri":"sip:1016@192.168.1.249","sessionId":"7a56cdab-e07b-43a6-ad48-9a711c                                                     496771","pointId":"SIP-d40d9d2e-2c16-4cbf-93a0-5d7b7029ec90","aUri":"1015","call                                                     Id":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5","cc":{"audio":["PCMU/8000"],"ice":fal                                                     se,"profile":"RTP/AVP"}}'
-[stun] Sending type=OPEN_PORT_OK iface=0.0.0.0 port=65442
-[stun] received: OPEN_PORT
-[stun] Received: type=OPEN_PORT
-[stun] Listening...
-RECEIVED FROM STUN : [('type', 'OPEN_PORT_OK'), ('iface', '0'), ('port', '65442'                                                     )]
- [y] sending <u'YouDial-APP'> '{"sdp": "v=0\\r\\no=- 3229174452 2 IN IP4 192.168.1.36\\r\\ns=-\\r\\nt=0 0\\r\\nm=audio 65442 RTP/AVP 0\\r\\nc=IN IP4 192.168.1.3                                                     6\\r\\na=sendrecv\\r\\na=rtcp-mux\\r\\na=rtpmap:0 PCMU/8000\\r\\n", "sender": "Y                                                     ouDial-MC", "cc": {"profile": "RTP/AVP", "audio": ["PCMU/8000"], "ice": false},                                                      "callId": "95b30fb9-7aef-4e6b-90e9-a397c5d313e5", "bUri": "sip:1016@192.168.1.24                                                     9", "pointId": "SIP-d40d9d2e-2c16-4cbf-93a0-5d7b7029ec90", "sessionId": "7a56cda                                                     b-e07b-43a6-ad48-9a711c496771", "vv": [true, false], "type": "SDP_OFFER", "aUri"                                                     : "1015"}'
-[stun] Sending type=OPEN_PORT_OK iface=0.0.0.0 port=65443
-[stun] Listening...
-RECEIVED FROM STUN : [('type', 'OPEN_PORT_OK'), ('iface', '0'), ('port', '65443'                                                     )]
- [y] sending <u'YouDial-APP'> '{"sdp": "v=0\\r\\no=- 3229174452 2 IN IP4 127.0.0.1\\r\\ns=-\\r\\nt=0 0\\r\\nm=audio 1 RTP/SAVPF 0\\r\\nc=IN IP4 0.0.0.0\\r\\na=i                                                     ce-ufrag:t30SYofTJD1E8XWx\\r\\na=ice-pwd:648/NXzChHKfDJP09wIHe5B0\\r\\na=ice-opt                                                     ions:google-ice\\r\\na=sendrecv\\r\\na=candidate:3354082314 1 udp 1677729535 192                                                     .168.1.36 65443 typ srflx generation 0\\r\\na=rtcp-mux\\r\\na=crypto:1 AES_CM_12                                                     8_HMAC_SHA1_80 inline:DOUXfgs9sLB4F16vvCksVKUptM7IptAStkjNS7ky\\r\\na=rtpmap:0 P                                                     CMU/8000\\r\\na=ssrc:4113987973 cname:mHMVNu9cEZzzEqs5\\r\\n", "sender": "YouDia                                                     l-MC", "cc": {"profile": "RTP/SAVPF", "userAgent": "Chrome", "audio": ["PCMU/800                                                     0"], "ssrcRequired": true, "ice": true}, "callId": "95b30fb9-7aef-4e6b-90e9-a397                                                     c5d313e5", "bUri": "sip:1016@192.168.1.249", "pointId": "WRTC-21b08405-9ed5-49c2                                                     -a49d-5b905a499d78", "sessionId": "7a56cdab-e07b-43a6-ad48-9a711c496771", "vv":                                                      [true, false], "type": "SDP_OFFER", "aUri": "1015"}'
- [x] Received '{"type":"SDP_ANSWER",
-                "sender":"YouDial-APP",
-                "sessionId":"7a56cdab-e07b-43a6-ad48-9a711c496771",
-                "pointId":"WRTC-21b08405-9ed5-49c2-a49d-5b905a499d78",
-                "callId":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5",
-                "sdp":"v\\u003d0\\r\\no\\u003dFreeSWITCH 1361507785 1361507786 IN IP4 192.168.1.249\\r\\ns\\u003dFreeSWITCH\\r\\nc\\u003dIN IP4 192.168.1.249\\r\\nt\\u003d0 0\\r\\nm\\u003daudio 55134 RTP/AVP 0\\r\\na\\u003drtpmap:0 PCMU/8000\\r\\na\\u003dsilenceSupp:off - - - -\\r\\na\\u003dptime:20\\r\\n"}'
-REMOTE addr= {'remote-ip': u'192.168.1.249', 'remote-port': 55134}
-[stun]  [y] sending <u'YouDial-APP'> '{"sender": "YouDial-MC", "cc": {"profile":                                                      "RTP/SAVPF", "userAgent": "Chrome", "audio": ["PCMU/8000"], "ssrcRequired": tru                                                     e, "ice": true}, "callId": "95b30fb9-7aef-4e6b-90e9-a397c5d313e5", "bUri": "sip:                                                     1016@192.168.1.249", "preceived: remote-ip=192.168.1.249 sub=tmp/2166611771 remo                                                     te-port=55134 pub=tmp/2003207884 type=ADD_POINT port=65443ointId": "WRTC-21b0840                                                     5-9ed5-49c2-a49d-5b905a499d78", "sessionId": "7a56cdab-e07b-43a6-ad48-9a711c4967                                                     71", "vv": [true, false], "type": "CREATE_MEDIA_POINT_OK", "aUri": "1015"}'
-
-[stun] Received: type=ADD_POINT port=65443 pub=tmp/2003207884 remote-ip=192.168.1.249 remote-port=55134 sub=tmp/2166611771
-[stun] Adding point : pub=tmp/2003207884 sub=tmp/2166611771
- [x] Received '{"type":"SDP_ANSWER",
-                "sender":"YouDial-APP",
-                "sessionId":"7a56cdab-e07b-43a6-ad48-9a711c496771",
-                "pointId":"SIP-d40d9d2e-2c16-4cbf-93a0-5d7b7029ec90",
-                "callId":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5",
-                "sdp":"v\\u003d0\\r\\no\\u003dFreeSWITCH 1361507785 1361507786 IN IP4 192.168.1.249\\r\\ns\\u003dFreeSWITCH\\r\\nc\\u003dIN IP4 192.168.1.249\\r\\nt\\u003d0 0\\r\\nm\\u003daudio 55134 RTP/AVP 0\\r\\na\\u003drtpmap:0 PCMU/8000\\r\\na\\u003dsilenceSupp:off - - - -\\r\\na\\u003dptime:20\\r\\n"}'
-
-
-REMOTE addr= {'remote-ip': u'192.168.1.249', 'remote-port': 55134}
- [y] sending <u'YouDial-APP'> '{"sender": "YouDial-MC", "cc": {"profile": "RTP/AVP", "audio": ["PCMU/8000"], "ice": false}, "callId": "95b30fb9-7aef-4e6b-90e9-a                                                     397c5d313e5", "bUri": "sip:1016@192.168.1.249", "pointId": "SIP-d40d9d2e-2c16-4c                                                     bf-93a0-5d7b7029ec90", "sessionId": "7a56cdab-e07b-43a6-ad48-9a711c496771", "vv"                                                     : [true, false], "type": "CREATE_MEDIA_POINT_OK", "aUri": "1015"}'
-[stun] Point has ip and port: 192.168.1.249:55134
- [x] Received '{"type":"JOIN_ROOM","sender":"YouDial-MC","vv":[true,false],"bUri                                                     ":"sip:1016@192.168.1.249","sessionId":"7a56cdab-e07b-43a6-ad48-9a711c496771","r                                                     oomId":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5","aUri":"1015","pointId":"WRTC-21b0                                                     8405-9ed5-49c2-a49d-5b905a499d78","callId":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5                                                     ","cc":{"profile":"RTP/SAVPF","userAgent":"Chrome","audio":["PCMU/8000"],"ssrcRe                                                     quired":true,"ice":true}}'
-Execure command: agents/room-agent
-[stun] received: remote-ip=192.168.1.249 sub=tmp/2671699831 remote-port=55134 pu                                                     b=tmp/2928289181 type=ADD_POINT port=65442
-[stun] Received: type=ADD_POINT port=65442 pub=tmp/2928289181 remote-ip=192.168.                                                     1.249 remote-port=55134 sub=tmp/2671699831
-[stun] Adding point : pub=tmp/2928289181 sub=tmp/2671699831
-[stun] Point has ip and port: 192.168.1.249:55134
-[stun] Listening...
-[stun] Listening...
- [x] Received '{"type":"JOIN_ROOM","sender":"YouDial-MC","vv":[true,false],"bUri                                                     ":"sip:1016@192.168.1.249","sessionId":"7a56cdab-e07b-43a6-ad48-9a711c496771","r                                                     oomId":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5","aUri":"1015","pointId":"SIP-d40d9                                                     d2e-2c16-4cbf-93a0-5d7b7029ec90","callId":"95b30fb9-7aef-4e6b-90e9-a397c5d313e5"                                                     ,"cc":{"profile":"RTP/AVP","audio":["PCMU/8000"],"ice":false}}'
-[room] received: sub=tmp/2003207884 pub=tmp/2166611771 pubSsrc=4113987973 type=J                                                     OIN id=WRTC-21b08405-9ed5-49c2-a49d-5b905a499d78
-[room] Received: type=JOIN id=WRTC-21b08405-9ed5-49c2-a49d-5b905a499d78 pub=tmp/                                                     2166611771 pubSsrc=4113987973 sub=tmp/2003207884
-[room] Sending type=JOIN_OK id=WRTC-21b08405-9ed5-49c2-a49d-5b905a499d78 pub=tmp                                                     /2166611771 pubSsrc=4113987973 sub=tmp/2003207884
-[room] Listening...
-[room] received: sub=tmp/2928289181 pub=tmp/2671699831 type=JOIN id=SIP-d40d9d2e                                                     -2c16-4cbf-93a0-5d7b7029ec90
-[room] Received: type=JOIN id=SIP-d40d9d2e-2c16-4cbf-93a0-5d7b7029ec90 pub=tmp/2                                                     671699831 sub=tmp/2928289181
-[room] Sending type=JOIN_OK id=SIP-d40d9d2e-2c16-4cbf-93a0-5d7b7029ec90 pub=tmp/                                                     2671699831 sub=tmp/2928289181
-[room] Listening...
-[stun] Received message [112] from domain AF_INET port 65449 internet address 19                                                     2.168.1.36
-
-[stun] Check magic
-[stun] Seems to be stun message
-[stun] Really stun message
-[stun] Binding request for unknown user
-[stun] Received message [112] from domain AF_INET port 65449 internet address 19                                                     2.168.1.36
-
-[stun] Check magic
-[stun] Seems to be stun message
-[stun] Really stun message
-[stun] Binding request for unknown user
-[stun] Received message [112] from domain AF_INET port 65449 internet address 19                                                     2.168.1.36
-
-[stun] Check magic
-[stun] Seems to be stun message
-[stun] Really stun message
-[stun] Binding request for unknown user
-
-
-
-"label":0,"id":"audio","candidate":"a=candidate:2896278100 1 udp 2113937151 192.168.1.36   53319 typ host generation 0\r\n"
-"label":0,"id":"audio","candidate":"a=candidate:2896278100 2 udp 2113937151 192.168.1.36   53319 typ host generation 0\r\n"
-"label":0,"id":"audio","candidate":"a=candidate:1521601408 2 udp 1845501695 194.8.172.178  53319 typ srflx raddr 192.168.1.36 rport 53319 generation 0\r\n"
-"label":0,"id":"audio","candidate":"a=candidate:1521601408 1 udp 1845501695 194.8.172.178  53319 typ srflx raddr 192.168.1.36 rport 53319 generation 0\r\n"
-"label":0,"id":"audio","candidate":"a=candidate:3793899172 1 tcp 1509957375 192.168.1.36   51040 typ host generation 0\r\n"
-
-"label":1,"id":"video","candidate":"a=candidate:2896278100 1 udp 2113937151 192.168.1.36   53319 typ host generation 0\r\n"
-"label":1,"id":"video","candidate":"a=candidate:2896278100 2 udp 2113937151 192.168.1.36   53319 typ host generation 0\r\n"
-"label":1,"id":"video","candidate":"a=candidate:1521601408 2 udp 1845501695 194.8.172.178  53319 typ srflx raddr 192.168.1.36 rport 53319 generation 0\r\n"
-"label":1,"id":"video","candidate":"a=candidate:1521601408 1 udp 1845501695 194.8.172.178  53319 typ srflx raddr 192.168.1.36 rport 53319 generation 0\r\n"
-"label":1,"id":"video","candidate":"a=candidate:3793899172 1 tcp 1509957375 192.168.1.36   51040 typ host generation 0\r\n"
 
 
 
