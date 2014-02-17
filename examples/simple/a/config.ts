@@ -41,9 +41,9 @@ class Config {
         return;
       }
       var value: any = this._data[key];
-      if(el.tagName.toLowerCase() === "input" && $el.attr("type") === "radio") {
+      if(el.tagName.toLowerCase() === "input" && ($el.attr("type") === "radio" || $el.attr("type") === "checkbox")) {
         $el.prop("checked", value);
-      } else {
+      } else  if(el.tagName.toLowerCase() === "input" ) {
         $el.val(value);
       }
     });
@@ -52,7 +52,7 @@ class Config {
     $("[data-config]").each((_, el) => {
       var key: string = $(el).data("config"), $el: JQuery = $(el);
       var value: any;
-      if(el.tagName.toLowerCase() === "input" && $el.attr("type") === "radio") {
+      if(el.tagName.toLowerCase() === "input" && ($el.attr("type") === "radio" || $el.attr("type") === "checkbox")) {
         value = $el.prop("checked");
       } else {
         value = $el.val();
@@ -69,6 +69,9 @@ class Config {
   getUsername()             { return this._data["username"];              }
   getPassword()             { return this._data["password"];              }
   getService()              { return this._data["service"];               }
+  getBUri()                 { return this._data["b-uri"];                 }
+  getVV()                   { return [!!this._data["vv-voice"], this._data["vv-video"]]; }
+  isInitAutomatically()     { return !!this._data["init-automatically"]; }
 }
 
 

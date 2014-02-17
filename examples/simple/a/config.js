@@ -41,9 +41,9 @@ var Config = (function () {
                 return;
             }
             var value = _this._data[key];
-            if (el.tagName.toLowerCase() === "input" && $el.attr("type") === "radio") {
+            if (el.tagName.toLowerCase() === "input" && ($el.attr("type") === "radio" || $el.attr("type") === "checkbox")) {
                 $el.prop("checked", value);
-            } else {
+            } else if (el.tagName.toLowerCase() === "input") {
                 $el.val(value);
             }
         });
@@ -53,7 +53,7 @@ var Config = (function () {
         $("[data-config]").each(function (_, el) {
             var key = $(el).data("config"), $el = $(el);
             var value;
-            if (el.tagName.toLowerCase() === "input" && $el.attr("type") === "radio") {
+            if (el.tagName.toLowerCase() === "input" && ($el.attr("type") === "radio" || $el.attr("type") === "checkbox")) {
                 value = $el.prop("checked");
             } else {
                 value = $el.val();
@@ -85,6 +85,15 @@ var Config = (function () {
     };
     Config.prototype.getService = function () {
         return this._data["service"];
+    };
+    Config.prototype.getBUri = function () {
+        return this._data["b-uri"];
+    };
+    Config.prototype.getVV = function () {
+        return [!!this._data["vv-voice"], this._data["vv-video"]];
+    };
+    Config.prototype.isInitAutomatically = function () {
+        return !!this._data["init-automatically"];
     };
     return Config;
 })();

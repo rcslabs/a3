@@ -47,7 +47,8 @@
   <table class="controls">
     <tr>
       <td>
-        <button id="init-all" class="btn btn-primary btn-small">init all</button>
+        <button id="init-all" class="btn btn-primary btn-small">init all</button><br/>
+        <label><input type="checkbox" data-config="init-automatically"/>Init automatically</label>
       </td>
       <td>
         <button id="start" class="btn btn-success btn-small">start</button>
@@ -64,12 +65,20 @@
         <button class="btn btn-danger btn-small">stop session</button>
         <label id="session-status">Session NOT started</label>
       </td>
+      <td>
+        <button id="check-hardware" class="btn btn-success btn-small">check hardware</button><br/>
+        <label id="hardware-status">NOT checked</label>
+      </td>
     </tr>
   </table>
 
   <div class="call">
-    <button class="btn btn-primary btn-small">start call</button>
+    <button id="start-call" class="btn btn-primary btn-small">start call</button>
     bUri: <input type="text" data-config="b-uri"/>
+    <div class="vv">
+      <label><input type="checkbox" data-config="vv-voice"/>voice</label>
+      <label><input type="checkbox" data-config="vv-video"/>video</label>
+    </div>
   </div>
   <div id="media-container" class="media-container">
 

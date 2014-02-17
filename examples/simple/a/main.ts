@@ -69,7 +69,7 @@ class CommunicatorGraph implements a3.ICommunicatorListener{
 
   onConnecting() { this._activateState(a3.State.CONNECTING); }
   onConnected() { this._activateState(a3.State.CONNECTED); }
-  onConnectionFailed() {}
+  onConnectionFailed() { this._activateState(a3.State.CONNECTION_FAILED); }
 
   onCheckHardwareSettings() {}
   onCheckHardwareReady() {}
@@ -137,6 +137,14 @@ class SimpleCommunicator extends a3.Communicator {
     super.open(config.getUsername(), config.getPassword(), "", "");
   }
 
+  startCall() {
+    super.startCall(config.getBUri(), config.getVV());
+  }
+
+  checkHardware() {
+    this.media.checkHardware()
+  }
+
 
 
 
@@ -164,34 +172,43 @@ class SimpleCommunicator extends a3.Communicator {
   }
 
   // hardware
-  onCheckHardwareSettings() { this._graph.onCheckHardwareSettings(); }
-  onCheckHardwareReady() { this._graph.onCheckHardwareReady(); }
-  onCheckHardwareFailed() { this._graph.onCheckHardwareFailed(); }
+  onCheckHardwareSettings() {
+    $("#hardware-status").text("checking")[0].className = "working";
+    this._graph.onCheckHardwareSettings();
+  }
+  onCheckHardwareReady() {
+    $("#hardware-status").text("ready")[0].className = "done";
+    this._graph.onCheckHardwareReady();
+  }
+  onCheckHardwareFailed() {
+    $("#hardware-status").text("failed")[0].className = "failed";
+    this._graph.onCheckHardwareFailed();
+  }
   onSoundVolumeChanged(value:number) { this._graph.onSoundVolumeChanged(value); }
 
   // session
   onSessionStarting() {
-    $("#session-status").text("Session starting").addClass("working");
+    $("#session-status").text("Session starting")[0].className = "working";
     this._graph.onSessionStarting();
   }
   onSessionStarted() {
-    $("#session-status").text("Session started").addClass("done");
+    $("#session-status").text("Session started")[0].className = "done";
     this._graph.onSessionStarted();
   }
   onSessionFailed() {
-    $("#session-status").text("Session failed").addClass("failed");
+    $("#session-status").text("Session failed")[0].className = "failed";
     this._graph.onSessionFailed();
   }
 
 
   onSignalingReady(o: a3.ISignaling) {
-    $("#signaling-status").text("Signaling ready").addClass("done");
+    $("#signaling-status").text("Signaling ready")[0].className = "done";
     this._graph.onSignalingReady(o);
     super.onSignalingReady(o);
   }
 
   onSignalingFailed(o: a3.ISignaling) {
-    $("#signaling-status").text("Signaling failed").addClass("failed");
+    $("#signaling-status").text("Signaling failed")[0].className = "failed";
     this._graph.onSignalingFailed(o);
     super.onSignalingFailed(o);
   }
@@ -224,5 +241,9 @@ $("#start").click(() => { communicator.start(); });
 $("#connect").click(() => { communicator.connect(); });
 $("#disconnect").click(() => { });
 $("#start-session").click(() => { communicator.open(); });
+$("#start-call").click(() => { communicator.startCall(); });
+$("#check-hardware").click(() => { communicator.checkHardware(); });
 
-
+if(config.isInitAutomatically()) {
+  $("#init-all").click();
+}

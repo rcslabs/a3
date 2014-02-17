@@ -84,6 +84,7 @@ var CommunicatorGraph = (function () {
         this._activateState(a3.State.CONNECTED);
     };
     CommunicatorGraph.prototype.onConnectionFailed = function () {
+        this._activateState(a3.State.CONNECTION_FAILED);
     };
 
     CommunicatorGraph.prototype.onCheckHardwareSettings = function () {
@@ -164,6 +165,14 @@ var SimpleCommunicator = (function (_super) {
         _super.prototype.open.call(this, config.getUsername(), config.getPassword(), "", "");
     };
 
+    SimpleCommunicator.prototype.startCall = function () {
+        _super.prototype.startCall.call(this, config.getBUri(), config.getVV());
+    };
+
+    SimpleCommunicator.prototype.checkHardware = function () {
+        this.media.checkHardware();
+    };
+
     // communicator subject
     SimpleCommunicator.prototype.onCommunicatorStarting = function () {
         this._graph.onCommunicatorStarting();
@@ -195,12 +204,15 @@ var SimpleCommunicator = (function (_super) {
 
     // hardware
     SimpleCommunicator.prototype.onCheckHardwareSettings = function () {
+        $("#hardware-status").text("checking")[0].className = "working";
         this._graph.onCheckHardwareSettings();
     };
     SimpleCommunicator.prototype.onCheckHardwareReady = function () {
+        $("#hardware-status").text("ready")[0].className = "done";
         this._graph.onCheckHardwareReady();
     };
     SimpleCommunicator.prototype.onCheckHardwareFailed = function () {
+        $("#hardware-status").text("failed")[0].className = "failed";
         this._graph.onCheckHardwareFailed();
     };
     SimpleCommunicator.prototype.onSoundVolumeChanged = function (value) {
@@ -209,26 +221,26 @@ var SimpleCommunicator = (function (_super) {
 
     // session
     SimpleCommunicator.prototype.onSessionStarting = function () {
-        $("#session-status").text("Session starting").addClass("working");
+        $("#session-status").text("Session starting")[0].className = "working";
         this._graph.onSessionStarting();
     };
     SimpleCommunicator.prototype.onSessionStarted = function () {
-        $("#session-status").text("Session started").addClass("done");
+        $("#session-status").text("Session started")[0].className = "done";
         this._graph.onSessionStarted();
     };
     SimpleCommunicator.prototype.onSessionFailed = function () {
-        $("#session-status").text("Session failed").addClass("failed");
+        $("#session-status").text("Session failed")[0].className = "failed";
         this._graph.onSessionFailed();
     };
 
     SimpleCommunicator.prototype.onSignalingReady = function (o) {
-        $("#signaling-status").text("Signaling ready").addClass("done");
+        $("#signaling-status").text("Signaling ready")[0].className = "done";
         this._graph.onSignalingReady(o);
         _super.prototype.onSignalingReady.call(this, o);
     };
 
     SimpleCommunicator.prototype.onSignalingFailed = function (o) {
-        $("#signaling-status").text("Signaling failed").addClass("failed");
+        $("#signaling-status").text("Signaling failed")[0].className = "failed";
         this._graph.onSignalingFailed(o);
         _super.prototype.onSignalingFailed.call(this, o);
     };
@@ -267,4 +279,14 @@ $("#disconnect").click(function () {
 $("#start-session").click(function () {
     communicator.open();
 });
+$("#start-call").click(function () {
+    communicator.startCall();
+});
+$("#check-hardware").click(function () {
+    communicator.checkHardware();
+});
+
+if (config.isInitAutomatically()) {
+    $("#init-all").click();
+}
 //# sourceMappingURL=main.js.map

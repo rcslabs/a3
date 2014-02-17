@@ -5,6 +5,15 @@ html, body {
 	background-color: white;
 }
 
+input, textarea {
+  font-size: 12px !important;
+}
+input[type="text"] {
+  height: 14px !important;
+  line-height: 18px;
+  padding:2px;
+}
+
 
 .config {
   border: 1px solid #cccccc;
@@ -12,6 +21,7 @@ html, body {
 }
 .config td {
   padding: 0 10px;
+  margin: 0;
 }
 .config input {
   margin-right: 5px;
@@ -41,7 +51,7 @@ html, body {
   font-weight: 800;
 }
 .controls td label.working {
-  color: yellow;
+  color: orange;
 }
 .controls td label.done {
   color: green;
@@ -50,7 +60,7 @@ html, body {
   color: red;
 }
 .controls button {
-  width: 90px;
+  width: 120px;
   margin: 2px 8px;
 }
 
@@ -67,100 +77,24 @@ html, body {
 
 
 
-
-
-
-
-
-
-
-
-#loading {
-	vertical-align: middle;
-	text-align: center;
+.call {
+  margin-top: 8px;
 }
-
-#login #login-form {
-	position:absolute;
-	left: 50%;
-	margin-left:-150px;
-	top:20px;
-	padding: 20px;
-	border: 1px #ddd outset;
-	width:250px;
+.call .vv {
+  display: inline-block;
 }
-#login .image-loading {
-	margin-left : 10px;
-	visibility  : hidden;
-	height      : 60px;
+.call .vv input {
+  margin:0;
 }
-#login .error {
-	color       : #dd2222;
-	position    : absolute;
-	top         : 2px;
-	left        : 20px;
-	display     : none;
-}
-#login-port {
-	padding-top    : 0;
-	padding-bottom : 0;
+.call .vv label {
+  font-size: 10px;
+  margin-bottom: 0;
+  line-height: 15px;
 }
 
 
-#video-block {
-	position          : relative;
-	height            : 300px;
-	width             : 400px;
-	background-color  : #cccccc;
-	margin            : 10px;
-	padding           : 0;
-	border            : 1px #ddd outset;
-	float             : left;
-}
-
-
-#dtmf-block {
-	padding       : 0;
-	position      : absolute;
-	width         : 200px;
-	height        : 300px;
-	left          : 50%;
-	top           : 10px;
-	border        : 1px solid #cccccc;
-	margin-left   : -100px;
-	box-sizing    : border-box;
-}
-#dtmf-block input[type="button"] {
-	width         : 30%;
-	height        : 30px;
-	margin-right  : 1%;
-	margin-left   : 1%;
-	margin-bottom : 5px;
-	box-sizing    : border-box;
-}
-#dtmf-block input[type="text"] {
-	width: 100%;
-	height: 30px;
-	margin-bottom:20px;
-	box-sizing: border-box;
-}
-#dtmf-block .icon-remove-sign {
-	position : absolute;
-	right    : 15px;
-	top      : 6px;
-	cursor   : pointer;
-}
-#dtmf-block #audio-call {
-	position : absolute;
-	left     : 5%;
-	right    : 55%;
-	height   : 30px;
-	top      : 200px;
-}
-#dtmf-block #video-call {
-	position : absolute;
-	left     : 55%;
-	right    : 5%;
-	height   : 30px;
-	top      : 200px;
+.media-container {
+  border: 1px solid #ccc;
+  width: 400px;
+  height: 400px;
 }
