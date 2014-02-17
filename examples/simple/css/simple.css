@@ -74,6 +74,8 @@ input[type="text"] {
   border: 1px solid #003399;
   background: white;
   overflow:hidden;
+  transition: width 0.8s;
+  -webkit-transition: width 0.8s;
 }
 #communicator-graph-paper {
   width: 300px;
