@@ -194,6 +194,7 @@ class SimpleCommunicator extends a3.Communicator {
   onSessionStarted() {
     $("#session-status").text("Session started")[0].className = "done";
     this._graph.onSessionStarted();
+    if(this._initAll) this.checkHardware();
   }
   onSessionFailed() {
     $("#session-status").text("Session failed")[0].className = "failed";

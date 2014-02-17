@@ -227,6 +227,8 @@ var SimpleCommunicator = (function (_super) {
     SimpleCommunicator.prototype.onSessionStarted = function () {
         $("#session-status").text("Session started")[0].className = "done";
         this._graph.onSessionStarted();
+        if (this._initAll)
+            this.checkHardware();
     };
     SimpleCommunicator.prototype.onSessionFailed = function () {
         $("#session-status").text("Session failed")[0].className = "failed";
