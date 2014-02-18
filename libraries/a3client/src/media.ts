@@ -95,7 +95,12 @@ module a3 {
 		private _playUrlVideo: any = undefined;
 		private _swf: any = null;
 
-		constructor(private _listener: IMediaListener, private _container, private _flashVars: any) {
+		constructor(private _listener: IMediaListener, private _container:HTMLElement, private _flashVars: any) {
+			var flashContainer = document.createElement('div');
+			flashContainer.id = 'this-div-will-replaced-by-swf';
+			this._container.appendChild(flashContainer);
+			this._container = flashContainer;
+
 			this._flashVars = this._flashVars || {};
 			var readyCallback = '__'+Math.round(Math.random()*Math.pow(10,16));
 			this._flashVars['cbReady'] = readyCallback;
