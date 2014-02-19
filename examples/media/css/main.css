@@ -1,0 +1,40 @@
+html, body {
+	width   : 100%;
+	margin  : 0;
+	padding : 10px;
+	background-color: white;
+}
+
+input, textarea {
+  font-size: 12px !important;
+  width: 250px;
+}
+input[type="text"] {
+  height: 14px !important;
+  line-height: 18px;
+  padding:2px;
+}
+
+
+.config {
+  border: 1px solid #cccccc;
+  margin-bottom: 10px;
+}
+.config td {
+  padding: 0 10px;
+  margin: 0;
+}
+.config input {
+  margin-right: 5px;
+  margin-top:1px;
+}
+
+
+
+#media {
+  margin-top:10px;
+  border: 1px solid #ccc;
+  width: 400px;
+  height: 400px;
+  position: relative;
+}
