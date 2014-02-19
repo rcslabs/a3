@@ -90,7 +90,6 @@ package
 				ExternalInterface.addCallback("muteSubscriber", muteSubscriber);
 				ExternalInterface.addCallback("playDialingSound", playDialingSound);
 				ExternalInterface.addCallback("stopDialingSound", stopDialingSound);
-				ExternalInterface.call(loaderInfo.parameters.cbReady);
 			}
 
 			mt = new MediaTransportJS(this);								
@@ -115,7 +114,11 @@ package
 			resizeHandler();
 			
 			// test case
-			if(!ExternalInterface.available) hw.run();
+			if(!ExternalInterface.available){
+				hw.run();
+			}else{
+				ExternalInterface.call(loaderInfo.parameters.cbReady);
+			}
 		}
 		
 		private function resizeHandler(event:Event=null):void
