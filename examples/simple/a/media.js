@@ -76,10 +76,10 @@ var a3;
             this._listener = _listener;
             this._container = _container;
             this._flashVars = _flashVars;
-            this._publishUrlVoice = undefined;
-            this._publishUrlVideo = undefined;
-            this._playUrlVoice = undefined;
-            this._playUrlVideo = undefined;
+            this._pubVoice = undefined;
+            this._pubVideo = undefined;
+            this._subVoice = undefined;
+            this._subVideo = undefined;
             this._swf = null;
             this._flashVars = this._flashVars || {};
             var readyCallback = '__' + Math.round(Math.random() * Math.pow(10, 16));
@@ -92,7 +92,7 @@ var a3;
             window[mediaCallback] = function (e) {
                 _this._listener.onMediaMessage(e.type, e);
             };
-            this._flashVars['logLevel'] = 'NONE';
+            this._flashVars['logLevel'] = 'ALL';
         }
         FlashMedia.prototype.start = function () {
             var _this = this;
@@ -111,8 +111,9 @@ var a3;
         FlashMedia.prototype.getCc = function () {
             return {
                 userAgent: "FlashPlayer",
-                audio: ["speex/8000"],
-                video: ["H264/90000"]
+                audio: ["PCMA/8000"],
+                video: ["H264/90000"],
+                "profile": "RTMP"
             };
         };
 
@@ -144,13 +145,51 @@ var a3;
             //  publishUrlVideo: [...]
             //  publishUrlVoice: [...]
             //}
-            this._publishUrlVoice = offerSdp.publishUrlVoice;
-            this._publishUrlVideo = offerSdp.publishUrlVideo;
-            this._playUrlVoice = offerSdp.playUrlVoice;
-            this._playUrlVideo = offerSdp.playUrlVideo;
+            if (typeof offerSdp === "string") {
+                var lines = offerSdp.split("\r\n");
+                var state = 0;
+                for (var i = 0; i < lines.length; i++) {
+                    var line = lines[i];
+                    if (line.match(/^m=audio/))
+                        state = 1;
+                    if (line.match(/^m=video/))
+                        state = 2;
+                    if (line) {
+                        switch (state) {
+                            case 0:
+                                break;
+                            case 1:
+                                if (line.match("^a=rtmp-sub:(.+)$"))
+                                    this._pubVoice = RegExp.$1;
+                                if (line.match("^a=rtmp-pub:(.+)$"))
+                                    this._subVoice = RegExp.$1;
+                                break;
+                            case 2:
+                                if (line.match("^a=rtmp-sub:(.+)$"))
+                                    this._pubVideo = RegExp.$1;
+                                if (line.match("^a=rtmp-pub:(.+)$"))
+                                    this._subVideo = RegExp.$1;
+                                break;
+                        }
+                    }
+                }
+            } else {
+                this._pubVoice = offerSdp.publishUrlVoice;
+                this._pubVideo = offerSdp.publishUrlVideo;
+                this._subVoice = offerSdp.playUrlVoice;
+                this._subVideo = offerSdp.playUrlVideo;
+            }
 
-            this._swf.publish(this._publishUrlVoice, this._publishUrlVideo);
-            this._swf.subscribe(this._playUrlVoice, this._playUrlVideo);
+            this._swf.publish(this._pubVoice, this._pubVideo);
+            this._swf.subscribe(this._subVoice, this._subVideo);
+
+            if (typeof offerSdp === "string") {
+                this._listener.onMediaMessage(MediaEvent.SDP_ANSWER, {
+                    callId: callId,
+                    pointId: pointId,
+                    sdp: offerSdp
+                });
+            }
         };
 
         FlashMedia.prototype.dispose = function () {
