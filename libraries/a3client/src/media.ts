@@ -89,10 +89,10 @@ module a3 {
 
 	export class FlashMedia implements IMedia
 	{
-		private _publishUrlVoice: any = undefined;
-		private _publishUrlVideo: any = undefined;
-		private _playUrlVoice: any = undefined;
-		private _playUrlVideo: any = undefined;
+		private _pubVoice: any = undefined;
+		private _pubVideo: any = undefined;
+		private _subVoice: any = undefined;
+		private _subVideo: any = undefined;
 		private _swf: any = null;
 
 		constructor(private _listener: IMediaListener, private _container:HTMLElement, private _flashVars: any) {
@@ -131,8 +131,9 @@ module a3 {
 		getCc(): any {
 			return {
 				userAgent: "FlashPlayer",
-				audio: ["speex/8000"],
-				video: ["H264/90000"]
+				audio: ["PCMA/8000"],
+				video: ["H264/90000"],
+				"profile" : "RTMP"
 			};
 		}
 
@@ -164,14 +165,44 @@ module a3 {
 			//  publishUrlVideo: [...]
 			//  publishUrlVoice: [...]
 			//}
+			if(typeof offerSdp === "string") {
+				var lines: string[] = offerSdp.split("\r\n");
+				var state = 0;
+				for(var i=0; i<lines.length; i++) {
+					var line: string = lines[i];
+					if(line.match(/^m=audio/)) state = 1;
+					if(line.match(/^m=video/)) state = 2;
+					if(line) {
+						switch(state) {
+							case 0: break;
+							case 1:
+								if(line.match("^a=rtmp-sub:(.+)$")) this._pubVoice = RegExp.$1;
+								if(line.match("^a=rtmp-pub:(.+)$")) this._subVoice = RegExp.$1;
+								break;
+							case 2:
+								if(line.match("^a=rtmp-sub:(.+)$")) this._pubVideo = RegExp.$1;
+								if(line.match("^a=rtmp-pub:(.+)$")) this._subVideo = RegExp.$1;
+								break;
+						}
+					}
+				}
+			} else {
+				this._pubVoice = offerSdp.publishUrlVoice;
+				this._pubVideo = offerSdp.publishUrlVideo;
+				this._subVoice = offerSdp.playUrlVoice;
+				this._subVideo = offerSdp.playUrlVideo;
+			}
 
-			this._publishUrlVoice = offerSdp.publishUrlVoice;
-			this._publishUrlVideo = offerSdp.publishUrlVideo;
-			this._playUrlVoice = offerSdp.playUrlVoice;
-			this._playUrlVideo = offerSdp.playUrlVideo;
+			if(this._pubVoice || this._pubVideo) this._swf.publish(   this._pubVoice, this._pubVideo );
+			if(this._subVoice || this._subVideo) this._swf.subscribe( this._subVoice, this._subVideo );
 
-			this._swf.publish   ( this._publishUrlVoice, this._publishUrlVideo );
-			this._swf.subscribe ( this._playUrlVoice,    this._playUrlVideo    );
+			if(typeof offerSdp === "string") {
+				this._listener.onMediaMessage(MediaEvent.SDP_ANSWER, {
+					callId: callId,
+					pointId: pointId,
+					sdp: offerSdp
+				});
+			}
 		}
 
 	   	dispose(){
