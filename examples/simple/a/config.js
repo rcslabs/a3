@@ -1,106 +1,65 @@
-/// <reference path="jquery.d.ts" />
-var $config = $(".config");
-
-var Config = (function () {
+/// <reference path="../../cdn/jquery.d.ts" />
+/// <reference path="../../cdn/config/config.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+//
+// Simple: config
+//
+var Config = (function (_super) {
+    __extends(Config, _super);
     function Config() {
-        this._data = {
-            "sio-signaling": true,
-            "webrtc-media": true
-        };
-        this.load();
-        this.applyUi();
-        this.addListeners();
+        _super.call(this, "config-simple");
     }
-    Config.prototype.load = function () {
-        if (!window.localStorage)
-            return;
-        var storage = window.localStorage;
-        $.extend(this._data, JSON.parse(storage.getItem("config-data")));
-    };
-    Config.prototype.save = function () {
-        if (!window.localStorage)
-            throw new Error("No window.localStorage");
-        var storage = window.localStorage;
-        storage.setItem("config-data", JSON.stringify(this._data));
-    };
-    Config.prototype.addListeners = function () {
-        var _this = this;
-        $("input[data-config], textarea[data-config]").on("change keypress", function () {
-            console.log("Config changed");
-            _this.applyData();
-            _this.save();
-        });
+    Config.prototype.defaults = function () {
+        return {
+            "sio-signaling": true,
+            "webrtc-media": true,
+            "service": "click2call"
+        };
     };
 
-    Config.prototype.applyUi = function () {
-        var _this = this;
-        $("[data-config]").each(function (_, el) {
-            var key = $(el).data("config"), $el = $(el);
-            if (!(key in _this._data)) {
-                console.warn("Config: Error in data-config: key=" + key);
-                return;
-            }
-            var value = _this._data[key];
-            if (el.tagName.toLowerCase() === "input" && ($el.attr("type") === "radio" || $el.attr("type") === "checkbox")) {
-                $el.prop("checked", value);
-            } else if (el.tagName.toLowerCase() === "input" || el.tagName.toLowerCase() === "textarea") {
-                $el.val(value);
-            } else {
-                $el.get(0).className = value;
-            }
-        });
-    };
-    Config.prototype.applyData = function () {
-        var _this = this;
-        $("[data-config]").each(function (_, el) {
-            var key = $(el).data("config"), $el = $(el);
-            var value;
-            if (el.tagName.toLowerCase() === "input" && ($el.attr("type") === "radio" || $el.attr("type") === "checkbox")) {
-                value = $el.prop("checked");
-            } else if (el.tagName.toLowerCase() === "input" || el.tagName.toLowerCase() === "textarea") {
-                value = $el.val();
-            } else {
-                value = $el.get(0).className;
-            }
-            _this._data[key] = value;
-        });
-    };
-
+    //
+    // getters
+    //
     Config.prototype.isSioSignaling = function () {
-        return !!this._data["sio-signaling"];
+        return !!this.value("sio-signaling");
     };
     Config.prototype.isFlashSignaling = function () {
         return !this.isSioSignaling();
     };
     Config.prototype.isWebrtcMedia = function () {
-        return !!this._data["webrtc-media"];
+        return !!this.value("webrtc-media");
     };
     Config.prototype.isFlashMedia = function () {
         return !this.isWebrtcMedia();
     };
     Config.prototype.getSioSignalingEndpoint = function () {
-        return this._data["sio-signaling-endpoint"];
+        return this.value("sio-signaling-endpoint");
     };
     Config.prototype.getUsername = function () {
-        return this._data["username"];
+        return this.value("username");
     };
     Config.prototype.getPassword = function () {
-        return this._data["password"];
+        return this.value("password");
     };
     Config.prototype.getService = function () {
-        return this._data["service"];
+        return this.value("service");
     };
     Config.prototype.getBUri = function () {
-        return this._data["b-uri"];
+        return this.value("b-uri");
     };
     Config.prototype.getVV = function () {
-        return [!!this._data["vv-voice"], this._data["vv-video"]];
+        return [!!this.value("vv-voice"), !!this.value("vv-video")];
     };
     Config.prototype.isInitAutomatically = function () {
-        return !!this._data["init-automatically"];
+        return !!this.value("init-automatically");
     };
     return Config;
-})();
+})(BaseConfig);
 
 var config = new Config();
 //# sourceMappingURL=config.js.map

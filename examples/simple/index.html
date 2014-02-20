@@ -1,113 +1,106 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title></title>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" href="../cdn/css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/simple.css">
-
-
-  <!--<script type="text/javascript" src="../lib/call-signalling.js"></script>
-  <script type="text/javascript" src="../lib/call-media.js"></script>
-  <!--<script type="text/javascript" src="/lib/phone.js"></script>
-  <script type="text/javascript" src="/lib/conference-view.js"></script>-->
+	<title></title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="../cdn/css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/simple.css">
 </head>
-<body data-state="loading">
+<body>
+	<table class="config" >
+		<tr>
+			<td colspan="4"><h4>Config:</h4></td>
+		</tr>
+		<tr>
+			<td>Signaling:</td>
+			<td>Endpoints:</td>
+			<td>Media:</td>
+			<td>Session:</td>
+		</tr>
+		<tr>
+			<td><label><input type="radio" name="signaling" data-config="sio-signaling"/>socket.io signaling</label></td>
+			<td><input type="text" data-config="sio-signaling-endpoint"/></td>
+			<td><label><input type="radio" name="media" data-config="webrtc-media"/>webrtc media</label></td>
+			<td rowspan="2">
+				<!-- Service -->
+				<table>
+					<tr><td>service: </td><td><input type="text" data-config="service"/></td></tr>
+					<tr><td>username:</td><td><input type="text" data-config="username"/></td></tr>
+					<tr><td>password:</td><td><input type="text" data-config="password"/></td></tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td><label><input type="radio" name="signaling" data-config="flash-signaling" />flash (RTMP2JS) signaling</label></td>
+			<td><textarea name="signaling" data-config="flash-signaling-endpoint"></textarea></td>
+			<td><label><input type="radio" name="media" data-config="flash-media"/>Flash (MEDIA2JS) media</label></td>
+		</tr>
+	</table>
 
-  <table class="config" >
-    <tr>
-      <td colspan="4"><h4>Config: </h4></td>
-    </tr>
-    <tr>
-      <td>Signaling:</td>
-      <td>Endpoints:</td>
-      <td>Media:</td>
-      <td>Session:</td>
-    </tr>
-    <tr>
-      <td><label><input type="radio" name="signaling" data-config="sio-signaling"/>socket.io signaling</label></td>
-      <td><input type="text" data-config="sio-signaling-endpoint"/></td>
-      <td><label><input type="radio" name="media" data-config="webrtc-media"/>webrtc media</label></td>
-      <td rowspan="2">
-        <!-- Service -->
-        <table>
-          <tr><td>service: </td><td><input type="text" data-config="service"/></td></tr>
-          <tr><td>username:</td><td><input type="text" data-config="username"/></td></tr>
-          <tr><td>password:</td><td><input type="text" data-config="password"/></td></tr>
-        </table>
-      </td>
-    </tr>
-    <tr>
-      <td><label><input type="radio" name="signaling" data-config="flash-signaling" />flash (RTMP2JS) signaling</label></td>
-      <td><textarea name="signaling" data-config="flash-signaling-endpoint"></textarea></td>
-      <td><label><input type="radio" name="media" data-config="flash-media"/>Flash (MEDIA2JS) media</label></td>
-    </tr>
-  </table>
+	<table class="controls">
+		<tr>
+			<td>
+				<button id="init-all" class="btn btn-primary btn-small">init all</button><br/>
+				<label><input type="checkbox" data-config="init-automatically"/>Init automatically</label>
+			</td>
+			<td>
+				<button id="start" class="btn btn-success btn-small">start</button>
+				<label id="signaling-status">Signaling NOT ready</label>
+				<label id="media-status">Media NOT ready</label>
+			</td>
+			<td>
+				<button id="connect" class="btn btn-success btn-small">connect</button><br/>
+				<button id="disconnect" class="btn btn-danger btn-small">disconnect</button>
+				<label id="connect-status">Disconnected</label>
+			</td>
+			<td>
+				<button id="start-session" class="btn btn-success btn-small">start session</button><br/>
+				<button id="stop-session" class="btn btn-danger btn-small">stop session</button>
+				<label id="session-status">Session NOT started</label>
+			</td>
+			<td>
+				<button id="check-hardware" class="btn btn-success btn-small">check hardware</button><br/>
+				<label id="hardware-status">NOT checked</label>
+			</td>
+		</tr>
+	</table>
 
-  <table class="controls">
-    <tr>
-      <td>
-        <button id="init-all" class="btn btn-primary btn-small">init all</button><br/>
-        <label><input type="checkbox" data-config="init-automatically"/>Init automatically</label>
-      </td>
-      <td>
-        <button id="start" class="btn btn-success btn-small">start</button>
-        <label id="signaling-status">Signaling NOT ready</label>
-        <label id="media-status">Media NOT ready</label>
-      </td>
-      <td>
-        <button id="connect" class="btn btn-success btn-small">connect</button><br/>
-        <button id="disconnect" class="btn btn-danger btn-small">disconnect</button>
-        <label id="connect-status">Disconnected</label>
-      </td>
-      <td>
-        <button id="start-session" class="btn btn-success btn-small">start session</button><br/>
-        <button id="stop-session" class="btn btn-danger btn-small">stop session</button>
-        <label id="session-status">Session NOT started</label>
-      </td>
-      <td>
-        <button id="check-hardware" class="btn btn-success btn-small">check hardware</button><br/>
-        <label id="hardware-status">NOT checked</label>
-      </td>
-    </tr>
-  </table>
+	<div class="call">
+		<button id="start-call" class="btn btn-primary btn-small">start call</button>
+		bUri: <input type="text" data-config="b-uri"/>
+		<div class="vv">
+			<label><input type="checkbox" data-config="vv-voice"/>voice</label>
+			<label><input type="checkbox" data-config="vv-video"/>video</label>
+		</div>
+	</div>
 
-  <div class="call">
-    <button id="start-call" class="btn btn-primary btn-small">start call</button>
-    bUri: <input type="text" data-config="b-uri"/>
-    <div class="vv">
-      <label><input type="checkbox" data-config="vv-voice"/>voice</label>
-      <label><input type="checkbox" data-config="vv-video"/>video</label>
-    </div>
-  </div>
-  <div id="media">
-    <div id="media-container" class="media-container"></div>
-  </div>
+	<div id="media">
+	</div>
+	<div id="flash-signaling-container"></div>
 
-  <div id="communicator-graph-mark">GRAPH</div>
-  <div id="communicator-graph" data-config="graph" class="hidden">
-    <div id="communicator-graph-paper"></div>
-  </div>
-
-
-
-  <script type="text/javascript" src="../cdn/jquery-1.9.0.min.js"></script>
-  <script type="text/javascript" src="../cdn/bootstrap.min.js"></script>
-  <script type="text/javascript" src="../cdn/socket.io-0.9.16.js"></script>
-  <script type="text/javascript" src="../cdn/swfobject-2.2.js"></script>
-  <script type="text/javascript" src="../cdn/raphael-2.1.2.min.js"></script>
-
-  <script>
-    window.DEBUG = true;
-    window.LOG = console.log.bind(console);
-  </script>
-
-  <script type="text/javascript" src="../cdn/a3client/a3.js"></script>
-
-  <script type="text/javascript" src="a/config.js"></script>
-  <script type="text/javascript" src="a/main.js"></script>
+	<div id="communicator-graph-mark">GRAPH</div>
+	<div id="communicator-graph" data-config="graph" class="hidden">
+		<div id="communicator-graph-paper"></div>
+	</div>
 
 
+
+	<script type="text/javascript" src="../cdn/jquery-1.9.0.min.js"></script>
+	<script type="text/javascript" src="../cdn/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../cdn/socket.io-0.9.16.js"></script>
+	<script type="text/javascript" src="../cdn/swfobject-2.2.js"></script>
+	<script type="text/javascript" src="../cdn/raphael-2.1.2.min.js"></script>
+
+	<script>
+		window.DEBUG = true;
+		window.LOG = console.log.bind(console);
+	</script>
+
+	<script type="text/javascript" src="../cdn/a3client/a3.js"></script>
+	<script type="text/javascript" src="../cdn/config/config.js"></script>
+
+	<script type="text/javascript" src="a/config.js"></script>
+	<script type="text/javascript" src="a/main.js"></script>
 
 </body>
 </html>

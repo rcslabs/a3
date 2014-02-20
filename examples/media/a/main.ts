@@ -1,4 +1,4 @@
-/// <reference path="jquery.d.ts" />
+/// <reference path="../../cdn/jquery.d.ts" />
 /// <reference path="../../cdn/a3client/a3.d.ts" />
 /// <reference path="config.ts" />
 
@@ -26,14 +26,12 @@ class MediaListener implements a3.IMediaListener {
 
 
 var media: a3.FlashMedia;
-function applyFlashVars() {
+function init() {
 	console.log("Flash Vars:", config.getFlashVars());
-	$("#media").html('<div id="media-container" class="media-container"></div>');
-	media = new a3.FlashMedia(new MediaListener(), document.getElementById("media-container"), config.getFlashVars());
+	$("#media").html('');
+	media = new a3.FlashMedia(new MediaListener(), document.getElementById("media"), config.getFlashVars());
 	media.start();
 }
-
-applyFlashVars();
 
 
 $start.click(() => {
@@ -51,5 +49,8 @@ $start.click(() => {
 	}
 });
 
-$(".flash-vars-config-toggle").click(() => { $("#flash-vars-config").toggleClass("hidden"); config.applyData();	config.save(); });
-$("#flash-vars-apply").click(() => { $("#flash-vars-config").addClass("hidden");  config.applyData();	config.save(); applyFlashVars() });
+$(".flash-vars-config-toggle").click(() => { $("#flash-vars-config").toggleClass("hidden"); config.apply();	});
+$("#flash-vars-apply").click(() => { $("#flash-vars-config").addClass("hidden");  config.apply();	init(); });
+
+
+init();

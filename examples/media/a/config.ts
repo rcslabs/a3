@@ -1,96 +1,46 @@
-/// <reference path="jquery.d.ts" />
+/// <reference path="../../cdn/jquery.d.ts" />
+/// <reference path="../../cdn/config/config.ts" />
 
+//
+// MediaTester config
+//
 
-var $config: JQuery = $(".config");
-
-class Config {
-  private _data: any = {
-    "pub-audio": "rtmp://192.168.1.200/live/subaudio",
-		"sub-audio": "rtmp://192.168.1.200/live/pubaudio",
-		"sub-video": "rtmp://192.168.1.200/live/pubvideo",
-		"pub-video": "rtmp://192.168.1.200/live/subvideo",
-		"is-pub-audio": true,
-		"is-sub-audio": true,
-		"is-pub-video": false,
-		"is-sub-video": false
-  };
+class Config extends BaseConfig {
 
   constructor() {
-    this.load();
-    this.applyUi();
-    this.addListeners();
+		super("config-media-tester");
   }
 
-  load() {
-    if(!window.localStorage) return;
-    var storage: Storage = window.localStorage;
-    $.extend(this._data, JSON.parse(storage.getItem("config-media")));
-  }
-  save() {
-    if(!window.localStorage) throw new Error("No window.localStorage");
-    var storage: Storage = window.localStorage;
-    storage.setItem("config-media", JSON.stringify(this._data));
-  }
-  addListeners() {
-    $("input[data-config], textarea[data-config], select[data-config]").on("change keypress", () => {
-      console.log("Config changed");
-      this.applyData();
-      this.save();
-    });
-  }
+	public defaults(): any {
+		return {
+			"pub-audio": "rtmp://192.168.1.200/live/subaudio",
+			"sub-audio": "rtmp://192.168.1.200/live/pubaudio",
+			"sub-video": "rtmp://192.168.1.200/live/pubvideo",
+			"pub-video": "rtmp://192.168.1.200/live/subvideo",
+			"is-pub-audio": true,
+			"is-sub-audio": true,
+			"is-pub-video": false,
+			"is-sub-video": false
+		};
+	}
 
-  applyUi() {
-    $("[data-config]").each((_, el) => {
-      var key: string = $(el).data("config"), $el: JQuery = $(el);
-      if(!(key in this._data)) {
-        console.warn("Config: Error in data-config: key=" + key);
-        return;
-      }
-      var value: any = this._data[key];
-      if(el.tagName.toLowerCase() === "input" && ($el.attr("type") === "radio" || $el.attr("type") === "checkbox")) {
-        $el.prop("checked", value);
-			} else if(["input", "textarea", "select"].indexOf(el.tagName.toLowerCase()) !== -1) {
-        $el.val(value);
-      } else {
-        $el.get(0).className = value;
-      }
-    });
-  }
-  applyData() {
-    $("[data-config]").each((_, el) => {
-      var key: string = $(el).data("config"), $el: JQuery = $(el);
-      var value: any;
-      if(el.tagName.toLowerCase() === "input" && ($el.attr("type") === "radio" || $el.attr("type") === "checkbox")) {
-        value = $el.prop("checked");
-      } else if(["input", "textarea", "select"].indexOf(el.tagName.toLowerCase()) !== -1) {
-        value = $el.val();
-				if(value && $el.attr("type") === "number") value = parseInt(value);
-			} else {
-        value = $el.get(0).className;
-      }
-      this._data[key] = value;
-    });
-  }
+	//
+	// getters
+	//
+	public getPubAudio() { return this.value("is-pub-audio") ? this.value("pub-audio") : null }
+	public getSubAudio() { return this.value("is-sub-audio") ? this.value("sub-audio") : null }
+	public getPubVideo() { return this.value("is-pub-video") ? this.value("pub-video") : null }
+	public getSubVideo() { return this.value("is-sub-video") ? this.value("sub-video") : null }
 
-	getPubAudio() { return this._data["is-pub-audio"] ? this._data["pub-audio"] : null }
-	getSubAudio() { return this._data["is-sub-audio"] ? this._data["sub-audio"] : null }
-	getPubVideo() { return this._data["is-pub-video"] ? this._data["pub-video"] : null }
-	getSubVideo() { return this._data["is-sub-video"] ? this._data["sub-video"] : null }
-
-	getFlashVars() {
+	public getFlashVars() {
 		var result = {};
-		for(var key in this._data) {
-			if(this._data.hasOwnProperty(key)){
-				if(key.indexOf("fv-") === 0 && this._data[key]) {
-					result[key.substr(3)] = this._data[key];
-				}
+		this.each((key, value) => {
+			if(key.indexOf("fv-") === 0 && value) {
+				result[key.substr(3)] = value;
 			}
-		}
+		});
 		return result;
 	}
 }
 
-
 var config: Config = new Config();
-
-

@@ -121,23 +121,26 @@ var CommunicatorGraph = (function () {
     return CommunicatorGraph;
 })();
 
+var flashVars = {
+    micRate: 44,
+    micCodec: "nellymoser",
+    logLevel: "ALL"
+};
+
 var SimpleCommunicatorFactory = (function () {
     function SimpleCommunicatorFactory() {
     }
     SimpleCommunicatorFactory.prototype.createMedia = function (listener) {
         if (config.isWebrtcMedia())
-            return new a3.WebrtcMedia(listener, document.getElementById("media-container"));
+            return new a3.WebrtcMedia(listener, document.getElementById("media"));
         else
-            return new a3.FlashMedia(listener, document.getElementById("media-container"), {
-                micRate: 44,
-                micCodec: "nellymoser"
-            });
+            return new a3.FlashMedia(listener, document.getElementById("media"), flashVars);
     };
     SimpleCommunicatorFactory.prototype.createSignaling = function (listener) {
         if (config.isSioSignaling())
             return new a3.SioSignaling(listener);
         else
-            return new a3.FlashSignaling(listener, "media-container", {});
+            return new a3.FlashSignaling(listener, "flash-signaling-container", {});
     };
     return SimpleCommunicatorFactory;
 })();
@@ -297,12 +300,11 @@ $("#check-hardware").click(function () {
 });
 
 if (config.isInitAutomatically()) {
-    $("#init-all").click();
+    communicator.initAll();
 }
 
 $("#communicator-graph-mark").click(function () {
     $("#communicator-graph").toggleClass("hidden");
-    config.applyData();
-    config.save();
+    config.apply();
 });
 //# sourceMappingURL=main.js.map

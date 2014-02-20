@@ -1,63 +1,63 @@
 html, body {
-	width   : 100%;
+	width    : 100%;
 	margin  : 0;
 	padding : 10px;
 	background-color: white;
 }
 
 input, textarea {
-  font-size: 12px !important;
-  width: 250px;
+	font-size: 12px !important;
+	width: 250px;
 }
 input {
-  height: 14px !important;
-  line-height: 18px;
-  padding:2px;
-  margin:0;
+	height: 14px !important;
+	line-height: 18px;
+	padding:2px;
+	margin:0;
 }
 select {
-  height: 16px !important;
-  font-size: 12px !important;
-  line-height: 12px;
-  padding:0;
-  margin:0;
+	height: 16px !important;
+	font-size: 12px !important;
+	line-height: 12px;
+	padding:0;
+	margin:0;
 }
 
 
 
 .config {
-  border: 1px solid #cccccc;
-  margin-bottom: 10px;
+	border: 1px solid #cccccc;
+	margin-bottom: 10px;
 }
 .config td {
-  padding: 0 10px;
-  margin: 0;
+	padding: 0 10px;
+	margin: 0;
 }
 .config input {
-  margin-right: 5px;
+	margin-right: 5px;
 }
 
 #flash-vars-config {
-  width: 80%;
+	width: 80%;
 }
 #flash-vars-config.hidden {
-  display: none;
+	display: none;
 }
 #flash-vars-config td {
-  vertical-align: middle;
+	vertical-align: middle;
 }
 #flash-vars-config tr:nth-child(2n+1) {
-  background-color: #efefef;
+	background-color: #efefef;
 }
 #flash-vars-config td:nth-child(3) {
-  font-size: 10px;
+	font-size: 10px;
 }
 
 
 #media {
-  margin-top:10px;
-  border: 1px solid #ccc;
-  width: 400px;
-  height: 400px;
-  position: relative;
+	margin-top:10px;
+	border: 1px solid #ccc;
+	width: 400px;
+	height: 400px;
+	position: relative;
 }
