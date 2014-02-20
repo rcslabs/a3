@@ -1,19 +1,19 @@
 html, body {
-	width    : 100%;
-	margin  : 0;
-	padding : 10px;
-	background-color: white;
+	width            : 100%;
+	margin	         : 0;
+	padding          : 10px;
+	background-color : white;
 }
 
 input, textarea {
-	font-size: 12px !important;
-	width: 250px;
+	font-size        : 12px !important;
+	width            : 250px;
 }
 input {
-	height: 14px !important;
-	line-height: 18px;
-	padding:2px;
-	margin:0;
+	height           : 14px !important;
+	line-height      : 18px;
+	padding          : 2px;
+	margin           : 0;
 }
 select {
 	height: 16px !important;
