@@ -26,9 +26,15 @@ var MediaListener = (function () {
     return MediaListener;
 })();
 
-var flashVars = {};
-var media = new a3.FlashMedia(new MediaListener(), document.getElementById("media-container"), flashVars);
-media.start();
+var media;
+function applyFlashVars() {
+    console.log("Flash Vars:", config.getFlashVars());
+    $("#media").html('<div id="media-container" class="media-container"></div>');
+    media = new a3.FlashMedia(new MediaListener(), document.getElementById("media-container"), config.getFlashVars());
+    media.start();
+}
+
+applyFlashVars();
 
 $start.click(function () {
     var sdpOffer = {
@@ -43,5 +49,17 @@ $start.click(function () {
     } catch (e) {
         debugger;
     }
+});
+
+$(".flash-vars-config-toggle").click(function () {
+    $("#flash-vars-config").toggleClass("hidden");
+    config.applyData();
+    config.save();
+});
+$("#flash-vars-apply").click(function () {
+    $("#flash-vars-config").addClass("hidden");
+    config.applyData();
+    config.save();
+    applyFlashVars();
 });
 //# sourceMappingURL=main.js.map

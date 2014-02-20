@@ -7,6 +7,163 @@
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body data-state="loading">
+  <a style="cursor: pointer" class="flash-vars-config-toggle">Flash Vars</a><br/>
+  <table class="config hidden" id="flash-vars-config" data-config="flash-vars-config">
+    <tr>
+      <td>logLevel</td>
+      <td>
+        <select data-config="fv-logLevel" value="NONE">
+          <option value="NONE" selected>NONE</option>
+          <option value="FATAL">FATAL</option>
+          <option value="ERROR">ERROR</option>
+          <option value="WARN">WARN</option>
+          <option value="INFO">INFO</option>
+          <option value="DEBUG">DEBUG</option>
+          <option value="ALL">ALL</option>
+        </select>
+      </td>
+      <td>Уровень логирования для <a href="DebugConsole.swf" target="_blank">дебаг-консоли</a></td>
+    </tr>
+    <tr>
+      <td>publisherRect</td>
+      <td><input type="text" data-config="fv-publisherRect"/></td>
+      <td>Прямоугольная область для размещения публикуемого видео - x,y,width,height. Значение по умолчанию - "0,216,88,72".</td>
+    </tr>
+    <tr>
+      <td>subscriberRect</td>
+      <td><input type="text" data-config="fv-subscriberRect"/></td>
+      <td>Прямоугольная область для размещения просматриваемого видео - x,y,width,height. Значение по умолчанию -"0,0,352,288". Минимальный размер: width: 215, height: 138</td>
+    </tr>
+    <tr>
+      <td>camFPS</td>
+      <td><input type="number" data-config="fv-camFPS"/></td>
+      <td>Частота кадров камеры. Значение по умолчанию - 10.</td>
+    </tr>
+    <tr>
+      <td>camQualityBW</td>
+      <td><input type="number" data-config="fv-camQualityBW"/></td>
+      <td>Ширина видеопотока камеры в байт/сек. Значение по умолчанию - 0.</td>
+    </tr>
+    <tr>
+      <td>camQuality</td>
+      <td><input type="number" data-config="fv-camQuality"/></td>
+      <td>Качество изображения камеры. Значение по умолчанию - 80.</td>
+    </tr>
+    <tr>
+      <td>camKeyFrame</td>
+      <td><input type="number" data-config="fv-camKeyFrame"/></td>
+      <td>Интервал ключевых фреймов камеры. Значение по умолчанию - 48.</td>
+    </tr>
+    <tr>
+      <td>camWidth</td>
+      <td><input type="number" data-config="fv-camWidth"/></td>
+      <td>Ширина изображения камеры. Значение по умолчанию - 352.</td>
+    </tr>
+    <tr>
+      <td>camHeight</td>
+      <td><input type="number" data-config="fv-camHeight"/></td>
+      <td>Высота изображения камеры. Значение по умолчанию - 288.</td>
+    </tr>
+    <tr>
+      <td>camMotionLevel</td>
+      <td><input type="number" data-config="fv-camMotionLevel"/></td>
+      <td>Уровень детектирования движения камеры. Значение по умолчанию - 0.</td>
+    </tr>
+    <tr>
+      <td>camMotionTimeout</td>
+      <td><input type="number" data-config="fv-camMotionTimeout"/></td>
+      <td>Таймаут детектирования движения камеры в миллисекундах. Значение по умолчанию - 20000.</td>
+    </tr>
+    <tr>
+      <td>camCodec</td>
+      <td><input type="text" data-config="fv-camCodec"></td>
+      <td>Кодек камеры. Возможные значения - "sorenson|h264". Значение по умолчанию - "sorenson".</td>
+    </tr>
+    <tr>
+      <td>micSilenceLevel</td>
+      <td><input type="number" data-config="fv-micSilenceLevel"></td>
+      <td>Уровень детектирования активности микрофона. Значение по умолчанию - 0.</td>
+    </tr>
+    <tr>
+      <td>micSilenceTimeout</td>
+      <td><input type="number" data-config="fv-micSilenceTimeout"></td>
+      <td>Таймаут детектирования активности микрофона в миллисекундах. Значение по умолчанию - 20000.</td>
+    </tr>
+    <tr>
+      <td>micCodec</td>
+      <td><input type="text" data-config="fv-micCodec"></td>
+      <td>Кодек микрофона. Возможные значения - "speex|nellymoser|pcmu|pcma". Значение по умолчанию - "nellymoser".</td>
+    </tr>
+    <tr>
+      <td>micGain</td>
+      <td><input type="number" data-config="fv-micGain"></td>
+      <td>Усиление микрофона. Диапазон - 0-100. Значение по умолчанию - 50.</td>
+    </tr>
+    <tr>
+      <td><a target="_blank" href="http://help.adobe.com/ru_RU/FlashPlatform/reference/actionscript/3/flash/media/Microphone.html#rate">micRate</a></td>
+      <td><input type="number" data-config="fv-micRate"></td>
+      <td>Частота дискретизации микрофона в кГц. Значение по умолчанию - 8.</td>
+    </tr>
+    <tr>
+      <td>bandwidthEndpoint</td>
+      <td><input type="text" data-config="fv-bandwidthEndpoint"></td>
+      <td>URL для детектора оптимизации качества QOS. Как правило совпадает с URL приложения live. Если значение не задано - QOS использоваться не будет.</td>
+    </tr>
+    <tr>
+      <td>bandwidthCheckInterval</td>
+      <td><input type="number" data-config="fv-bandwidthCheckInterval"></td>
+      <td>Интервал в миллисекундах для измерения ширины канала QOS. Значение по умолчанию - 5000.</td>
+    </tr>
+    <tr>
+      <td>bandwidthDisableDownloadCheck</td>
+      <td><input type="text" data-config="fv-bandwidthDisableDownloadCheck"></td>
+      <td>Игнорировать измерение полосы download (от сервера к клиенту). Значения - 'true|false'. Значение по умолчанию - false.</td>
+    </tr>
+    <tr>
+      <td>bandwidthDisableUploadCheck</td>
+      <td><input type="text" data-config="fv-bandwidthDisableUploadCheck"></td>
+      <td>Игнорировать измерение полосы upload (от клиента к серверу). Значения - 'true|false'. Значение по умолчанию - false.</td>
+    </tr>
+    <tr>
+      <td>bandwidthMinCameraLimit</td>
+      <td><input type="text" data-config="fv-bandwidthMinCameraLimit"></td>
+      <td>Минимальная полоса пропускания в кБит/сек для камеры. Если ширина полосы будет ниже - камера будет отключена. Значение по умолчанию - 100.</td>
+    </tr>
+    <!--  Дополнительные параметры, управляющие отображением -->
+    <tr>
+      <td>callTimerX</td>
+      <td><input type="number" data-config="fv-callTimerX"></td>
+      <td>Позиция текстового поля таймера. Значение по умолчанию - 0.</td>
+    </tr>
+    <tr>
+      <td>callTimerY</td>
+      <td><input type="number" data-config="fv-callTimerY"/></td>
+      <td>Позиция текстового поля таймера. Значение по умолчанию - 0.</td>
+    </tr>
+    <tr>
+      <td>callTimerFontColor</td>
+      <td><input type="text" data-config="fv-callTimerFontColor"/></td>
+      <td>Цвет текстового поля таймера. Значение по умолчанию - 0.</td>
+    </tr>
+    <tr>
+      <td>callTimerFontSize</td>
+      <td><input type="number" data-config="fv-callTimerFontSize"/></td>
+      <td>Размер текстового поля таймера. Значение по умолчанию - 10.</td>
+    </tr>
+    <tr>
+      <td>clickTag</td>
+      <td><input type="text" data-config="fv-clickTag"/></td>
+      <td>URL ссылки для фонового изображения. См. loadImage().</td>
+    </tr>
+    <tr>
+      <td colspan="3">
+        <br/>
+        <button id="flash-vars-apply" class="btn btn-primary">Apply</button>
+        <br/><br/>
+        <a style="cursor: pointer" class="flash-vars-config-toggle">Hide</a>
+      </td>
+    </tr>
+  </table>
 
   <table class="config" >
     <tr>
@@ -32,7 +189,7 @@
   <button id="start" class="btn btn-primary " disabled>start</button><br/>
 
   <div id="media">
-    <div id="media-container" class="media-container"></div>
+    <!--<div id="media-container" class="media-container"></div>-->
   </div>
 
   <script>

@@ -31,7 +31,7 @@ var Config = (function () {
     };
     Config.prototype.addListeners = function () {
         var _this = this;
-        $("input[data-config], textarea[data-config]").on("change keypress", function () {
+        $("input[data-config], textarea[data-config], select[data-config]").on("change keypress", function () {
             console.log("Config changed");
             _this.applyData();
             _this.save();
@@ -49,7 +49,7 @@ var Config = (function () {
             var value = _this._data[key];
             if (el.tagName.toLowerCase() === "input" && ($el.attr("type") === "radio" || $el.attr("type") === "checkbox")) {
                 $el.prop("checked", value);
-            } else if (el.tagName.toLowerCase() === "input" || el.tagName.toLowerCase() === "textarea") {
+            } else if (["input", "textarea", "select"].indexOf(el.tagName.toLowerCase()) !== -1) {
                 $el.val(value);
             } else {
                 $el.get(0).className = value;
@@ -63,8 +63,10 @@ var Config = (function () {
             var value;
             if (el.tagName.toLowerCase() === "input" && ($el.attr("type") === "radio" || $el.attr("type") === "checkbox")) {
                 value = $el.prop("checked");
-            } else if (el.tagName.toLowerCase() === "input" || el.tagName.toLowerCase() === "textarea") {
+            } else if (["input", "textarea", "select"].indexOf(el.tagName.toLowerCase()) !== -1) {
                 value = $el.val();
+                if (value && $el.attr("type") === "number")
+                    value = parseInt(value);
             } else {
                 value = $el.get(0).className;
             }
@@ -83,6 +85,18 @@ var Config = (function () {
     };
     Config.prototype.getSubVideo = function () {
         return this._data["is-sub-video"] ? this._data["sub-video"] : null;
+    };
+
+    Config.prototype.getFlashVars = function () {
+        var result = {};
+        for (var key in this._data) {
+            if (this._data.hasOwnProperty(key)) {
+                if (key.indexOf("fv-") === 0 && this._data[key]) {
+                    result[key.substr(3)] = this._data[key];
+                }
+            }
+        }
+        return result;
     };
     return Config;
 })();

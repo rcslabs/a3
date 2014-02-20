@@ -24,12 +24,19 @@ class MediaListener implements a3.IMediaListener {
 	}
 }
 
-var flashVars = {};
-var media = new a3.FlashMedia(new MediaListener(), document.getElementById("media-container"), flashVars);
-media.start();
+
+var media: a3.FlashMedia;
+function applyFlashVars() {
+	console.log("Flash Vars:", config.getFlashVars());
+	$("#media").html('<div id="media-container" class="media-container"></div>');
+	media = new a3.FlashMedia(new MediaListener(), document.getElementById("media-container"), config.getFlashVars());
+	media.start();
+}
+
+applyFlashVars();
+
 
 $start.click(() => {
-
 	var sdpOffer = {
 		publishUrlVoice: 	config.getPubAudio(),
 		playUrlVoice: 		config.getSubAudio(),
@@ -43,3 +50,6 @@ $start.click(() => {
 		debugger;
 	}
 });
+
+$(".flash-vars-config-toggle").click(() => { $("#flash-vars-config").toggleClass("hidden"); config.applyData();	config.save(); });
+$("#flash-vars-apply").click(() => { $("#flash-vars-config").addClass("hidden");  config.applyData();	config.save(); applyFlashVars() });

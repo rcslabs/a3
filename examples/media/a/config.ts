@@ -32,7 +32,7 @@ class Config {
     storage.setItem("config-media", JSON.stringify(this._data));
   }
   addListeners() {
-    $("input[data-config], textarea[data-config]").on("change keypress", () => {
+    $("input[data-config], textarea[data-config], select[data-config]").on("change keypress", () => {
       console.log("Config changed");
       this.applyData();
       this.save();
@@ -49,7 +49,7 @@ class Config {
       var value: any = this._data[key];
       if(el.tagName.toLowerCase() === "input" && ($el.attr("type") === "radio" || $el.attr("type") === "checkbox")) {
         $el.prop("checked", value);
-      } else if(el.tagName.toLowerCase() === "input" || el.tagName.toLowerCase() === "textarea") {
+			} else if(["input", "textarea", "select"].indexOf(el.tagName.toLowerCase()) !== -1) {
         $el.val(value);
       } else {
         $el.get(0).className = value;
@@ -62,9 +62,10 @@ class Config {
       var value: any;
       if(el.tagName.toLowerCase() === "input" && ($el.attr("type") === "radio" || $el.attr("type") === "checkbox")) {
         value = $el.prop("checked");
-      } else if(el.tagName.toLowerCase() === "input" || el.tagName.toLowerCase() === "textarea") {
+      } else if(["input", "textarea", "select"].indexOf(el.tagName.toLowerCase()) !== -1) {
         value = $el.val();
-      } else {
+				if(value && $el.attr("type") === "number") value = parseInt(value);
+			} else {
         value = $el.get(0).className;
       }
       this._data[key] = value;
@@ -75,8 +76,21 @@ class Config {
 	getSubAudio() { return this._data["is-sub-audio"] ? this._data["sub-audio"] : null }
 	getPubVideo() { return this._data["is-pub-video"] ? this._data["pub-video"] : null }
 	getSubVideo() { return this._data["is-sub-video"] ? this._data["sub-video"] : null }
+
+	getFlashVars() {
+		var result = {};
+		for(var key in this._data) {
+			if(this._data.hasOwnProperty(key)){
+				if(key.indexOf("fv-") === 0 && this._data[key]) {
+					result[key.substr(3)] = this._data[key];
+				}
+			}
+		}
+		return result;
+	}
 }
 
 
 var config: Config = new Config();
+
 
