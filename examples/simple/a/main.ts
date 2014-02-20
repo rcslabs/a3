@@ -1,14 +1,15 @@
-/// <reference path="communicator.ts" />
+/// <reference path="../../cdn/a3client/a3.d.ts" />
 /// <reference path="config.ts" />
 
 declare var Raphael;
 
 Raphael.fn.arrow = function (x1, y1, x2, y2, size) {
+	var r = <any>this;
   var angle = Math.atan2(x1-x2,y2-y1);
   angle = (angle / (2 * Math.PI)) * 360;
-  var arrowPath = this.path("M" + x2 + " " + y2 + " L" + (x2 - size) + " " + (y2 - size) + " L" + (x2 - size) + " " + (y2 + size) + " L" + x2 + " " + y2 )
+  var arrowPath = r.path("M" + x2 + " " + y2 + " L" + (x2 - size) + " " + (y2 - size) + " L" + (x2 - size) + " " + (y2 + size) + " L" + x2 + " " + y2 )
                    .attr("fill","#444").rotate((90+angle),x2,y2);
-  var linePath = this.path("M" + x1 + " " + y1 + " L" + x2 + " " + y2).attr("color", "#ffaabb");
+  var linePath = r.path("M" + x1 + " " + y1 + " L" + x2 + " " + y2).attr("color", "#ffaabb");
   return [linePath,arrowPath];
 };
 
@@ -96,7 +97,10 @@ class SimpleCommunicatorFactory implements a3.ICommunicatorFactory {
     else
       return new a3.FlashMedia(listener,
                                document.getElementById("media-container"),
-                               {});
+                               {
+			                           micRate: 44,
+                                 micCodec: "nellymoser"
+		                           });
   }
   createSignaling(listener: a3.ISignalingListener): a3.ISignaling {
     if(config.isSioSignaling())

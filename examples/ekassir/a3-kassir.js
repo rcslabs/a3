@@ -55,7 +55,7 @@ var SimpleWebrtcCommunicator = (function (_super) {
 
         if (!this.isVisible)
             this.show();
-else
+        else
             this.hide();
     };
     SimpleWebrtcCommunicator.prototype.show = function () {

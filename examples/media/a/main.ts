@@ -1,5 +1,5 @@
 /// <reference path="jquery.d.ts" />
-/// <reference path="media.ts" />
+/// <reference path="../../cdn/a3client/a3.d.ts" />
 /// <reference path="config.ts" />
 
 var $start = $("#start");

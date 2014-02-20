@@ -1,4 +1,4 @@
-/// <reference path="communicator.ts" />
+/// <reference path="../../cdn/a3client/a3.d.ts" />
 /// <reference path="config.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -8,10 +8,11 @@ var __extends = this.__extends || function (d, b) {
 };
 
 Raphael.fn.arrow = function (x1, y1, x2, y2, size) {
+    var r = this;
     var angle = Math.atan2(x1 - x2, y2 - y1);
     angle = (angle / (2 * Math.PI)) * 360;
-    var arrowPath = this.path("M" + x2 + " " + y2 + " L" + (x2 - size) + " " + (y2 - size) + " L" + (x2 - size) + " " + (y2 + size) + " L" + x2 + " " + y2).attr("fill", "#444").rotate((90 + angle), x2, y2);
-    var linePath = this.path("M" + x1 + " " + y1 + " L" + x2 + " " + y2).attr("color", "#ffaabb");
+    var arrowPath = r.path("M" + x2 + " " + y2 + " L" + (x2 - size) + " " + (y2 - size) + " L" + (x2 - size) + " " + (y2 + size) + " L" + x2 + " " + y2).attr("fill", "#444").rotate((90 + angle), x2, y2);
+    var linePath = r.path("M" + x1 + " " + y1 + " L" + x2 + " " + y2).attr("color", "#ffaabb");
     return [linePath, arrowPath];
 };
 
@@ -127,7 +128,10 @@ var SimpleCommunicatorFactory = (function () {
         if (config.isWebrtcMedia())
             return new a3.WebrtcMedia(listener, document.getElementById("media-container"));
         else
-            return new a3.FlashMedia(listener, document.getElementById("media-container"), {});
+            return new a3.FlashMedia(listener, document.getElementById("media-container"), {
+                micRate: 44,
+                micCodec: "nellymoser"
+            });
     };
     SimpleCommunicatorFactory.prototype.createSignaling = function (listener) {
         if (config.isSioSignaling())
