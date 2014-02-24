@@ -19,12 +19,18 @@ allprojects {
 
     new ByteArrayOutputStream().withStream { os ->
         def result = exec {
+            ignoreExitValue = true
             executable = 'svn'
             args = ['info', projectDir]
             standardOutput = os
         }
-        def rev = (os.toString() =~ /Last Changed Rev: (\d+)/)
-        project.ext.revision = rev[0][1];
+
+        if(!result){
+            def rev = (os.toString() =~ /Last Changed Rev: (\d+)/)
+            project.ext.revision = rev[0][1];
+        } else {
+            project.ext.revision = 'no-revision';   
+        }
     }
 }
 
@@ -57,6 +63,8 @@ task (build) {
 }
 
 task (dist, type: Tar) {
+    dependsOn 'build'
+
     // TODO: remove hardcoded 'build' dir
     extension = 'tar.gz'
     baseName = 'alena3-dist'
@@ -64,53 +72,47 @@ task (dist, type: Tar) {
     exclude '**/.svn'
     exclude '**/.git'
 
-    dependsOn 'build'
-    dependsOn ':libraries:a3client:dist'
-    dependsOn ':client-handler:dist'
+    from('scripts'){
+        exclude 'nginx.conf'
+        into('alena')
+        fileMode = 0755 
+    }
 
-    doLast {
-        from('scripts'){
-            exclude 'nginx.conf'
-            into('alena')
-            fileMode = 0755 
-        }
+    from('scripts'){
+        include 'nginx.conf'
+        into('alena')
+    }
 
-        from('scripts'){
-            include 'nginx.conf'
-            into('alena')
-        }
+    from('.'){
+        include 'install.sh'
+        into('alena')
+        fileMode = 0755 
+    }
 
-        from('.'){
-            include 'install.sh'
-            into('alena')
-            fileMode = 0755 
-        }
+    from("webcall-app/build/libs"){
+        include '*.jar'
+        rename 'webcall-app-(.+).jar', 'webcall-app.jar'
+        into('alena/webcall-app')
+    }
 
-        from("webcall-app/build/libs"){
-            include '*.jar'
-            rename 'webcall-app-(.+).jar', 'webcall-app.jar'
-            into('alena/webcall-app')
-        }
+    from('webcall-app/src/main/resources'){
+        include 'default.properties'
+        rename 'default.properties', 'config.ini'
+        into('alena/webcall-app')
+    }
 
-        from('webcall-app/src/main/resources'){
-            include 'default.properties'
-            rename 'default.properties', 'config.ini'
-            into('alena/webcall-app')
-        }
+    from('media-controller'){
+        into('alena/media-controller')  
+    }
 
-        from('media-controller'){
-            into('alena/media-controller')  
-        }
-
-        from("client-handler/build"){
-            include '*.js'
-            include 'config.ini'
-            into('alena/client-handler')
-        }
-        
-        from("client-handler/build/node_modules"){
-            into('alena/client-handler/node_modules')
-        }
+    from("client-handler/build"){
+        include '*.js'
+        include 'config.ini'
+        into('alena/client-handler')
+    }
+    
+    from("client-handler/build/node_modules"){
+        into('alena/client-handler/node_modules')
     }
 }
 
