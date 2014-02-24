@@ -1,1 +1,6 @@
-
+include 'libraries:java:rcl-api'
+include 'libraries:a3client'
+include 'libraries:media2js'
+include 'libraries:rtmp2js'
+include 'client-handler'
+include 'webcall-app' 

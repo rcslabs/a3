@@ -1,88 +1,116 @@
 
-task('client-handler', type: GradleBuild) {
-    buildFile = 'client-handler/build.gradle'
-    tasks = ['packing']
+allprojects {
+    group = 'com.rcslabs'
+    version = '3.1.0-SNAPSHOT'
+
+    apply plugin: 'maven'
+
+    repositories {
+        mavenLocal()
+        maven{ url 'http://repo.rcslabs.ru/archiva/repository/internal/'}
+        maven{ url 'http://repo.rcslabs.ru/archiva/repository/snapshots/'}
+        mavenCentral()
+    }
+
+    // for 'publish' task - URL depends on version suffix
+    ext.rcslabsRepo = 'http://repo.rcslabs.ru/archiva/repository/'+(version.endsWith('-SNAPSHOT') ? 'snapshots/' : 'internal/')
+    ext.datetime = new java.text.SimpleDateFormat("yyyyMMdd-HHmm").format(Calendar.getInstance().getTime());
+    ext.builder = System.getProperty("user.name"); 
+
+    new ByteArrayOutputStream().withStream { os ->
+        def result = exec {
+            executable = 'svn'
+            args = ['info', projectDir]
+            standardOutput = os
+        }
+        def rev = (os.toString() =~ /Last Changed Rev: (\d+)/)
+        project.ext.revision = rev[0][1];
+    }
 }
 
-task('rtmp2js', type: GradleBuild) {
-    buildFile = 'libraries/rtmp2js/build.gradle'
-    tasks = ['build']
+subprojects {
+    // ugly fix the issue https://github.com/GradleFx/GradleFx/issues/91
+    // gradlefx conflicts with the maven-publish plugin
+    if(!('rtmp2js' == name || 'media2js' == name)) {
+        apply plugin: 'maven-publish'  
+        publishing {
+            repositories {
+                maven { url rcslabsRepo }
+            }
+        }  
+    }
+
+    buildscript {
+        repositories {
+            mavenCentral()
+        }
+    }
 }
 
-task('media2js', type: GradleBuild) {
-    buildFile = 'libraries/media2js/build.gradle'
-    tasks = ['build']
+task (build) {
+    dependsOn ':libraries:media2js:build'
+    dependsOn ':libraries:rtmp2js:build'
+    dependsOn ':libraries:a3client:build'
+    dependsOn ':client-handler:build'
+    dependsOn ':libraries:java:rcl-api:build'
+    dependsOn ':webcall-app:build'
 }
 
-task('a3client', type: GradleBuild) {
-    buildFile = 'libraries/a3client/build.gradle'
-    tasks = ['packing']
-}
-
-task('call-library', type: GradleBuild) {
-    buildFile = 'libraries/java/build.gradle'
-    tasks = ['install']
-}
-
-task('webcall-app', type: GradleBuild) {
-    buildFile = 'webcall-app/build.gradle'
-    tasks = ['install']
-}
-
-task('build', dependsOn:['client-handler', 'a3client', 'rtmp2js', 'media2js', 'call-library', 'webcall-app']) << {}
-
-task('all', dependsOn: build) << { 
-    println "Alias for build task" 
-}
-
-task('packing', type: Tar) {
+task (dist, type: Tar) {
+    // TODO: remove hardcoded 'build' dir
     extension = 'tar.gz'
     baseName = 'alena3-dist'
     compression = Compression.GZIP
-
-    from('scripts'){
-        exclude 'nginx.conf'
-        into('alena')
-        fileMode = 0755 
-    }
-
-    from('scripts'){
-        include 'nginx.conf'
-        into('alena')
-    }
-
-    from('.'){
-        include 'install.sh'
-        into('alena')
-        fileMode = 0755 
-    }
-
-    from('webcall-app/target/libs'){
-        include '*.jar'
-        rename 'webcall-app-(.+).jar', 'webcall-app.jar'
-        into('alena/webcall-app')
-    }
-
-    from('webcall-app/src/main/resources'){
-        include 'default.properties'
-        rename 'default.properties', 'config.ini'
-        into('alena/webcall-app')
-    }
-
-    from('media-controller'){
-        into('alena/media-controller')  
-    }
-
-    from('client-handler/target'){
-        include '*.js'
-        include 'config.ini'
-        into('alena/client-handler')
-    }
-    
-    from('client-handler/target/node_modules'){
-        into('alena/client-handler/node_modules')
-    }
-
     exclude '**/.svn'
     exclude '**/.git'
+
+    dependsOn 'build'
+    dependsOn ':libraries:a3client:dist'
+    dependsOn ':client-handler:dist'
+
+    doLast {
+        from('scripts'){
+            exclude 'nginx.conf'
+            into('alena')
+            fileMode = 0755 
+        }
+
+        from('scripts'){
+            include 'nginx.conf'
+            into('alena')
+        }
+
+        from('.'){
+            include 'install.sh'
+            into('alena')
+            fileMode = 0755 
+        }
+
+        from("webcall-app/build/libs"){
+            include '*.jar'
+            rename 'webcall-app-(.+).jar', 'webcall-app.jar'
+            into('alena/webcall-app')
+        }
+
+        from('webcall-app/src/main/resources'){
+            include 'default.properties'
+            rename 'default.properties', 'config.ini'
+            into('alena/webcall-app')
+        }
+
+        from('media-controller'){
+            into('alena/media-controller')  
+        }
+
+        from("client-handler/build"){
+            include '*.js'
+            include 'config.ini'
+            into('alena/client-handler')
+        }
+        
+        from("client-handler/build/node_modules"){
+            into('alena/client-handler/node_modules')
+        }
+    }
 }
+
