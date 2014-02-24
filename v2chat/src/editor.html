@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="a3.js"></script>
+	<script src="main.js"></script>
+</head>
+<body>
+
+<style>
+	body, html{width:100%; height:100%; overflow:hidden; margin:0; padding:0; background: #3c3f41; color:#ffffff; }
+	#locale-area, #tmpl-area { width:47%; height:96%; font:monospace; resize:none; padding:8px; background: #2b2b2b; color: #a9b7c6; border-color:#3c3f41; }
+</style>
+<div style="height:90%;">
+	<textarea id="tmpl-area"></textarea>
+	<textarea id="locale-area"></textarea>
+</div>
+<div>
+	<button id="btn-save">SAVE</button>
+</div>
+<script>
+	window.LOG = console.log.bind(console);
+	var m = document.location.search.match(/id=([^&]+)/);
+	if(m == null){ alert(("id not defined")); throw new Error("id not defined"); }
+	var resources = new Resources('//webrtc.v2chat.com/tmpl/'+m[1]);
+	resources.loadTemplate(function(data){$("#tmpl-area").val(data);});
+	resources.loadLocale(function(data){$("#locale-area").val(data);});
+	$('#btn-save').click(function(){
+		resources.saveTemplate($("#tmpl-area").val());
+		resources.saveLocale($("#locale-area").val());
+	});
+</script>
+
+</body>
+</html>

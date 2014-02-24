@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="libs.js"></script>
+    <script src="signaling.js"></script>
+    <script src="media.js"></script>
+    <script src="communicator.js"></script>
+    <!--script src="a3.js"></script-->
+    <script src="main.js"></script>
+</head>
+<body>
+
+<script>
+    // v2chat   https://constructor.v2chat.com/web-constructor/work/?e38a5cc47fb74658832ff42f79cd2588
+    // terminal https://constructor.v2chat.com/web-constructor/work/?68f4ed9407f04195ba550f936e8f802c
+    // window.LOG = window.WARN = window.ERROR = console.log.bind(console);
+    var communicator = new Click2CallCommunicator();
+    var factory = new CompatibleFactory();
+    factory.addEndpoint("rtmps://be1b.v2chat.com/webcall2/"+communicator.query.id);
+    factory.addEndpoint("rtmp://be1.v2chat.com/webcall2/"+communicator.query.id);
+    factory.addEndpoint("rtmp://be1b.v2chat.com:80/webcall2/"+communicator.query.id);
+    factory.addEndpoint("rtmpt://be1.v2chat.com/webcall2/"+communicator.query.id);
+    factory.addEndpoint(document.location.protocol+"//localhost");
+    factory.setServiceName("constructor");
+    communicator.setFactory(factory);
+    var resources = new Resources('//localhost/tmpl/'+communicator.query.id);
+    resources.load( function(res){
+        if(res === false){
+            alert('Error on loading resource. See console for details. Mission impossible');
+            throw new Error('Critical error');
+        }
+        $('body').append(res.tmpl);
+        communicator.setLocale(res.locale);
+        communicator.start();
+    }, (typeof communicator.query['lang'] !== 'undefined' ? communicator.query.lang : null));
+</script>
+</body>
+</html>

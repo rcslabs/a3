@@ -1,0 +1,78 @@
+
+task copySources(type: Copy) {
+    //outputs.upToDateWhen { false }
+    //delete buildDir
+    //mkdir buildDir
+    from('src')
+    into(buildDir)
+    include('*.ts')
+}
+
+task copyLibs(type: Copy) {
+    dependsOn ':libraries:a3client:build'
+    from('../libraries/a3client/build')
+    into(buildDir)
+    include 'a3.*'
+    include '*.swf'
+}
+
+
+task (build, type: Exec) {
+    dependsOn 'copySources'
+    dependsOn 'copyLibs'
+
+    doFirst {
+        workingDir buildDir
+        def commandLineArgs = ['tsc', '-d', '--sourcemap', 'main.ts', '--target', 'ES5', '--outDir', buildDir, '--out', 'main.js'];
+        def os = System.getProperty("os.name").toLowerCase();
+        if(os.contains('mac')){
+            commandLineArgs[0] = "/usr/local/bin/tsc";
+        }else if(os.contains('windows')){
+            commandLineArgs[0] = System.getenv()['APPDATA'] + '\\npm\\node_modules\\typescript\\bin\\tsc'
+            commandLineArgs.add(0, 'node');
+        }
+        commandLine commandLineArgs
+    }
+}
+
+task (dist, type: Tar) {
+    dependsOn 'build'
+    extension = 'tar.gz'
+    baseName = 'v2chat-dist'
+    compression = Compression.GZIP
+    exclude '**/.svn'
+    exclude '**/.git'
+
+    doFirst {
+        def info = 'BUILD INFO:\n';
+            info+= "Version:     ${version}\n";
+            info+= "Revision:    ${project.ext.revision}\n";
+            info+= "Builder:     ${project.ext.builder}\n";
+            info+= "Date:        ${project.ext.datetime}\n";
+        file('build/build.info').write(info);
+    }
+
+    from(buildDir){
+        include '*.swf'
+        include 'a3.js'
+        include 'main.js'
+        include 'build.info'
+        into('www')
+    }
+
+    from('src'){
+        include 'slider/*'
+        include '*.png'
+        include 'click2call.js'
+        include 'libs.js'
+        into('www')
+    }
+
+    from('src'){
+        filter { String line -> line.replace("localhost", "webrtc.v2chat.com") }
+        include 'click2call.html'
+        include 'editor.html'
+        into('www')
+    }
+}
+
