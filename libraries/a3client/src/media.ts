@@ -52,6 +52,8 @@ module a3 {
 		muteSound(value: boolean);
 		setOfferSdp(callId: string, pointId: string, offerSdp: any);
 		playDtmf(dtmf: string);
+		playRBT();
+		stopRBT();
 		dispose();
 	}
 
@@ -89,10 +91,10 @@ module a3 {
 
 	export class FlashMedia implements IMedia
 	{
-		private _pubVoice: any = undefined;
-		private _pubVideo: any = undefined;
-		private _subVoice: any = undefined;
-		private _subVideo: any = undefined;
+		private _publishUrlVoice: any = undefined;
+		private _publishUrlVideo: any = undefined;
+		private _playUrlVoice: any = undefined;
+		private _playUrlVideo: any = undefined;
 		private _swf: any = null;
 
 		constructor(private _listener: IMediaListener, private _container:HTMLElement, private _flashVars: any) {
@@ -131,9 +133,8 @@ module a3 {
 		getCc(): any {
 			return {
 				userAgent: "FlashPlayer",
-				audio: ["PCMA/8000"],
-				video: ["H264/90000"],
-				"profile" : "RTMP"
+				audio: ["speex/8000"],
+				video: ["H264/90000"]
 			};
 		}
 
@@ -165,44 +166,14 @@ module a3 {
 			//  publishUrlVideo: [...]
 			//  publishUrlVoice: [...]
 			//}
-			if(typeof offerSdp === "string") {
-				var lines: string[] = offerSdp.split("\r\n");
-				var state = 0;
-				for(var i=0; i<lines.length; i++) {
-					var line: string = lines[i];
-					if(line.match(/^m=audio/)) state = 1;
-					if(line.match(/^m=video/)) state = 2;
-					if(line) {
-						switch(state) {
-							case 0: break;
-							case 1:
-								if(line.match("^a=rtmp-sub:(.+)$")) this._pubVoice = RegExp.$1;
-								if(line.match("^a=rtmp-pub:(.+)$")) this._subVoice = RegExp.$1;
-								break;
-							case 2:
-								if(line.match("^a=rtmp-sub:(.+)$")) this._pubVideo = RegExp.$1;
-								if(line.match("^a=rtmp-pub:(.+)$")) this._subVideo = RegExp.$1;
-								break;
-						}
-					}
-				}
-			} else {
-				this._pubVoice = offerSdp.publishUrlVoice;
-				this._pubVideo = offerSdp.publishUrlVideo;
-				this._subVoice = offerSdp.playUrlVoice;
-				this._subVideo = offerSdp.playUrlVideo;
-			}
 
-			if(this._pubVoice || this._pubVideo) this._swf.publish(   this._pubVoice, this._pubVideo );
-			if(this._subVoice || this._subVideo) this._swf.subscribe( this._subVoice, this._subVideo );
+			this._publishUrlVoice = offerSdp.publishUrlVoice;
+			this._publishUrlVideo = offerSdp.publishUrlVideo;
+			this._playUrlVoice = offerSdp.playUrlVoice;
+			this._playUrlVideo = offerSdp.playUrlVideo;
 
-			if(typeof offerSdp === "string") {
-				this._listener.onMediaMessage(MediaEvent.SDP_ANSWER, {
-					callId: callId,
-					pointId: pointId,
-					sdp: offerSdp
-				});
-			}
+			this._swf.publish   ( this._publishUrlVoice, this._publishUrlVideo );
+			this._swf.subscribe ( this._playUrlVoice,    this._playUrlVideo    );
 		}
 
 	   	dispose(){
@@ -212,6 +183,12 @@ module a3 {
 
 		playDtmf(dtmf: string) {
 
+		}
+
+		playRBT() {
+		}
+
+		stopRBT() {
 		}
 	}
 
@@ -240,6 +217,7 @@ module a3 {
 		private _micVolume: number = 1;
 
 		private _dtmfPlayer: DtmfPlayer = new DtmfPlayer();
+		private _rbtPlayer: RBTPlayer = new RBTPlayer();
 
 		constructor(private _listener: IMediaListener, private _container) {
 			this._remoteVideo = document.createElement("video");
@@ -312,11 +290,15 @@ module a3 {
 			};
 		}
 
-	 	dispose(){
+	 	dispose(){ //debugger;
+			if(this.__pcVideo) this.__pcVideo.close();
+			this.__pcVideo = null;
+			if(this.__pc) this.__pc.close();
+			this.__pc = null;
+			try{ this._remoteStream.getVideoTracks()[0].stop(); } catch(e) { LOG("Trouble on dispose video"); }
+			try{ this._remoteStream.getAudioTracks()[0].stop(); } catch(e) { LOG("Trouble on dispose audio"); }
 			try{ this._localStream.getVideoTracks()[0].stop(); } catch(e) { LOG("Trouble on dispose video"); }
 			try{ this._localStream.getAudioTracks()[0].stop(); } catch(e) { LOG("Trouble on dispose audio"); }
-			this.__pcVideo = null;
-			this.__pc = null;
 		}
 
 		checkHardware() {
@@ -532,6 +514,14 @@ module a3 {
 		playDtmf(dtmf: string) {
 			this._dtmfPlayer.playDtmf(dtmf);
 		}
+
+		playRBT() {
+			this._rbtPlayer.play();
+		}
+
+		stopRBT() {
+			this._rbtPlayer.stop();
+		}
 	}
 
 
@@ -547,7 +537,7 @@ module a3 {
 
 		constructor(private audioContext: any, private freq: number) {
 			var volume = audioContext.createGainNode();
-			volume.gain.value = 0.5;
+			volume.gain.value = 0.2;
 			volume.connect(audioContext.destination);
 			this.gainNode = volume;
 
@@ -561,6 +551,37 @@ module a3 {
 		}
 		pause() {
 			this.oscillator.disconnect();
+		}
+	}
+
+	/**
+	 * Ringback tone player
+	 */
+	class RBTPlayer {
+		private _oscillator: ToneGenerator = null;
+		private _cnt: number = 0;
+		private _intv: number;
+		constructor() {
+			if(window["webkitAudioContext"]) {
+				var audioContext = new window["webkitAudioContext"]();
+				this._oscillator = new ToneGenerator(audioContext, 425);
+			}
+		}
+
+		play() { // 425 hz play 1s / pause 4s
+			this._intv = setInterval(()=>{
+				if(!(this._cnt % 5)){ // next iteration
+					this._oscillator.play();
+				}else if(!((this._cnt-1) % 5)){ // 1 sec after play
+					this._oscillator.pause();
+				}
+				this._cnt++;
+			}, 1000);
+		}
+
+		stop() {
+			this._oscillator.pause();
+			clearInterval(this._intv);
 		}
 	}
 

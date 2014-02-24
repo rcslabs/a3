@@ -152,15 +152,24 @@ module a3 {
 		setMicrophoneVolume(value) { this.media.setMicrophoneVolume(value); }
 		setSoundVolume(value) { this.media.setSoundVolume(value); }
 
-		onEnterStateStarting() { this._notifyListener('onCallStarting'); }
+		onEnterStateStarting() {
+			this.media.playRBT();
+			this._notifyListener('onCallStarting');
+		}
+
 		onEnterStateRinging() { this._notifyListener('onCallRinging'); } // incoming call starting
-		onEnterStateProgress() { this._notifyListener('onCallStarted'); }
+		onEnterStateProgress() {
+			this.media.stopRBT();
+			this._notifyListener('onCallStarted');
+		}
 
 		onEnterStateFinished() {
+			this.media.stopRBT();
 			this.media.dispose();
 			this._notifyListener('onCallFinished');
 		}
 		onEnterStateFailed() {
+			this.media.stopRBT();
 			this.media.dispose();
 			this._notifyListener('onCallFailed');
 		}
