@@ -532,7 +532,7 @@ module a3 {
 					} else if (event === Event.HARDWARE_STATE_CHANGED) {
 						this._onHardwareStateChanged(opt);
 					} else if(event === Event.MEDIA_READY) { // Flash element is reloaded
-						this.media.checkHardware();
+						this.media.checkHardware(true);
 					} else {
 						this._unhandledEvent(event, opt);
 					}
@@ -562,7 +562,7 @@ module a3 {
 					} else if (event === Event.HARDWARE_STATE_CHANGED) {
 						this._onHardwareStateChanged(opt);
 					} else if(event === Event.MEDIA_READY) { // Flash element is reloaded
-						this.media.checkHardware();
+						this.media.checkHardware(true);
 					} else {
 						this._unhandledEvent(event, opt);
 					}

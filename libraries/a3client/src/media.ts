@@ -45,7 +45,7 @@ module a3 {
 	export interface IMedia {
 		start();
 		getCc(): any;
-		checkHardware();
+		checkHardware(enableVideo: boolean);
 		setMicrophoneVolume(volume: number);
 		setSoundVolume(volume: number);
 		muteMicrophone(value: boolean);
@@ -154,7 +154,8 @@ module a3 {
 			this._swf.muteSound(value);
 		}
 
-		checkHardware() {
+		checkHardware(enableVideo: boolean) {
+			// TODO: implements this
 			this._swf.checkHardware();
 		}
 
@@ -301,31 +302,32 @@ module a3 {
 			try{ this._localStream.getAudioTracks()[0].stop(); } catch(e) { LOG("Trouble on dispose audio"); }
 		}
 
-		checkHardware() {
+		checkHardware(enableVideo: boolean) {
 			this._notify("HardwareEvent.HARDWARE_STATE", { data: {
 				microphone: { state: HardwareState.DISABLED },
 				camera: { state: HardwareState.DISABLED },
 				userDefined : false
 			}});
-			getUserMedia(
-				{
-					audio: true,
-					video: {
-						mandatory: {
-							"minWidth": "320",
-							"maxWidth": "1280",
-							"minHeight": "180",
-							"maxHeight": "720",
-							"minFrameRate": "5"
-						},
-						optional: [
-							{ width: VIDEO_WIDTH },
-							{ height: VIDEO_HEIGHT},
-							{ frameRate: VIDEO_FRAMERATE },
-							{ facingMode: "user" }
-						]
-					}
-				},
+
+			var opts:any = {audio: true};
+			if(enableVideo){
+				opts.video = {
+					mandatory: {
+						"minWidth": "320",
+						"maxWidth": "1280",
+						"minHeight": "180",
+						"maxHeight": "720",
+						"minFrameRate": "5"
+					},
+					optional: [
+						{ width: VIDEO_WIDTH },
+						{ height: VIDEO_HEIGHT},
+						{ frameRate: VIDEO_FRAMERATE },
+						{ facingMode: "user" }
+					]
+				};
+			}
+			getUserMedia(opts,
 				(stream) => {
 					var audioTracks = stream.getAudioTracks();
 					var videoTracks = stream.getVideoTracks();
