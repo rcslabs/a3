@@ -1,4 +1,4 @@
-/// <reference path="a3.d.ts" />
+/// <reference path="communicator.ts" />
 /// <reference path="jquery.d.ts" />
 
 var STUN_SERVER = "stun:stun.l.google.com:19302";
@@ -89,7 +89,7 @@ class Click2CallCommunicator extends a3.Communicator {
 
     onSessionStarted() {
         if(this._deferredCall != null){
-            this.media.checkHardware();
+            this.media.checkHardware(this._deferredCall.vv[1]);
         }
     }
 
@@ -145,7 +145,7 @@ class Click2CallCommunicator extends a3.Communicator {
         if(this.getState() !== a3.State.SESSION_STARTED){
             this.open(this._username, this._password, '', '');
         }else{
-            this.media.checkHardware();
+            this.media.checkHardware(vv[1]);
         }
     }
 
@@ -215,6 +215,9 @@ class Mediator implements a3.ICommunicatorListener {
     private _root:any = null; // should be DIV
     private _views:{ [id: string]: any; } = {}; // should be DIVs
     private _elems:{ [id: string]: any; } = {}; // any DOM nodes
+
+	private _stopwatchValue: number = 0;
+	private _stopwatchIntv: number = 0;
 
     constructor(communicator:Click2CallCommunicator, rootElement:HTMLElement){
         this._communicator = communicator;
@@ -320,6 +323,8 @@ class Mediator implements a3.ICommunicatorListener {
         this._views['talking']        = this._e('a3-talking-view');
         this._views['call-failed']    = this._e('a3-call-failed-view');
         this._views['call-finished']  = this._e('a3-call-finished-view');
+		this._views['callback']       = this._e('a3-callback-view');
+		this._views['callback-result']= this._e('a3-callback-result-view');
         this._views['outro']          = this._e('a3-outro-view');
 
         for(var p in this._views){
@@ -328,16 +333,11 @@ class Mediator implements a3.ICommunicatorListener {
 			$(this._views[p]).addClass('a3-view');
         }
 
-        var h = '<div style="position:absolute;width:100%;left:0;bottom:0px;">' +
-			'<table style="width:100%;height:100%" cellpadding="0" cellspacing="0"><tr>' +
-			'<td class="a3-footer" style="padding:0 5px;text-align:left;vertical-align:middle;">&nbsp;</td>' +
-			'<td class="a3-footer" style="padding:0 5px;text-align:right;vertical-align:middle;">'+(typeof this._communicator.locale['COPYRIGHT'] !== 'undefined' ? this._communicator.locale['COPYRIGHT'] : '&copy;')+'</td></tr></table></div>';
-        $(this._root).append(h);
-        this._elems['statusbar'] = this._e('a3-statusbar');
-
 		if($('.a3-hardware-controls').length){
 			this._initHardwareControls();
 		}
+
+		this._initFooter();
 
 		if('he' == this._communicator.query.lang){ this._root.style.direction = 'rtl'; }
         this._root.addEventListener('click', (e) => {this._onClick(<MouseEvent>e)});
@@ -357,6 +357,23 @@ class Mediator implements a3.ICommunicatorListener {
         a[3] = parseInt(elem.style.height);
         return a;
     }
+
+	_initFooter(){
+		var e = document.createElement('style');
+		var h = '#a3-footer{position:absolute;width:100%;left:0;bottom:0px;background-color: #d4e4f1; font-size:12px;font-weight:normal;}\n';
+		    h+= '.a3-btn-back{position:absolute;bottom:32px;left:10px}\n';
+		    h+= '.a3-btn-help{position:absolute;bottom:32px;right:10px}\n';
+		    h+= '\n';
+		e.innerHTML = h;
+		document.head.appendChild(e);
+
+		var l = this._communicator.locale;
+		var copy = (typeof l['COPYRIGHT']  !== 'undefined' ? l['COPYRIGHT']  : '&copy;');
+		var back = (typeof l['BACK_LABEL'] !== 'undefined' ? l['BACK_LABEL'] : 'BACK');
+		var help = (typeof l['HELP_LABEL'] !== 'undefined' ? l['HELP_LABEL'] : 'HELP');
+		var h = '<div id="a3-footer"><button class="a3-btn-back a3-footer-button">'+back+'</button><button class="a3-btn-help a3-footer-button">'+help+'</button><div style="padding:4px;text-align:right;">'+copy+'</div></div>';
+		$(this._root).append(h);
+	}
 
 	_initHardwareControls(){
 		// TODO: hardcoded default slider value is not good!
@@ -400,6 +417,16 @@ class Mediator implements a3.ICommunicatorListener {
         if(m == null || m.length<2){ return; }
         var cls = m[1];
         switch(cls){
+			case 'btn-back':
+				this._communicator.onClickHangupCall();
+				this._toggleView('intro');
+				break;
+			case 'btn-help':
+				this._toggleHelp();
+				break;
+			case 'btn-callback':
+				this._toggleView('callback');
+				break;
             case 'btn-voice-call':
                 this._toggleView('start-call');
                 this._communicator.onClickStartCall(a3.CallType.AUDIO);
@@ -419,7 +446,7 @@ class Mediator implements a3.ICommunicatorListener {
 				this._communicator.onClickSoundMute(!('true' == $(event.target).attr('data-toggle')));
 				break;
 			default:
-				console.warn("Unhandled click on elem ." + cls);
+				WARN("Unhandled click on elem ." + cls);
         }
     }
 
@@ -430,7 +457,40 @@ class Mediator implements a3.ICommunicatorListener {
         }
 		$('body').trigger('view-changed', id);
         this._root.style.display = 'block';
+
+		if(-1 != ['hw-failed', 'call-failed', 'call-finished', 'callback', 'callback-result', 'outro'].indexOf(id)){
+			$('.a3-btn-back').removeAttr('disabled');
+		}else{
+			$('.a3-btn-back').attr('disabled','disabled');
+		}
+
+		/* start/stop stopwatch */
+		var $stopwatch = $('.a3-stopwatch');
+		if($stopwatch.length){
+			if('talking' == id){
+				this._stopwatchValue = 0;
+				this._stopwatchIntv = setInterval(() => {
+					$stopwatch.html(this._toMMSS(this._stopwatchValue++));
+				}, 1000);
+			}else{
+				clearInterval(this._stopwatchIntv);
+			}
+		}
     }
+
+	_toMMSS(value:number) {
+		var hours:any   = Math.floor(value / 3600);
+		var minutes:any = Math.floor((value - (hours * 3600)) / 60);
+		var seconds:any = value - (hours * 3600) - (minutes * 60);
+		if (minutes < 10) {minutes = "0"+minutes;}
+		if (seconds < 10) {seconds = "0"+seconds;}
+		var time = minutes+':'+seconds;
+		return time;
+	}
+
+	_toggleHelp(){
+		console.log('HELP');
+	}
 }
 
 
@@ -486,7 +546,7 @@ class CompatibleFactory implements a3.ICommunicatorFactory
 		this.mediaContainer = document.createElement('div');
 		this.mediaContainer.id = 'a3-media-container';
 		this.mediaContainer.style.position = 'absolute';
-		this.mediaContainer.style.zIndex = '99';
+		this.mediaContainer.style.zIndex = '50';
 		this.mediaContainer.className = 'a3-remote-video-hidden';
 		//this.mediaContainer.style.visibility = 'hidden';
 		document.body.appendChild(this.mediaContainer);
