@@ -24,13 +24,8 @@ allprojects {
             args = ['info', projectDir]
             standardOutput = os
         }
-
-        if(!result){
-            def rev = (os.toString() =~ /Last Changed Rev: (\d+)/)
-            project.ext.revision = rev[0][1];
-        } else {
-            project.ext.revision = 'no-revision';   
-        }
+        def rev = (os.toString() =~ /Last Changed Rev: (\d+)/)
+        project.ext.revision = rev[0][1];
     }
 }
 
