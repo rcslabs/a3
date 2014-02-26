@@ -214,10 +214,10 @@ class Mediator implements a3.ICommunicatorListener {
     private _communicator:Click2CallCommunicator;
     private _root:any = null; // should be DIV
     private _views:{ [id: string]: any; } = {}; // should be DIVs
-    private _elems:{ [id: string]: any; } = {}; // any DOM nodes
-
+	private _$helpContainer:any = null;
 	private _stopwatchValue: number = 0;
 	private _stopwatchIntv: number = 0;
+	private _currentView: string = null;
 
     constructor(communicator:Click2CallCommunicator, rootElement:HTMLElement){
         this._communicator = communicator;
@@ -227,13 +227,11 @@ class Mediator implements a3.ICommunicatorListener {
         this._initTemplate();
     }
 
-    onCommunicatorStarting() {
-        this._setStatus('loading');
-    }
+    onCommunicatorStarting() {}
 
-    onConnecting() {
-        this._setStatus('connecting');
-    }
+    onConnecting() {}
+
+	onConnectionFailed() {}
 
     onConnected() {
 		if(this._views['intro'] != null){
@@ -241,26 +239,18 @@ class Mediator implements a3.ICommunicatorListener {
 		} else { // if intro disabled - start the video call immediately
 			this._communicator.onClickStartCall(a3.CallType.BOTH);
 		}
-        this._setStatus('connected');
-    }
-
-    onConnectionFailed() {
-        this._setStatus('connection failed');
     }
 
     onCheckHardwareSettings() {
-        this._setStatus('check hardware');
         this._toggleView('hw-test');
 		this._media.showSettingsPanel();
     }
 
     onCheckHardwareReady() {
-        this._setStatus('hardware ready');
 		this._media.hide();
     }
 
     onCheckHardwareFailed() {
-        this._setStatus('hardware test was failed');
         this._toggleView('hw-failed');
     }
 
@@ -270,12 +260,10 @@ class Mediator implements a3.ICommunicatorListener {
     }
 
     onCallStarting(call:a3.Call) {
-        this._setStatus('call connecting');
         this._toggleView('calling');
     }
 
     onCallStarted(call:a3.Call) {
-        this._setStatus('talking');
         this._toggleView('talking');
         if(call.isVideo()){
             this._media.show();
@@ -284,13 +272,11 @@ class Mediator implements a3.ICommunicatorListener {
 
     onCallFinished(call:a3.Call) {
         this._media.hide();
-        this._setStatus('ready');
         this._toggleView('call-finished');
     }
 
     onCallFailed(call:a3.Call) {
         this._media.hide();
-        this._setStatus('ready');
         this._toggleView('call-failed');
     }
 
@@ -299,7 +285,6 @@ class Mediator implements a3.ICommunicatorListener {
     }
 
     onCommunicatorFailed() {
-        this._setStatus('app failed');
         this._toggleView('loading-failed');
     }
 
@@ -337,16 +322,12 @@ class Mediator implements a3.ICommunicatorListener {
 			this._initHardwareControls();
 		}
 
+		this._initHelpContainer();
 		this._initFooter();
 
 		if('he' == this._communicator.query.lang){ this._root.style.direction = 'rtl'; }
         this._root.addEventListener('click', (e) => {this._onClick(<MouseEvent>e)});
         this._root.style.display = 'none';
-    }
-
-    _setStatus(message:string){
-        // TODO: localize messages and all that jazz...
-        // this._elems['statusbar'].innerHTML = message;
     }
 
     _rect(elem:any):any{
@@ -358,12 +339,24 @@ class Mediator implements a3.ICommunicatorListener {
         return a;
     }
 
+	_initHelpContainer(){
+		var e = document.createElement('style');
+		// TODO: help above flash, hmm???
+		var c = '#a3-help{position:absolute;width:100%;top:0;bottom:70px;background:#f1f1f1;z-index:70;}\n'; // z-index=70 above media z-index=50
+		e.innerHTML = c;
+		document.head.appendChild(e);
+
+		var h = '<div id="a3-help" data-visible="false" data-pending="false"><iframe id="a3-help" frameborder="0" scrolling="no" style="width:100%;height:100%;"></iframe></div>';
+		$('body').append(h);
+		this._$helpContainer = $('#a3-help');
+		this._$helpContainer.hide();
+	}
+
 	_initFooter(){
 		var e = document.createElement('style');
 		var h = '#a3-footer{position:absolute;width:100%;left:0;bottom:0px;background-color: #d4e4f1; font-size:12px;font-weight:normal;}\n';
 		    h+= '.a3-btn-back{position:absolute;bottom:32px;left:10px}\n';
 		    h+= '.a3-btn-help{position:absolute;bottom:32px;right:10px}\n';
-		    h+= '\n';
 		e.innerHTML = h;
 		document.head.appendChild(e);
 
@@ -450,14 +443,17 @@ class Mediator implements a3.ICommunicatorListener {
         }
     }
 
-    _toggleView(id:string):void{
+    _toggleView(id:string):void
+	{
         for(var p in this._views){
 			if(this._views[p] == null){ continue; }
             this._views[p].style.visibility = (p == id ? 'visible' : 'hidden');
         }
+		this._currentView = id;
 		$('body').trigger('view-changed', id);
         this._root.style.display = 'block';
 
+		// button BACK enabled/disabled separation by views
 		if(-1 != ['hw-failed', 'call-failed', 'call-finished', 'callback', 'callback-result', 'outro'].indexOf(id)){
 			$('.a3-btn-back').removeAttr('disabled');
 		}else{
@@ -489,10 +485,24 @@ class Mediator implements a3.ICommunicatorListener {
 	}
 
 	_toggleHelp(){
-		console.log('HELP');
+		if('true' == this._$helpContainer.attr('data-pending')){ return; }
+		var isVisible:boolean = ('true' == this._$helpContainer.attr('data-visible'));
+		this._$helpContainer.attr('data-pending', 'true');
+		$('.a3-btn-help').attr('disabled','disabled');
+		this._$helpContainer.toggle('slow', () => {
+			if(!isVisible){
+				this._$helpContainer.attr('data-visible', 'true');
+				var helpPage:string = '/help/'+this._communicator.query.lang+'.html#'+this._currentView;
+				this._$helpContainer.children(":first").attr('src', helpPage);
+			}else{
+				this._$helpContainer.attr('data-visible', 'false');
+				this._$helpContainer.children(":first").attr('src', 'about:blank');
+			}
+			$('.a3-btn-help').removeAttr('disabled');
+			this._$helpContainer.attr('data-pending', 'false');
+		});
 	}
 }
-
 
 class ConstructorCompatibleSioSignaling extends a3.SioSignaling
 {
