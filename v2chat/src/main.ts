@@ -343,10 +343,11 @@ class Mediator implements a3.ICommunicatorListener {
 		var e = document.createElement('style');
 		// TODO: help above flash, hmm???
 		var c = '#a3-help{position:absolute;width:100%;top:0;bottom:70px;background:#f1f1f1;z-index:70;}\n'; // z-index=70 above media z-index=50
+		    c+= '#a3-help-frm{width:100%;height:100%;border:0;}\n';
 		e.innerHTML = c;
 		document.head.appendChild(e);
 
-		var h = '<div id="a3-help" data-visible="false" data-pending="false"><iframe id="a3-help" frameborder="0" scrolling="yes" style="width:100%;height:100%;"></iframe></div>';
+		var h = '<div id="a3-help" data-visible="false" data-pending="false"><iframe id="a3-help-frm"></iframe></div>';
 		$('body').append(h);
 		this._$helpContainer = $('#a3-help');
 		this._$helpContainer.hide();
