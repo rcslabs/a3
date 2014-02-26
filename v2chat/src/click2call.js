@@ -22,8 +22,7 @@ var Click2Call = (function () {
 		opts.horz = (typeof opts['left'] !== 'undefined' ? 'L' : 'R');
 		opts.vert = (typeof opts['bottom'] !== 'undefined' ? 'B' : 'T');
 		opts.csspos = ('L' == opts.horz ? 'left:0' : 'right:0') + ';' + ('T' == opts.vert ? 'top:'+opts['top'] : 'bottom:'+opts['bottom']);
-
-		document.write('<div id="click2call-tab-'+id+'" class="click2call-tab click2call-tab-'+opts.horz+'" style="'+opts.csspos.replace(/(left|right):0/, "$1:-8px")+'; background-image:url('+opts.tab+');" onclick="click2call.toggle(\''+id+'\');"></div>');
+		document.write('<img src="'+opts.tab+'" id="click2call-tab-'+id+'" class="click2call-tab click2call-tab-'+opts.horz+'" style="'+opts.csspos.replace(/(left|right):0/, "$1:-8px")+';" onclick="click2call.toggle(\''+id+'\');">');
 		document.write('<iframe id="click2call-frm-'+id+'" frameborder="0" scrolling="no" class="click2call-frm" style="width:0; height:'+opts.h+'px;'+opts.csspos+';"></iframe>');
 		this.widgets[id] = {'opts' : opts};
 	};
@@ -48,7 +47,7 @@ var Click2Call = (function () {
 		var style = document.createElement('style');
 		var transition = function(p){ var t = ['transition: '+p+' 500ms;']; t[1] = '-webkit-'+t[0]; t[2] = '-ms-'+t[0]; t[3] = '-o-'+t[0]; t[1] = '-moz-'+t[0]; return t.join(' '); };
 		var h = '.click2call-frm{position:fixed; background:#f0f0f0; '+transition('width')+'}';
-		h+= '.click2call-tab{width:48px; height:256px; position:fixed; cursor:pointer;}';
+		h+= '.click2call-tab{position:fixed; cursor:pointer;}';
 		h+= '.click2call-tab-L{'+transition('left')+'}';
 		h+= '.click2call-tab-R{'+transition('right')+'}';
 		style.innerHTML = h;
