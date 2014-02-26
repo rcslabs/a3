@@ -8,6 +8,8 @@ package ru.rcslabs.components
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.media.Microphone;
+	import ru.rcslabs.webcall.AppConfig;
+	import ru.rcslabs.webcall.MediaTransport;
 	
 	import flashx.textLayout.formats.TextAlign;
 	
@@ -50,7 +52,7 @@ package ru.rcslabs.components
 			monit = new MicMonitor();
 			monit.init();
 			monit.setMonitorDelegate(this);
-			monit.setMicrophone( mic );
+			monit.setMicrophone(mic);
 			monit.setStage(stage);
 			monit.check();		
 		}
@@ -95,8 +97,15 @@ package ru.rcslabs.components
 					break;
 				
 				case MicMonitor.CHECK_LEVEL_STATE: 	
-					delegate.onMonitorStateChanged(value);
-					showMeter();
+					// quick fix
+					// if swf was configure with parameter 'checkMicVolume=false'
+					// skip this and next state 
+					if(AppConfig(MediaTransport(delegate).config).checkMicVolume){
+						delegate.onMonitorStateChanged(value);
+						showMeter();
+					} else { 
+						onMonitorStateChanged(MicMonitor.OK_LEVEL_STATE);
+					}
 					break;	
 				
 				case MicMonitor.NO_LEVEL_STATE: 	

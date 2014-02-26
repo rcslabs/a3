@@ -77,19 +77,14 @@ package
 					Log.getLogger(Logger.DEFAULT_CATEGORY).debug(config.toString());
 				}
 
-				dm = new DragHelper();
-				/*dm.allowDrag(pubCont, new Rectangle(
-					config.subscriberRect.x, 
-					config.subscriberRect.y,
-					config.subscriberRect.width - config.publisherRect.width,
-					config.subscriberRect.height - config.publisherRect.height
-				));*/
+				//dm = new DragHelper();
 				
 				ExternalInterface.marshallExceptions = true;
 				
 				ExternalInterface.addCallback("muteSubscriber", muteSubscriber);
-				ExternalInterface.addCallback("playDialingSound", playDialingSound);
-				ExternalInterface.addCallback("stopDialingSound", stopDialingSound);
+				ExternalInterface.addCallback("playRBT", playDialingSound);
+				ExternalInterface.addCallback("stopRBT", stopDialingSound);
+				ExternalInterface.addCallback("playDtmf", playDtmf);
 			}
 
 			mt = new MediaTransportJS(this);								
@@ -142,6 +137,11 @@ package
 			dialSoundChannel = null;
 		}
 		
+		private function playDtmf(char:String):void
+		{
+			SoundManager.play(char, 100); 
+		}
+
 		private function pubHandler(e:MediaTransportEvent):void
 		{
 			pubCont.visible = (null != mt.publisherVideo);

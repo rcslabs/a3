@@ -8,6 +8,11 @@ package ru.rcslabs.webcall
 		function AppConfig(){
 			super();
 			defaultValues.micCodec = SoundCodec.SPEEX;
+			defaultValues.checkMicVolume = true;
 		}
+
+		public function get checkMicVolume():Boolean{
+			return getPropertyAsBoolean('checkMicVolume');
+		}	
 	}
 }
