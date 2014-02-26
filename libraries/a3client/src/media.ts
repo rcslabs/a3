@@ -20,7 +20,7 @@ module a3 {
 	if(typeof LOG === "undefined") LOG = function() {};
 	if(typeof ERROR === "undefined") ERROR = function() {};
 
-	var MIN_FLASH_VERSION = '10.3.0';
+	var MIN_FLASH_VERSION = '11';
 	var DTMF_DURATION: number = 140;
 	var DTMF_INTERVAL: number = 200;
 	var VIDEO_WIDTH: number = 352;
