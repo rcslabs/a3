@@ -356,7 +356,7 @@ class Mediator implements a3.ICommunicatorListener {
 	_initFooter(){
 		var l = this._communicator.locale;
 		var copy = (typeof l['COPYRIGHT']  !== 'undefined' ? l['COPYRIGHT']  : '&copy;');
-		var h = '<div class="a3-footer"><div style="padding:4px;text-align:right;">'+copy+'</div></div>';
+		var h = '<div class="a3-footer" style="position:absolute;width:100%;left:0;bottom:0px;"><div style="padding:4px;text-align:right;">'+copy+'</div></div>';
 		$(this._root).append(h);
 	}
 
