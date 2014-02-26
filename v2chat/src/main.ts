@@ -3,7 +3,7 @@
 
 var STUN_SERVER = "stun:stun.l.google.com:19302";
 var STUN_TIMEOUT = 3000;
-var FP_MIN_VERSION = "11";
+var FP_MIN_VERSION = "10.3";
 
 declare var LOG:any;
 declare var WARN:any;
@@ -354,18 +354,9 @@ class Mediator implements a3.ICommunicatorListener {
 	}
 
 	_initFooter(){
-		var e = document.createElement('style');
-		var h = '#a3-footer{position:absolute;width:100%;left:0;bottom:0px;background-color: #d4e4f1; font-size:12px;font-weight:normal;}\n';
-		    h+= '.a3-btn-back{position:absolute;bottom:32px;left:10px}\n';
-		    h+= '.a3-btn-help{position:absolute;bottom:32px;right:10px}\n';
-		e.innerHTML = h;
-		document.head.appendChild(e);
-
 		var l = this._communicator.locale;
 		var copy = (typeof l['COPYRIGHT']  !== 'undefined' ? l['COPYRIGHT']  : '&copy;');
-		var back = (typeof l['BACK_LABEL'] !== 'undefined' ? l['BACK_LABEL'] : 'BACK');
-		var help = (typeof l['HELP_LABEL'] !== 'undefined' ? l['HELP_LABEL'] : 'HELP');
-		var h = '<div id="a3-footer"><button class="a3-btn-back a3-footer-button">'+back+'</button><button class="a3-btn-help a3-footer-button">'+help+'</button><div style="padding:4px;text-align:right;">'+copy+'</div></div>';
+		var h = '<div class="a3-footer"><div style="padding:4px;text-align:right;">'+copy+'</div></div>';
 		$(this._root).append(h);
 	}
 

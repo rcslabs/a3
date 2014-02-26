@@ -2,6 +2,10 @@
 <style>
 body{font: 12px Arial, Verdana, Helvetica; color:#444444;}
 body, html{margin:0; padding:0;}
+
+h1 {position:absolute; top:40px; width:350px; margin:auto 30px;text-align:center; font-size:16px; font-weight:bold;}
+h2 {position:absolute; width:350px; margin:auto 30px; text-align:center; font-size:12px; font-weight:normal;}
+
 #a3{position:absolute; display:none; width:410px; height:480px; background-color: #f1f1f1;}
 .a3-view{position:absolute; left:0px; top:0px; width:100%; height:100%;}
 .a3-remote-video{width:352px; height:288px; left:29px;top:96px}
@@ -10,11 +14,12 @@ body, html{margin:0; padding:0;}
 .a3-btn-video-call {}
 .a3-btn-cancel, .a3-btn-hangup{position:absolute; width:132px; height:40px; background: url(${BASE_URL}/btn3.png); border:none; color:white; font-weight:bold;text-align:right;padding-right:14px;}
 .a3-hardware-controls{position:absolute;top:200px;}
+
+.a3-footer{position:absolute;width:100%;left:0;bottom:0px;background-color:#d4e4f1;color:#444444;font-size:12px;font-weight:normal;}
 .a3-footer-button{-moz-border-radius:12px; border-radius:12px; font-size:16px; font-weight:bold; border:1px solid #17466a; background: #3091db; color:#ffffff; padding:2px 10px;}
 .a3-footer-button[disabled]{background-color: #f1f1f1 !important; border:1px dashed #96cbf3 !important; color:#e0e0e0 !important;}
-
-h1 {position:absolute; top:40px; width:350px; margin:auto 30px;text-align:center; font-size:16px; font-weight:bold;}
-h2 {position:absolute; width:350px; margin:auto 30px; text-align:center; font-size:12px; font-weight:normal;}
+.a3-btn-back{position:absolute;bottom:32px;left:10px}
+.a3-btn-help{position:absolute;bottom:32px;right:10px}
 
 .callback-form{position:absolute; top:120px; margin:auto 40px;}
 .callback-form input, .callback-form textarea{ border:1px solid #96cbf3; width:320px; margin:6px 0; padding:4px;}
@@ -103,6 +108,9 @@ h2 {position:absolute; width:350px; margin:auto 30px; text-align:center; font-si
 	<div id="a3-callback-result-view">
 		<h1>${CALLBACK_FORM_RESULT_MESSAGE}</h1>
 	</div>
+
+	<button class="a3-btn-back a3-footer-button">${BACK_LABEL}</button>
+	<button class="a3-btn-help a3-footer-button">${HELP_LABEL}</button>
 </div>
 
 <script>	
