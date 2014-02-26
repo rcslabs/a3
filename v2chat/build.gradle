@@ -1,19 +1,17 @@
 
 task copySources(type: Copy) {
-    //outputs.upToDateWhen { false }
-    //delete buildDir
-    //mkdir buildDir
-    from('src')
-    into(buildDir)
+    filter { String line -> line.replace("<reference path=\"communicator.ts\" />", "<reference path=\"a3.d.ts\" />") }
     include('*.ts')
+    from('src')
+    into(buildDir)  
 }
 
 task copyLibs(type: Copy) {
     dependsOn ':libraries:a3client:build'
-    from('../libraries/a3client/build')
-    into(buildDir)
     include 'a3.*'
     include '*.swf'
+    from('../libraries/a3client/build')
+    into(buildDir)
 }
 
 
@@ -53,11 +51,15 @@ task (dist, type: Tar) {
     }
 
     from(buildDir){
+        include 'build.info'
+        into('www')
+    }
+
+    from(buildDir){
         include '*.swf'
         include 'a3.js'
         include 'main.js'
-        include 'build.info'
-        into('www')
+        into('www/a3')
     }
 
     from('src'){
@@ -65,14 +67,22 @@ task (dist, type: Tar) {
         include '*.png'
         include 'click2call.js'
         include 'libs.js'
-        into('www')
+        into('www/a3')
     }
 
     from('src'){
         filter { String line -> line.replace("localhost", "webrtc.v2chat.com") }
         include 'click2call.html'
         include 'editor.html'
-        into('www')
+        into('www/a3')
+    }
+
+    from('resources/help'){
+        into('www/help')
+    }
+
+    from('resources/template'){
+        into('www/tmpl/default')
     }
 }
 

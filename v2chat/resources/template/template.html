@@ -1,0 +1,130 @@
+<!-- default v2chat widget -->
+<style>
+body{font: 12px Arial, Verdana, Helvetica; color:#444444;}
+body, html{margin:0; padding:0;}
+#a3{position:absolute; display:none; width:410px; height:480px; background-color: #f1f1f1;}
+.a3-view{position:absolute; left:0px; top:0px; width:100%; height:100%;}
+.a3-remote-video{width:352px; height:288px; left:29px;top:96px}
+.a3-intro-btn{position:absolute; width:341px; height:61px; left:30px; font-size:16px; font-weight:bold; border:none; text-decoration:none;}
+.a3-btn-voice-call {top:102px;background: url(${BASE_URL}/btn1.png);}
+.a3-btn-video-call {}
+.a3-btn-cancel, .a3-btn-hangup{position:absolute; width:132px; height:40px; background: url(${BASE_URL}/btn3.png); border:none; color:white; font-weight:bold;text-align:right;padding-right:14px;}
+.a3-hardware-controls{position:absolute;top:200px;}
+.a3-footer-button{-moz-border-radius:12px; border-radius:12px; font-size:16px; font-weight:bold; border:1px solid #17466a; background: #3091db; color:#ffffff; padding:2px 10px;}
+.a3-footer-button[disabled]{background-color: #f1f1f1 !important; border:1px dashed #96cbf3 !important; color:#e0e0e0 !important;}
+
+h1 {position:absolute; top:40px; width:350px; margin:auto 30px;text-align:center; font-size:16px; font-weight:bold;}
+h2 {position:absolute; width:350px; margin:auto 30px; text-align:center; font-size:12px; font-weight:normal;}
+
+.callback-form{position:absolute; top:120px; margin:auto 40px;}
+.callback-form input, .callback-form textarea{ border:1px solid #96cbf3; width:320px; margin:6px 0; padding:4px;}
+.callback-form textarea{height:100px; resize: none; font: 12px Arial, Verdana, Helvetica; }
+.callback-form input[type=submit], .callback-result-btn{width:330px; margin:6px 0; padding:4px;}
+.callback-result-btn{position:absolute; top:120px; margin:auto 40px;}
+
+.noselect {-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
+.a3-stopwatch {position: absolute; top: 90px; color: deepskyblue; font-size: 65px; text-align: center; width: 410px;}
+</style>
+
+<div id="a3">
+	<div id="a3-loading-view">
+		<h1>${APP_LOADING}</h1>
+	</div>
+
+	<div id="a3-loading-failed-view">
+		<h1>${APP_FAILED}</h1>
+	</div>
+
+	<div id="a3-intro-view">
+		<h1>${INTRO_MSG1}</h1>
+		<button class="a3-btn-voice-call a3-intro-btn">${INTRO_MSG2}</button>
+		<h2 style="top:170px;">${INTRO_MSG3}</h2>
+		<button class="a3-btn-callback a3-intro-btn" style="top:250px;background: url(${BASE_URL}/btn2.png)">${INTRO_MSG4}</button>
+		<h2 style="top:320px;">${INTRO_MSG5}</h2>
+	</div>
+
+	<div id="a3-start-call-view">
+		<h1>${CALLING}</h1>
+	</div>
+
+	<div id="a3-hw-test-view">
+		<h1>${HW_CHECK}</h1>
+        <h2 style="top:100px;">${HW_CHECK_MSG1}</h2>
+	</div>
+
+	<div id="a3-hw-failed-view">
+		<h1>${HW_FAILED}</h1>
+	</div>
+
+	<div id="a3-calling-view">
+		<h1>${CALLING}</h1>
+		<div class="a3-hardware-controls"></div>
+		<button class="a3-btn-cancel" style="top:270px;left:139px;">${CANCEL_THE_CALL}</button>
+	</div>
+
+	<div id="a3-talking-view">
+		<h1>${TALKING}</h1>
+		<div class="a3-stopwatch noselect"></div>
+		<div class="a3-hardware-controls"></div>
+		<button class="a3-btn-hangup" style="top:270px;left:139px;">${HANGUP_THE_CALL}</button>
+	</div>
+
+	<div id="a3-call-failed-view">
+		<h1 style="top:20px">${CALL_FAILED}</h1>
+		<h2 style="top:100px">${CALLBACK_FORM_TITLE}</h2>
+		<form class="callback-form" action="http://webrtc.v2chat.com/demo/service-stub.html">
+			<input placeholder="${CALLBACK_FORM_NAME_LABEL}" name="name"><br>
+			<input placeholder="${CALLBACK_FORM_PHONE_LABEL}" name="phone"><br>
+			<input placeholder="${CALLBACK_FORM_DATE_LABEL}" name="date"><br>
+			<input placeholder="${CALLBACK_FORM_SUBJECT_LABEL}" name="subject"><br>
+			<textarea name="message" placeholder="${CALLBACK_FORM_MESSAGE_LABEL}"></textarea>
+			<div>${CALLBACK_FORM_FOOTER}</div>
+			<input type="submit" class="callback-form-btn pretty-button" value="${CALLBACK_FORM_SUBMIT_LABEL}">
+		</form>
+	</div>
+
+	<div id="a3-call-finished-view">
+		<h1>${CALL_FINISHED}</h1>
+	</div>
+
+	<div id="a3-callback-view">
+		<h1>${CALLBACK_FORM_TITLE}</h1>
+		<form class="callback-form" style="top:80px" action="http://webrtc.v2chat.com/demo/service-stub.html">
+			<input placeholder="${CALLBACK_FORM_NAME_LABEL}" name="name"><br>
+			<input placeholder="${CALLBACK_FORM_PHONE_LABEL}" name="phone"><br>
+			<input placeholder="${CALLBACK_FORM_DATE_LABEL}" name="date"><br>
+			<input placeholder="${CALLBACK_FORM_SUBJECT_LABEL}" name="subject"><br>
+			<textarea name="message" placeholder="${CALLBACK_FORM_MESSAGE_LABEL}"></textarea>
+			<div>${CALLBACK_FORM_FOOTER}</div>
+			<input type="submit" class="callback-form-btn pretty-button" value="${CALLBACK_FORM_SUBMIT_LABEL}">
+		</form>
+	</div>
+
+	<div id="a3-callback-result-view">
+		<h1>${CALLBACK_FORM_RESULT_MESSAGE}</h1>
+	</div>
+</div>
+
+<script>	
+	/* send callback form */
+	$(".callback-form").submit(function(event) {
+		event.preventDefault();
+		var $form = $(this);
+		var formdata = {};
+		formdata.name = $form.find("input[name='name']").val();
+		formdata.phone = $form.find("input[name='phone']").val();
+		formdata.date = $form.find("input[name='date']").val();
+		formdata.subject = $form.find("input[name='subject']").val();
+		formdata.message = $form.find("input[name='message']").val();
+		var posting = $.get($form.attr("action"), formdata);
+		var result = function(data){
+			$('#a3-call-failed-view').css('visibility', 'hidden');
+			$('#callback-view').css('visibility', 'hidden');
+			$('#callback-result-view').css('visibility', 'visible');
+		}
+        // only for simple demo
+		posting.done(result);
+		posting.fail(result);
+	});
+
+</script>
