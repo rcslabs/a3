@@ -104,6 +104,7 @@ module a3 {
 			this._container = flashContainer;
 
 			this._flashVars = this._flashVars || {};
+			//this._flashVars['checkMicVolume'] = false;
 			var readyCallback = '__'+Math.round(Math.random()*Math.pow(10,16));
 			this._flashVars['cbReady'] = readyCallback;
 			window[readyCallback] = () => { this._listener.onMediaReady(this); }
@@ -183,13 +184,15 @@ module a3 {
 		}
 
 		playDtmf(dtmf: string) {
-
+			this._swf.playDtmf(dtmf);
 		}
 
 		playRBT() {
+			this._swf.playRBT();
 		}
 
 		stopRBT() {
+			this._swf.stopRBT();
 		}
 	}
 
