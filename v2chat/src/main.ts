@@ -3,7 +3,7 @@
 
 var STUN_SERVER = "stun:stun.l.google.com:19302";
 var STUN_TIMEOUT = 3000;
-var FP_MIN_VERSION = "10.3";
+var FP_MIN_VERSION = "11";
 
 declare var LOG:any;
 declare var WARN:any;
