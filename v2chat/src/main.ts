@@ -346,7 +346,7 @@ class Mediator implements a3.ICommunicatorListener {
 		e.innerHTML = c;
 		document.head.appendChild(e);
 
-		var h = '<div id="a3-help" data-visible="false" data-pending="false"><iframe id="a3-help" frameborder="0" scrolling="no" style="width:100%;height:100%;"></iframe></div>';
+		var h = '<div id="a3-help" data-visible="false" data-pending="false"><iframe id="a3-help" frameborder="0" scrolling="yes" style="width:100%;height:100%;"></iframe></div>';
 		$('body').append(h);
 		this._$helpContainer = $('#a3-help');
 		this._$helpContainer.hide();
