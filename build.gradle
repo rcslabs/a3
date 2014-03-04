@@ -109,5 +109,10 @@ task (dist, type: Tar) {
     from("client-handler/build/node_modules"){
         into('alena/client-handler/node_modules')
     }
+
+    from("libraries"){
+        include 'gst-speex-flvmux.patch'
+        into('alena')
+    }
 }
 

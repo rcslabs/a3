@@ -1,0 +1,77 @@
+diff -Naur gst-plugins-good-1.2.0-orig/ext/speex/gstspeexdec.c gst-plugins-good-1.2.0-patched/ext/speex/gstspeexdec.c
+--- gst-plugins-good-1.2.0-orig/ext/speex/gstspeexdec.c	2013-09-04 21:08:13.000000000 +0400
++++ gst-plugins-good-1.2.0-patched/ext/speex/gstspeexdec.c	2014-03-03 18:59:39.000000000 +0400
+@@ -202,13 +202,17 @@
+   dec->header = speex_packet_to_header ((gchar *) map.data, map.size);
+   gst_buffer_unmap (buf, &map);
+ 
+-  if (!dec->header)
+-    goto no_header;
+-
+-  if (dec->header->mode >= SPEEX_NB_MODES || dec->header->mode < 0)
+-    goto mode_too_old;
+-
+-  dec->mode = speex_lib_get_mode (dec->header->mode);
++  // +sx patch no any header in stream! always wideband mode
++  //if (!dec->header)
++  //  goto no_header;
++
++  //if (dec->header->mode >= SPEEX_NB_MODES || dec->header->mode < 0)
++  //  goto mode_too_old;
++ 
++  dec->mode = &speex_wb_mode; 
++  GST_WARNING_OBJECT (dec, "This decoder not understands any speex header and always runs in speex_wb_mode");
++  //dec->mode = speex_lib_get_mode (dec->header->mode);
++  // -sx patch
+ 
+   /* initialize the decoder */
+   dec->state = speex_decoder_init (dec->mode);
+diff -Naur gst-plugins-good-1.2.0-orig/ext/speex/gstspeexenc.c gst-plugins-good-1.2.0-patched/ext/speex/gstspeexenc.c
+--- gst-plugins-good-1.2.0-orig/ext/speex/gstspeexenc.c	2013-09-04 21:08:13.000000000 +0400
++++ gst-plugins-good-1.2.0-patched/ext/speex/gstspeexenc.c	2014-03-03 19:56:27.000000000 +0400
+@@ -709,11 +709,12 @@
+     /* push out buffers */
+     /* store buffers for later pre_push sending */
+     headers = NULL;
+-    GST_DEBUG_OBJECT (enc, "storing header buffers");
+-    headers = g_list_prepend (headers, buf2);
+-    headers = g_list_prepend (headers, buf1);
+-    gst_audio_encoder_set_headers (benc, headers);
+-
++    // +sx patch
++    //GST_DEBUG_OBJECT (enc, "storing header buffers");
++    //headers = g_list_prepend (headers, buf2);
++    //headers = g_list_prepend (headers, buf1);
++    //gst_audio_encoder_set_headers (benc, headers);
++    // -sx patch
+     enc->header_sent = TRUE;
+   }
+ 
+diff -Naur gst-plugins-good-1.2.0-orig/gst/flv/gstflvmux.c gst-plugins-good-1.2.0-patched/gst/flv/gstflvmux.c
+--- gst-plugins-good-1.2.0-orig/gst/flv/gstflvmux.c	2013-09-04 21:08:13.000000000 +0400
++++ gst-plugins-good-1.2.0-patched/gst/flv/gstflvmux.c	2014-03-04 13:19:40.000000000 +0400
+@@ -82,7 +82,10 @@
+         "audio/x-raw, format = (string) { U8, S16LE}, layout = (string) interleaved, channels = (int) { 1, 2 }, rate = (int) { 5512, 11025, 22050, 44100 }; "
+         "audio/x-alaw, channels = (int) { 1, 2 }, rate = (int) { 5512, 11025, 22050, 44100 }; "
+         "audio/x-mulaw, channels = (int) { 1, 2 }, rate = (int) { 5512, 11025, 22050, 44100 }; "
+-        "audio/x-speex, channels = (int) { 1, 2 }, rate = (int) { 5512, 11025, 22050, 44100 };")
++// +sx patch 
++//      "audio/x-speex, channels = (int) { 1, 2 }, rate = (int) { 5512, 11025, 22050, 44100 };")       
++        "audio/x-speex, channels = (int) { 1, 2 }, rate = (int) { 5512, 8000, 11025, 22050, 44100 };")
++// -sx patch
+     );
+ 
+ #define gst_flv_mux_parent_class parent_class
+@@ -469,6 +472,12 @@
+         cpad->rate = 0;
+       else if (rate == 16000 && cpad->audio_codec == 4)
+         cpad->rate = 0;
++// +sx patch
++      else if (rate == 8000 && cpad->audio_codec == 11)
++        cpad->rate = 0;
++      else if (rate == 16000 && cpad->audio_codec == 11)
++        cpad->rate = 0;
++// -sx patch
+       else
+         ret = FALSE;
+     } else if (cpad->audio_codec == 10) {
