@@ -28,9 +28,11 @@ var MediaListener = (function () {
 
 var media;
 function init() {
-    console.log("Flash Vars:", config.getFlashVars());
+    var flashVars = config.getFlashVars();
+    flashVars["checkMicVolume"] = false;
+    console.log("Flash Vars:", flashVars);
     $("#media").html('');
-    media = new a3.FlashMedia(new MediaListener(), document.getElementById("media"), config.getFlashVars());
+    media = new a3.FlashMedia(new MediaListener(), document.getElementById("media"), flashVars);
     media.start();
 }
 

@@ -27,9 +27,11 @@ class MediaListener implements a3.IMediaListener {
 
 var media: a3.FlashMedia;
 function init() {
-	console.log("Flash Vars:", config.getFlashVars());
+	var flashVars = config.getFlashVars();
+	flashVars["checkMicVolume"] = false;
+	console.log("Flash Vars:", flashVars );
 	$("#media").html('');
-	media = new a3.FlashMedia(new MediaListener(), document.getElementById("media"), config.getFlashVars());
+	media = new a3.FlashMedia(new MediaListener(), document.getElementById("media"), flashVars);
 	media.start();
 }
 
