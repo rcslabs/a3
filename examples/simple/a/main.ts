@@ -92,7 +92,8 @@ class CommunicatorGraph implements a3.ICommunicatorListener{
 var flashVars = {
 	micRate: 44,
 	micCodec: "nellymoser",
-	logLevel: "ALL"
+	logLevel: "ALL",
+	camCodec: "h264"
 };
 
 class SimpleCommunicatorFactory implements a3.ICommunicatorFactory {

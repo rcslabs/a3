@@ -124,7 +124,8 @@ var CommunicatorGraph = (function () {
 var flashVars = {
     micRate: 44,
     micCodec: "nellymoser",
-    logLevel: "ALL"
+    logLevel: "ALL",
+    camCodec: "h264"
 };
 
 var SimpleCommunicatorFactory = (function () {
