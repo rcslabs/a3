@@ -328,6 +328,39 @@ class Mediator implements a3.ICommunicatorListener {
 		if('he' == this._communicator.query.lang){ this._root.style.direction = 'rtl'; }
         this._root.addEventListener('click', (e) => {this._onClick(<MouseEvent>e)});
         this._root.style.display = 'none';
+
+        /* send callback form */
+        $(".callback-form").submit((event) => {
+            event.preventDefault();
+            var $form = $(event.currentTarget);
+            var formdata = {};
+            var trim_re = /^([*|\s]+)|([*|\s]+)$/g ;
+            formdata['name'] =    $form.find("input[name='name']").val().replace(trim_re, "");
+            formdata['phone'] =   $form.find("input[name='phone']").val().replace(trim_re, "");
+            formdata['date'] =    $form.find("input[name='date']").val().replace(trim_re, "");
+            formdata['subject'] = $form.find("input[name='subject']").val().replace(trim_re, "");
+            formdata['message'] = $form.find("textarea[name='message']").val().replace(trim_re, "");
+            // simple check
+            if('' == formdata['name'].trim()) return;
+            if('' == formdata['phone'].trim()) return;
+
+            formdata['id'] = this._communicator.query.id;
+            //formdata.reason =         $form.find("input[name='reason']").val();
+            var l = this._communicator.locale;
+            formdata['label4name'] =    l['CALLBACK_FORM_NAME_LABEL'].replace(trim_re, "");
+            formdata['label4phone'] =   l['CALLBACK_FORM_PHONE_LABEL'].replace(trim_re, "");
+            formdata['label4date'] =    l['CALLBACK_FORM_DATE_LABEL'].replace(trim_re, "");
+            formdata['label4subject'] = l['CALLBACK_FORM_SUBJECT_LABEL'].replace(trim_re, "");
+            formdata['label4message'] = l['CALLBACK_FORM_MESSAGE_LABEL'].replace(trim_re, "");
+            var result = function(data){ 
+                //$('#a3-call-failed-view').css('visibility', 'hidden');
+                //$('#a3-callback-view').css('visibility', 'hidden');
+                //$('#a3-callback-result-view').css('visibility', 'visible');
+            };
+            $.post('//webrtc.v2chat.com/service/callback', formdata)
+                .done(() => { this._toggleView('callback-result'); })
+                .fail(() => { this._toggleView('callback-result'); });
+        });
     }
 
     _rect(elem:any):any{
