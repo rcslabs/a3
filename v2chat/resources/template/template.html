@@ -77,7 +77,8 @@ h2 {position:absolute; width:350px; margin:auto 30px; text-align:center; font-si
 	<div id="a3-call-failed-view">
 		<h1 style="top:20px">${CALL_FAILED}</h1>
 		<h2 style="top:100px">${CALLBACK_FORM_TITLE}</h2>
-		<form class="callback-form" action="http://webrtc.v2chat.com/demo/service-stub.html">
+		<form class="callback-form">
+			<input type="hidden" name="reason" value="CALL_FAILED">
 			<input placeholder="${CALLBACK_FORM_NAME_LABEL}" name="name"><br>
 			<input placeholder="${CALLBACK_FORM_PHONE_LABEL}" name="phone"><br>
 			<input placeholder="${CALLBACK_FORM_DATE_LABEL}" name="date"><br>
@@ -94,7 +95,8 @@ h2 {position:absolute; width:350px; margin:auto 30px; text-align:center; font-si
 
 	<div id="a3-callback-view">
 		<h1>${CALLBACK_FORM_TITLE}</h1>
-		<form class="callback-form" style="top:80px" action="http://webrtc.v2chat.com/demo/service-stub.html">
+		<form class="callback-form" style="top:80px">
+			<input type="hidden" name="reason" value="USER_ACTION">
 			<input placeholder="${CALLBACK_FORM_NAME_LABEL}" name="name"><br>
 			<input placeholder="${CALLBACK_FORM_PHONE_LABEL}" name="phone"><br>
 			<input placeholder="${CALLBACK_FORM_DATE_LABEL}" name="date"><br>
@@ -113,26 +115,20 @@ h2 {position:absolute; width:350px; margin:auto 30px; text-align:center; font-si
 	<button class="a3-btn-help a3-footer-button">${HELP_LABEL}</button>
 </div>
 
-<script>	
-	/* send callback form */
-	$(".callback-form").submit(function(event) {
-		event.preventDefault();
-		var $form = $(this);
-		var formdata = {};
-		formdata.name = $form.find("input[name='name']").val();
-		formdata.phone = $form.find("input[name='phone']").val();
-		formdata.date = $form.find("input[name='date']").val();
-		formdata.subject = $form.find("input[name='subject']").val();
-		formdata.message = $form.find("input[name='message']").val();
-		var posting = $.get($form.attr("action"), formdata);
-		var result = function(data){
-			$('#a3-call-failed-view').css('visibility', 'hidden');
-			$('#callback-view').css('visibility', 'hidden');
-			$('#callback-result-view').css('visibility', 'visible');
-		}
-        // only for simple demo
-		posting.done(result);
-		posting.fail(result);
-	});
-
+<script>
+	/* working hours */
+	$('body').on('view-changed', function(e, v){ 
+		if('intro' == v){
+			var check = (function (){
+				//var d = new Date(2000,1,2,10,29);
+				var d = new Date(); 
+				var m = d.getHours()*60+d.getMinutes(); 
+				return (m >= 630 && m <= 1170);  // 10:30 - 19:30
+			})();
+			if(!check){
+				$('#a3-intro-view').css('visibility', 'hidden');
+				$('#a3-callback-view').css('visibility', 'visible');
+			}			
+		} 
+	});	
 </script>
