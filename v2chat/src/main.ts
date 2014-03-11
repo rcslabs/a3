@@ -155,7 +155,7 @@ class Click2CallCommunicator extends a3.Communicator {
         call.hangup();
     }
 
-    onClickKeypadChar(value:string){
+    onClickDialpadChar(value:string){
         if(this.calls.length < 1){ return; }
         var call:a3.Call = this.calls[0]; // only single call allowed
         this.media.playDtmf(value);
@@ -322,6 +322,10 @@ class Mediator implements a3.ICommunicatorListener {
 			this._initHardwareControls();
 		}
 
+        /* dialpad feature init */
+        $('.a3-view[data-dialpad]').append('<div class="a3-dialpad noselect"><table><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="1">1</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="2">2</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="3">3</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="4">4</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="5">5</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="6">6</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="7">7</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="8">8</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="9">9</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="*">*</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="0">0</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="#">#</button></td></tr></table><button class="btn-close a3-btn-dialpad-close">&#215;</button></div>');
+        $('.a3-dialpad').hide();
+
 		this._initHelpContainer();
 		this._initFooter();
 
@@ -352,11 +356,6 @@ class Mediator implements a3.ICommunicatorListener {
             formdata['label4date'] =    l['CALLBACK_FORM_DATE_LABEL'].replace(trim_re, "");
             formdata['label4subject'] = l['CALLBACK_FORM_SUBJECT_LABEL'].replace(trim_re, "");
             formdata['label4message'] = l['CALLBACK_FORM_MESSAGE_LABEL'].replace(trim_re, "");
-            var result = function(data){ 
-                //$('#a3-call-failed-view').css('visibility', 'hidden');
-                //$('#a3-callback-view').css('visibility', 'hidden');
-                //$('#a3-callback-result-view').css('visibility', 'visible');
-            };
             $.post('//webrtc.v2chat.com/service/callback', formdata)
                 .done(() => { this._toggleView('callback-result'); })
                 .fail(() => { this._toggleView('callback-result'); });
@@ -463,6 +462,13 @@ class Mediator implements a3.ICommunicatorListener {
 			case 'btn-sound-mute':
 				this._communicator.onClickSoundMute(!('true' == $(event.target).attr('data-toggle')));
 				break;
+            case 'btn-dialpad-toggle':
+            case 'btn-dialpad-close':
+                this._toggleDialpad();
+                break;
+            case 'btn-dialpad':
+                this._communicator.onClickDialpadChar(""+$(event.target).data('value'));
+                break;
 			default:
 				WARN("Unhandled click on elem ." + cls);
         }
@@ -475,11 +481,10 @@ class Mediator implements a3.ICommunicatorListener {
             this._views[p].style.visibility = (p == id ? 'visible' : 'hidden');
         }
 		this._currentView = id;
-		$('body').trigger('view-changed', id);
         this._root.style.display = 'block';
 
 		// button BACK enabled/disabled separation by views
-		if(-1 != ['hw-failed', 'call-failed', 'call-finished', 'callback', 'callback-result', 'outro'].indexOf(id)){
+		if(-1 != ['hw-failed', 'call-failed', 'call-finished', 'callback', 'callback-result', 'outro'].indexOf(this._currentView)){
 			$('.a3-btn-back').removeAttr('disabled');
 		}else{
 			$('.a3-btn-back').attr('disabled','disabled');
@@ -488,15 +493,25 @@ class Mediator implements a3.ICommunicatorListener {
 		/* start/stop stopwatch */
 		var $stopwatch = $('.a3-stopwatch');
 		if($stopwatch.length){
-			if('talking' == id){
-				this._stopwatchValue = 0;
+            this._stopwatchValue = 0;
+            $stopwatch.html(this._toMMSS(0));
+			if('talking' == this._currentView){
 				this._stopwatchIntv = setInterval(() => {
-					$stopwatch.html(this._toMMSS(this._stopwatchValue++));
+					$stopwatch.html(this._toMMSS(++this._stopwatchValue));
 				}, 1000);
 			}else{
 				clearInterval(this._stopwatchIntv);
 			}
 		}
+
+        /* dialpad feature */
+        $('.a3-dialpad').hide();
+        var $view = $(this._views[this._currentView]);
+        if($view.data('dialpad') === 'show'){  // auto show on view
+            $('.a3-dialpad', this._views[this._currentView]).show();
+        }
+
+        $('body').trigger('view-changed', this._currentView);
     }
 
 	_toMMSS(value:number) {
@@ -527,6 +542,10 @@ class Mediator implements a3.ICommunicatorListener {
 			this._$helpContainer.attr('data-pending', 'false');
 		});
 	}
+
+    _toggleDialpad(){
+        $('.a3-dialpad', this._views[this._currentView]).toggle();
+    }
 }
 
 class ConstructorCompatibleSioSignaling extends a3.SioSignaling
