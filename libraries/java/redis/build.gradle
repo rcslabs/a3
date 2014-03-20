@@ -1,0 +1,60 @@
+
+apply plugin: 'java'
+
+dependencies {
+    testCompile "junit:junit:4.10"
+}
+
+ext.sharedManifest = manifest {
+	attributes(
+		"Created-By": "Gradle " + gradle.gradleVersion,
+		"Built-By":  project.ext.builder,
+		"Build-Jdk": System.getProperty('java.version'),
+		"Implementation-Title": "Redis layer", 
+		"Implementation-Version": version,
+		"Implementation-Vendor-Id": "RCSLabs",
+		"Implementation-Build": project.ext.revision,
+		"Implementation-Build-Timestamp": project.ext.datetime
+	)
+}
+
+jar {
+	manifest = project.manifest {
+    	from sharedManifest
+	}
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+	manifest = project.manifest {
+    	from sharedManifest
+	}   	
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+	manifest = project.manifest {
+    	from sharedManifest
+	}    
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+publishing {
+	publications {
+        mavenJava(MavenPublication) {
+            from components.java
+			artifact sourcesJar
+			artifact javadocJar
+	        pom.withXml {
+	        	def desc = 'Built by '+builder+' at '+datetime+' on rev. #'+revision
+                asNode().appendNode('description', desc)
+            }
+        }        
+    }
+}
