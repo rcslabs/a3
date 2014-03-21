@@ -1,5 +1,7 @@
-package com.rcslabs.messaging;
+package com.rcslabs.redis;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -16,7 +18,16 @@ import java.util.concurrent.TimeUnit;
 public class RedisMessageBroker implements IMessageBroker {
 
 	protected final static Logger log = LoggerFactory.getLogger(RedisMessageBroker.class);
-	
+
+    public static Gson gson;
+
+    static {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(IMessage.class, new JsonMessageDeserializer());
+        gsonBuilder.registerTypeAdapter(IMessage.class, new JsonMessageSerializer());
+        gson = gsonBuilder.create();
+    }
+
 	private Map<String, RedisSubscriber> subscribers;
 	private JedisPool pool;
     private Jedis jedis;
@@ -66,7 +77,7 @@ public class RedisMessageBroker implements IMessageBroker {
     @Override
 	public void publish(String channel, IMessage message){
         if(!connected){ return; }
-        jedis.publish(channel, Message.toJson(message));
+        jedis.publish(channel, gson.toJson(message));
         log.info("sent " + channel + " " + message);
 	}
 

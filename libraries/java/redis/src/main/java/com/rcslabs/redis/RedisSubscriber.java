@@ -1,4 +1,4 @@
-package com.rcslabs.messaging;
+package com.rcslabs.redis;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ class RedisSubscriber extends JedisPubSub implements Runnable {
 	public void onMessage(String channel, String message) {
         try{
             log.info("recv channel=" + channel + ", message=" + message);
-		    IMessage m = Message.fromJson(message);
+		    IMessage m = RedisMessageBroker.gson.fromJson(message, JsonMessage.class);
             delegate.onMessageReceived(channel, m);
         } catch(Exception e){
             log.error("Error on message processing " + message, e);
