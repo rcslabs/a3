@@ -1,9 +1,10 @@
-/// <reference path="communicator.ts" />
+/// <reference path="a3.d.ts" />
 /// <reference path="jquery.d.ts" />
 
 var STUN_SERVER = "stun:stun.l.google.com:19302";
 var STUN_TIMEOUT = 3000;
 var FP_MIN_VERSION = "10.3";
+var STAT_SERVICE = "/stat/push/";
 
 declare var LOG:any;
 declare var WARN:any;
@@ -18,17 +19,22 @@ class Click2CallCommunicator extends a3.Communicator {
     private _username:string = null;
     private _password:string = null;
     private _deferredCall:any = null;
+    private _statCookie:string = null;
+
 	public query:any = {};
 	public locale:any = null;
 
-    constructor() {
-        super();
+    constructor() { 
+        super(); 
 		// parse query string if any
 		if("" !== document.location.search){
 			document.location.search.replace(/^[?]/, "").split("&").forEach((e) => { var a = e.split('='); this.query[a[0]] = a[1]; });
 		}
 		if(typeof this.query['id'] === 'undefined'){   this.query.id = 'default'; }
 		if(typeof this.query['lang'] === 'undefined'){ this.query.lang = 'en'; }
+        var m = document.cookie.match(/A3Stat=(\d+)/);
+        if(null != m){ this._statCookie = m[1]; }
+        this.sendStat('INIT');
     }
 
 	setLocale(data:any){
@@ -67,11 +73,13 @@ class Click2CallCommunicator extends a3.Communicator {
     // autoconnect on application started
     onCommunicatorStarted(){
         this._mediator.onCommunicatorStarted();
+        this.sendStat('STARTED');
         this.connect();
     }
 
     onCommunicatorFailed() {
         this._mediator.onCommunicatorFailed();
+        this.sendStat('FAILED', 'application');
     }
 
     onConnecting() {
@@ -85,6 +93,7 @@ class Click2CallCommunicator extends a3.Communicator {
     onConnectionFailed(){
         // uncomment below for connection auto failover
         // this.connect();
+        this.sendStat('FAILED', 'connection');
     }
 
     onSessionStarted() {
@@ -94,6 +103,7 @@ class Click2CallCommunicator extends a3.Communicator {
     }
 
     onCheckHardwareSettings() {
+        this.sendStat('CHECK_HW');
         this._mediator.onCheckHardwareSettings();
     }
 
@@ -104,12 +114,14 @@ class Click2CallCommunicator extends a3.Communicator {
             var vv = this._deferredCall.vv;
             var destination = this._deferredCall.destination;
             this._deferredCall = null;
+            this.sendStat('START_CALL');
             super.startCall(destination, vv);
         }
     }
 
     onCheckHardwareFailed() {
         this._mediator.onCheckHardwareFailed();
+        this.sendStat('FAILED', 'hardware');
     }
 
     onSoundVolumeChanged(value:number) {
@@ -121,21 +133,25 @@ class Click2CallCommunicator extends a3.Communicator {
     }
 
     onCallStarted(call: a3.Call) {
+        this.sendStat('CALL_STARTED');
         this._mediator.onCallStarted(call);
     }
 
     onCallFinished(call: a3.Call) {
+        this.sendStat('CALL_FINISHED');
         this.media.dispose();
         this._mediator.onCallFinished(call);
     }
 
     onCallFailed(call: a3.Call) {
+        this.sendStat('CALL_FAILED');
         this.media.dispose();
         this._mediator.onCallFailed(call);
     }
 
     // click call -> start session (if not ready) -> check hardware (if not ready) -> start call
     onClickStartCall(type){
+        this.sendStat('CLICK_TO_CALL');
         var vv = [false, false];
         if(type == a3.CallType.AUDIO || type == a3.CallType.BOTH){ vv[0] = true; }
         if(type == a3.CallType.VIDEO || type == a3.CallType.BOTH){ vv[1] = true; }
@@ -169,6 +185,18 @@ class Click2CallCommunicator extends a3.Communicator {
 	onClickSoundMute(value:boolean){
 		this.media.muteSound(value);
 	}
+
+    sendStat(ev:string, details:string=null){
+        var data = {'ref': encodeURI(document.referrer)};
+        data['e'] = ev;
+        data['sc'] = this._statCookie;
+        data['b'] = this.query.id;
+        data['c'] = (this.calls[0] ? this.calls[0].getId() : null);
+        data['ts'] = (new Date()).getTime();
+        data['rnd'] = Math.random();
+        data['details'] = details;
+        $.get(STAT_SERVICE, data);
+    }
 }
 
 class MediaContainer {
