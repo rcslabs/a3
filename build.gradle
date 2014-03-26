@@ -18,14 +18,18 @@ allprojects {
     ext.builder = System.getProperty("user.name"); 
 
     new ByteArrayOutputStream().withStream { os ->
-        def result = exec {
-            ignoreExitValue = true
-            executable = 'svn'
-            args = ['info', projectDir]
-            standardOutput = os
+        try{
+            def result = exec {
+                ignoreExitValue = true
+                executable = 'svn'
+                args = ['info', projectDir]
+                standardOutput = os
+            }
+            def rev = (os.toString() =~ /Last Changed Rev: (\d+)/)
+            project.ext.revision = rev[0][1];
+        } catch (e) {
+            project.ext.revision = 'N/A'
         }
-        def rev = (os.toString() =~ /Last Changed Rev: (\d+)/)
-        project.ext.revision = rev[0][1];
     }
 }
 
