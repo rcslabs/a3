@@ -12,7 +12,7 @@ import java.util.Date;
 
 
 @Controller()
-@RequestMapping("/stat")
+@RequestMapping("/")
 public class StatController {
     private static final String USER_AGENT_HEADER = "User-Agent";
 
