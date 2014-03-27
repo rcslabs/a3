@@ -24,8 +24,7 @@ var Click2Call = (function () {
 		opts.vert = (typeof opts['bottom'] !== 'undefined' ? 'B' : 'T');
 		opts.csspos = ('L' == opts.horz ? 'left:0' : 'right:0') + ';' + ('T' == opts.vert ? 'top:'+opts['top'] : 'bottom:'+opts['bottom']);
 
-		document.write('<img src="'+opts.tab+'" id="click2call-tab-'+id+'" class="click2call-tab click2call-tab-'+opts.horz+'" style="'
-+opts.csspos.replace(/(left|right):0/, "$1:-8px")+';" onclick="click2call.toggle(\''+id+'\');">');
+		document.write('<img src="'+opts.tab+'" id="click2call-tab-'+id+'" class="click2call-tab click2call-tab-'+opts.horz+'" style="'+opts.csspos.replace(/(left|right):0/, "$1:-8px")+';" onclick="click2call.toggle(\''+id+'\');">');
 		document.write('<iframe id="click2call-frm-'+id+'" frameborder="0" scrolling="no" class="click2call-frm" style="width:0; height:'+opts.h+'px;'+opts.csspos+';"></iframe>');
 		this.widgets[id] = {'opts' : opts};
 	};
