@@ -16,7 +16,7 @@
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 
-    <filter>
+    <!--filter>
         <filter-name>corsFilter</filter-name>
         <filter-class>com.rcslabs.a3.stat.CorsFilter</filter-class>
     </filter>
@@ -24,5 +24,5 @@
     <filter-mapping>
         <filter-name>corsFilter</filter-name>
         <url-pattern>/*</url-pattern>
-    </filter-mapping>
+    </filter-mapping-->
 </web-app>

@@ -15,7 +15,7 @@ import java.util.Date;
 @RequestMapping("/")
 public class StatController {
     private static final String USER_AGENT_HEADER = "User-Agent";
-
+    private static final String X_FORWARDED_FOR_HEADER = "X-FORWARDED-FOR";
     @Autowired
     private StatService service;
 
@@ -31,9 +31,14 @@ public class StatController {
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
         }
 
+        String ipAddress = request.getHeader(X_FORWARDED_FOR_HEADER);
+        if (ipAddress == null) {
+            ipAddress = request.getRemoteAddr();
+        }
+
         ClientLogEntry item = new ClientLogEntry();
         item.setUserAgent(request.getHeader(USER_AGENT_HEADER));
-        item.setRemoteAddr(request.getRemoteAddr());
+        item.setRemoteAddr(ipAddress);
         item.setServerDate(new Date());
         item.setReferrer(request.getParameter(ClientLogEntry.PARAM_REFERRER));
         item.setClientDate(new Date(Long.parseLong(request.getParameter(ClientLogEntry.PARAM_TIMESTAMP), 10)));
