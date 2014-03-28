@@ -1,8 +1,11 @@
 package com.rcslabs.a3.stat;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+@Entity
+@Table(name="stat_client_log")
 public final class ClientLogEntry implements Serializable {
 
     public static final long serialVersionUID = 1L;
@@ -17,25 +20,43 @@ public final class ClientLogEntry implements Serializable {
 
     public ClientLogEntry(){}
 
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name="remote_addr")
     private String remoteAddr;
 
+    @Column(name="user_agent")
     private String userAgent;
 
+    @Column(name="referrer")
     private String referrer;
 
+    @Column(name="button_id")
     private String buttonId;
 
+    @Column(name="call_id")
     private String callId;
 
+    @Column(name="stat_cookie")
     private String statCookie;
 
+    @Column(name="event")
     private String event;
 
+    @Column(name="details")
     private String details;
 
+    @Column(name="client_date")
     private Date clientDate;
 
+    @Column(name="server_date")
     private Date serverDate;
+
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
 
     public String getRemoteAddr() {
         return remoteAddr;

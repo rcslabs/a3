@@ -18,6 +18,12 @@ public class StatDAOImpl implements StatDAO {
     }
 
     @Override
+    public CallLogEntry save(CallLogEntry item) {
+        getSession().save(item);
+        return item;
+    }
+
+    @Override
     public ClientLogEntry save(ClientLogEntry item) {
         getSession().save(item);
         return item;

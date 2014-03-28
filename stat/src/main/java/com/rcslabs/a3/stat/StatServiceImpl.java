@@ -9,16 +9,41 @@ import org.springframework.stereotype.Service;
 public class StatServiceImpl implements StatService {
 
     private static final String KEY_FOR_CLIENTS_LOG = "log:clients";
-
-    //@Autowired
-    //private StatDAO dao;
+    private static final String KEY_FOR_CALLS_LOG = "log:calls";
 
     @Autowired
-    private RedisTemplate<String, ClientLogEntry> redisTemplate;
+    private StatDAO dao;
+
+    @Autowired
+    private RedisTemplate<String, ClientLogEntry> redisClientLogEntryTemplate;
+
+    @Autowired
+    private RedisTemplate<String, CallLogEntry> redisCallLogEntryTemplate;
 
     @Override
     public void pushClientLogEntry(ClientLogEntry item) {
-        redisTemplate.opsForList().rightPush(KEY_FOR_CLIENTS_LOG, item);
-        redisTemplate.convertAndSend("log:clients", item);
+        redisClientLogEntryTemplate.opsForList().rightPush(KEY_FOR_CLIENTS_LOG, item);
+        redisClientLogEntryTemplate.convertAndSend(KEY_FOR_CLIENTS_LOG, item);
+
+    }
+
+    @Override
+    public void flushClientsLog() {
+        ClientLogEntry entry = null;
+        while(true){
+            entry = redisClientLogEntryTemplate.opsForList().leftPop(KEY_FOR_CLIENTS_LOG);
+            if(entry == null){ break; }
+            dao.save(entry);
+        }
+    }
+
+    @Override
+    public void flushCallsLog() {
+        CallLogEntry entry = null;
+        while(true){
+            entry = redisCallLogEntryTemplate.opsForList().leftPop(KEY_FOR_CALLS_LOG);
+            if(entry == null){ break; }
+            dao.save(entry);
+        }
     }
 }

@@ -14,14 +14,16 @@ import java.util.Date;
 @Controller()
 @RequestMapping("/")
 public class StatController {
+
     private static final String USER_AGENT_HEADER = "User-Agent";
     private static final String X_FORWARDED_FOR_HEADER = "X-FORWARDED-FOR";
+
     @Autowired
     private StatService service;
 
     @ResponseBody
     @RequestMapping("/push")
-    public ResponseEntity<String> handleRequest(HttpServletRequest request)
+    public ResponseEntity<String> handlePushRequest(HttpServletRequest request)
     {
         if(null == request.getParameter(ClientLogEntry.PARAM_BUTTON_ID)){
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
@@ -49,6 +51,15 @@ public class StatController {
         item.setDetails(request.getParameter(ClientLogEntry.PARAM_DETAILS));
 
         service.pushClientLogEntry(item);
+        return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+    }
+
+    @ResponseBody
+    @RequestMapping("/flush")
+    public ResponseEntity<String> handleFlushRequest(HttpServletRequest request)
+    {
+        service.flushClientsLog();
+        service.flushCallsLog();
         return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
     }
 }
