@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name="stat_client_log")
+@Table(name="stat_log_clients")
 public final class ClientLogEntry implements Serializable {
 
     public static final long serialVersionUID = 1L;
@@ -42,17 +42,14 @@ public final class ClientLogEntry implements Serializable {
     @Column(name="stat_cookie")
     private String statCookie;
 
-    @Column(name="event")
-    private String event;
+    @Column(name="type")
+    private String type;
 
     @Column(name="details")
     private String details;
 
-    @Column(name="client_date")
-    private Date clientDate;
-
-    @Column(name="server_date")
-    private Date serverDate;
+    @Column(name="timestamp")
+    private Date timestamp;
 
     public Long getId() { return id; }
 
@@ -90,36 +87,12 @@ public final class ClientLogEntry implements Serializable {
         this.callId = callId;
     }
 
-    public String getEvent() {
-        return event;
-    }
-
-    public void setEvent(String event) {
-        this.event = event;
-    }
-
     public String getDetails() {
         return details;
     }
 
     public void setDetails(String details) {
         this.details = details;
-    }
-
-    public Date getClientDate() {
-        return clientDate;
-    }
-
-    public void setClientDate(Date clientDate) {
-        this.clientDate = clientDate;
-    }
-
-    public Date getServerDate() {
-        return serverDate;
-    }
-
-    public void setServerDate(Date serverDate) {
-        this.serverDate = serverDate;
     }
 
     public String getButtonId() {
@@ -136,5 +109,21 @@ public final class ClientLogEntry implements Serializable {
 
     public void setStatCookie(String statCookie) {
         this.statCookie = statCookie;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 }

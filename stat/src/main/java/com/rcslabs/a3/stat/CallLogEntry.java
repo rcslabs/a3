@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name="stat_call_log")
+@Table(name="stat_log_calls")
 public class CallLogEntry implements Serializable {
 
     public static final long serialVersionUID = 1L;
@@ -14,8 +14,11 @@ public class CallLogEntry implements Serializable {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="date")
+    @Column(name="timestamp")
     private Date timestamp;
+
+    @Column(name="button_id")
+    private String buttonId;
 
     @Column(name="call_id")
     private String callId;
@@ -35,6 +38,9 @@ public class CallLogEntry implements Serializable {
     @Column(name="details")
     private String details;
 
+    @Column(name="consolidated")
+    private boolean consolidated;
+
     public CallLogEntry(){}
 
     public Long getId() {
@@ -51,6 +57,14 @@ public class CallLogEntry implements Serializable {
 
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getButtonId() {
+        return buttonId;
+    }
+
+    public void setButtonId(String buttonId) {
+        this.buttonId = buttonId;
     }
 
     public String getCallId() {
@@ -99,5 +113,13 @@ public class CallLogEntry implements Serializable {
 
     public void setDetails(String details) {
         this.details = details;
+    }
+
+    public boolean isConsolidated() {
+        return consolidated;
+    }
+
+    public void setConsolidated(boolean consolidated) {
+        this.consolidated = consolidated;
     }
 }

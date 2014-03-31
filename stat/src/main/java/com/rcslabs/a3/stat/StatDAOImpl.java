@@ -1,10 +1,17 @@
 package com.rcslabs.a3.stat;
 
+import org.hibernate.Criteria;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 @Repository
 @Transactional
@@ -18,8 +25,20 @@ public class StatDAOImpl implements StatDAO {
     }
 
     @Override
+    public List<CallLogEntry> getCallLogEntriesByCallId(String callId) {
+        return getSession().createQuery("from CallLogEntry where callId=:callId order by timestamp")
+                .setString("callId", callId).list();
+    }
+
+    @Override
     public CallLogEntry save(CallLogEntry item) {
         getSession().save(item);
+        return item;
+    }
+
+    @Override
+    public CallLogEntry update(CallLogEntry item) {
+        getSession().update(item);
         return item;
     }
 
@@ -28,4 +47,33 @@ public class StatDAOImpl implements StatDAO {
         getSession().save(item);
         return item;
     }
+
+    @Override
+    public CallConsolidatedEntry save(CallConsolidatedEntry item) {
+        getSession().save(item);
+        return item;
+    }
+
+    @Override
+    public List findNotConsolidatedCalls() {
+        String q = "select distinct on(call_id) button_id, call_id from stat_log_calls where consolidated = false";
+        SQLQuery sql = getSession().createSQLQuery(q);
+        return sql.list();
+    }
+
+    @Override
+    public List<CallConsolidatedEntry> findCallsByDate(Date date) {
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            String d = sdf.format(date); // skip hours
+            Date startDate = sdf.parse(d);
+            Date endDate = new Date(startDate.getTime()+(86400000));
+            Criteria criteria = getSession().createCriteria(CallConsolidatedEntry.class)
+                    .add(Restrictions.between("start", startDate, endDate));
+            return criteria.list();
+        } catch (Exception e){
+            return null;
+        }
+    }
+
 }
