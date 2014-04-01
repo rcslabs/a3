@@ -6,9 +6,7 @@ import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class StatServiceImpl implements StatService {
@@ -64,20 +62,42 @@ public class StatServiceImpl implements StatService {
         CallConsolidatedEntry consolidatedEntry;
         while( notConsolidatedCallsIter.hasNext() ){
             Object[] tuple = (Object[]) notConsolidatedCallsIter.next();
-            String buttonId = (String)tuple[0];
+            //String buttonId = (String)tuple[0];
             String callId = (String)tuple[1];
             notConsolidatedCallLogEntries = dao.getCallLogEntriesByCallId(callId);
-            consolidatedEntry = new CallConsolidatedEntry(buttonId, notConsolidatedCallLogEntries);
-            dao.save(consolidatedEntry);
-            for(CallLogEntry le : notConsolidatedCallLogEntries){
-                le.setConsolidated(true);
-                dao.update(le);
+
+            // create one consolidated row from several log-entry rows
+            consolidatedEntry = new CallConsolidatedEntry(notConsolidatedCallLogEntries);
+
+            // Achtung! The call entry must be "completed" means it state has "failed" or "finished".
+            // Only in this case we can mark an entry rows as consolidated.
+            if(consolidatedEntry.isCompleted()){
+                dao.save(consolidatedEntry);
+                for(CallLogEntry le : notConsolidatedCallLogEntries){
+                    le.setConsolidated(true);
+                    dao.update(le);
+                }
             }
         }
     }
 
     @Override
+    public Map<String, String> getButtons() {
+        List<ButtonEntry> list = dao.getButtonList();
+        HashMap<String, String> res = new HashMap<String, String>();
+        for(ButtonEntry be : list){
+            res.put(be.getButtonId(), be.getTitle());
+        }
+        return res;
+    }
+
+    @Override
     public List<CallConsolidatedEntry> findConsolidatedCalls(Date parsedDate) {
         return dao.findCallsByDate(parsedDate);
+    }
+
+    @Override
+    public List<CallConsolidatedEntry> findConsolidatedCalls(String buttonId, Date parsedDate) {
+        return dao.findCallsByButtonIdAndMonth(buttonId, parsedDate);
     }
 }

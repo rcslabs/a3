@@ -5,13 +5,16 @@ import java.util.List;
 
 public interface StatDAO {
 
-    List<CallLogEntry> getCallLogEntriesByCallId(String id);
     CallLogEntry save(CallLogEntry item);
     CallLogEntry update(CallLogEntry item);
+    List<CallLogEntry> getCallLogEntriesByCallId(String id);
+    List<CallLogEntry> findNotConsolidatedCalls();
 
     ClientLogEntry save(ClientLogEntry item);
-    CallConsolidatedEntry save(CallConsolidatedEntry item);
-    List<CallLogEntry> findNotConsolidatedCalls();
-    List<CallConsolidatedEntry> findCallsByDate(Date date);
 
+    CallConsolidatedEntry save(CallConsolidatedEntry item);
+    List<CallConsolidatedEntry> findCallsByDate(Date date);
+    List<CallConsolidatedEntry> findCallsByButtonIdAndMonth(String buttonId, Date date);
+
+    List<ButtonEntry> getButtonList();
 }

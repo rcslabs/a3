@@ -3,6 +3,7 @@ package com.rcslabs.a3.stat;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface StatService {
     void pushClientLogEntry(ClientLogEntry item);
@@ -10,5 +11,7 @@ public interface StatService {
     void flushCallsLog();
     void consolidateCalls();
 
+    Map<String, String> getButtons();
     List<CallConsolidatedEntry> findConsolidatedCalls(Date parsedDate);
+    List<CallConsolidatedEntry> findConsolidatedCalls(String buttonId, Date parsedDate);
 }

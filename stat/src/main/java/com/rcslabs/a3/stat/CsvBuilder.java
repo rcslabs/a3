@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CsvBuilder<T> {
+public class CsvBuilder {
 
     private final char separator;
     private final char nl = '\n';
@@ -29,20 +29,20 @@ public class CsvBuilder<T> {
         this.sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
 
-    public void addProperty(String label, String getter){
+    public void addColumn(String label, String getter){
         columns.put(label, getter);
     }
 
-    public void buildFromList(List<T> source){
+    public void buildFromList(List source){
         buildFirstLine();
         if(0 == source.size()) return;
         explicitGetters(source.get(0));
-        for(T item : source){
+        for(Object item : source){
             buildEntryLine(item);
         }
     }
 
-    private void explicitGetters(T item){
+    public void explicitGetters(Object item){
         Method[] methods = item.getClass().getDeclaredMethods();
         for(int i=0; i<methods.length; ++i){
             String name = methods[i].getName();
@@ -55,7 +55,7 @@ public class CsvBuilder<T> {
         }
     }
 
-    private void buildFirstLine(){
+    public void buildFirstLine(){
         for(String p : columns.keySet()){
             sb.append('"').append(p).append('"').append(separator);
         }
@@ -64,13 +64,12 @@ public class CsvBuilder<T> {
         sb.append(nl);
     }
 
-    private void buildEntryLine(T item){
+    public void buildEntryLine(Object item){
         for(String p : columns.keySet()){
             try{
                 Object value = getters.get(p).invoke(item);
-                if(value instanceof Date){
-                    value = sdf.format(value);
-                }
+                if(value instanceof Date){ value = sdf.format(value); }
+                if(value == null){ value = ""; }
                 sb.append('"').append(value).append('"').append(separator);
             }catch(Exception e){
                 System.out.println("Invalid access " + e);

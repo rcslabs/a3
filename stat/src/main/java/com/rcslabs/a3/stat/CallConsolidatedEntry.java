@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name="stat_consolidated_calls")
@@ -45,12 +46,19 @@ public class CallConsolidatedEntry implements Serializable {
     @Column(name="details")
     private String details;
 
-    public CallConsolidatedEntry(String buttonId, List<CallLogEntry> callLogEntries)
-    {
-        this.setButtonId(buttonId);
+    private static Map<String, String> buttons;
 
+    public CallConsolidatedEntry(List<CallLogEntry> callLogEntries)
+    {
         for(CallLogEntry e : callLogEntries)
         {
+            // try to lazy set evt properties
+            if(getButtonId() == null){ this.setButtonId(e.getButtonId()); }
+            if(getSipId() == null){ this.setSipId(e.getSipId()); }
+            if(getCallId() == null){ this.setCallId(e.getCallId()); }
+            if(getA() == null){ this.setA(e.getA()); }
+            if(getB() == null){ this.setB(e.getB()); }
+
             if("START_CALL".equals(e.getType())){
                 this.setStart(e.getTimestamp());
             }else if("CALL_STARTED".equals(e.getType())){
@@ -61,23 +69,37 @@ public class CallConsolidatedEntry implements Serializable {
                 this.setFailed(e.getTimestamp());
                 this.setDetails(e.getDetails());
             }
-
-            // try to lazy set evt properties
-            if(getSipId() == null){ this.setSipId(e.getSipId()); }
-            if(getCallId() == null){ this.setCallId(e.getCallId()); }
-            if(getA() == null){ this.setA(e.getA()); }
-            if(getB() == null){ this.setB(e.getB()); }
         }
     }
 
     public CallConsolidatedEntry(){}
 
+    // UGLY: bad way to use relations. You should use ORM, but who cares?
+    public static void setButtons(Map<String, String> buttons) {
+        CallConsolidatedEntry.buttons = buttons;
+    }
+
+    public String getExplicitTitle(){
+        if(buttons.containsKey(buttonId)){
+            return buttons.get(buttonId);
+        }else{
+            return buttonId;
+        }
+    }
+
     public boolean isStarted(){
         return (null != getStarted());
     }
 
-    public boolean isFailed(){
-        return (null != getFailed());
+    public boolean isCompleted(){
+        return (null != getFailed() || null != getFinished());
+    }
+
+    public String getFailedDetails(){
+        if (null != getFailed()){
+            return getDetails();
+        }
+        return null;
     }
 
     public float getWaitDuration(){

@@ -14,7 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller()
@@ -93,8 +95,19 @@ public class StatController {
 
     @ResponseBody
     @RequestMapping(value="/details/{date}", method=RequestMethod.GET)
-    public ResponseEntity<String> handleDetailsRequest(@PathVariable String date){
-        String response = null;
+    public ResponseEntity<String> handleDetailsRequest(@PathVariable String date)
+    {
+        CsvBuilder csv = new CsvBuilder();
+        csv.addColumn("date", "getStart");
+        csv.addColumn("wait", "getWaitDuration");
+        csv.addColumn("talk", "getTalkDuration");
+        csv.addColumn("failed", "getFailedDetails");
+        csv.addColumn("button", "getExplicitTitle");
+        csv.addColumn("callId", "getCallId");
+        csv.addColumn("sipId", "getSipId");
+        csv.addColumn("a", "getA");
+        csv.addColumn("b", "getB");
+
         try{
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
             Date parsedDate =  sdf.parse(date);
@@ -103,34 +116,32 @@ public class StatController {
             service.flushCallsLog();
             service.consolidateCalls();
 
+            CallConsolidatedEntry.setButtons(service.getButtons());
             List<CallConsolidatedEntry> calls = service.findConsolidatedCalls(parsedDate);
-            CsvBuilder<CallConsolidatedEntry> csv = new CsvBuilder<CallConsolidatedEntry>();
-            csv.addProperty("date", "getStart");
-            csv.addProperty("started", "isStarted");
-            csv.addProperty("wait", "getWaitDuration");
-            csv.addProperty("talk", "getTalkDuration");
-            csv.addProperty("buttonId", "getButtonId");
-            csv.addProperty("callId", "getCallId");
-            csv.addProperty("sipId", "getSipId");
-            csv.addProperty("a", "getA");
-            csv.addProperty("b", "getB");
             csv.buildFromList(calls);
-            response = csv.getResult();
 
+            String filename = "a3-stat-"+date+".csv";
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.add("Content-type", "text/csv");
+            responseHeaders.add("Content-Disposition", "attachment; filename=\""+filename+"\"");
+            return new ResponseEntity<String>(csv.getResult(), responseHeaders, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.add("Content-type", "text/csv");
-        responseHeaders.add("Content-Disposition", "attachment; filename=\"stat-"+date+".csv\"");
-        return new ResponseEntity<String>(response, responseHeaders, HttpStatus.OK);
     }
 
     @ResponseBody
-    @RequestMapping(value="/summary/{date}/{buttonId}", method=RequestMethod.GET)
-    public ResponseEntity<String> handleSummaryRequest(@PathVariable String date, @PathVariable String buttonId){
-        String response = null;
+    @RequestMapping(value="/summary/{buttonId}/{date}", method=RequestMethod.GET)
+    public ResponseEntity<String> handleSummaryRequest(@PathVariable String buttonId, @PathVariable String date)
+    {
+        CsvBuilder csv = new CsvBuilder();
+        csv.addColumn("day", "getDayOfMonth");
+        csv.addColumn("count", "getCount");
+        csv.addColumn("talkSummary", "getSummaryDuration");
+        csv.addColumn("talkMean", "getMeanDuration");
+        csv.addColumn("waitSummary", "getSummaryWait");
+        csv.addColumn("waitMean", "getMeanWait");
+        csv.buildFirstLine();
 
         try{
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
@@ -140,13 +151,43 @@ public class StatController {
             service.flushCallsLog();
             service.consolidateCalls();
 
+            List<CallConsolidatedEntry> calls = service.findConsolidatedCalls(buttonId, parsedDate);
+            Map<String, CsvCallsSummaryRow> result = new LinkedHashMap<String, CsvCallsSummaryRow>();
 
+            SimpleDateFormat sdf2 = new SimpleDateFormat("d");
+            String dayOfMonth;
+            CsvCallsSummaryRow row;
+
+            for(CallConsolidatedEntry cce : calls){
+                if(!cce.isStarted()){ continue; }
+                dayOfMonth = sdf2.format(cce.getStart());
+                if(!result.containsKey(dayOfMonth)){
+                    row = new CsvCallsSummaryRow(dayOfMonth);
+                    result.put(dayOfMonth, row);
+                }else{
+                    row = result.get(dayOfMonth);
+                }
+                row.addCallEntry(cce);
+            }
+
+            boolean exg = false;
+            for(String key : result.keySet()){
+                row = result.get(key);
+                if(!exg){
+                    csv.explicitGetters(row);
+                    exg = true;
+                }
+                csv.buildEntryLine(row);
+            }
+
+            Map<String, String> buttons = service.getButtons();
+            String filename = "a3-stat-"+date+"-"+buttons.get(buttonId)+".csv";
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.add("Content-type", "text/csv");
+            responseHeaders.add("Content-Disposition", "attachment; filename=\""+filename+"\"");
+            return new ResponseEntity<String>(csv.getResult(), responseHeaders, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.add("Content-type", "text/csv");
-        responseHeaders.add("Content-Disposition", "attachment; filename=\"stat-"+date+"-"+buttonId+".csv\"");
-        return new ResponseEntity<String>(response, responseHeaders, HttpStatus.OK);
     }
 }

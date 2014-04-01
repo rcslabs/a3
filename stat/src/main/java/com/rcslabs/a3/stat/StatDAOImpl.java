@@ -4,12 +4,14 @@ import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -74,6 +76,31 @@ public class StatDAOImpl implements StatDAO {
         } catch (Exception e){
             return null;
         }
+    }
+
+    @Override
+    public List<CallConsolidatedEntry> findCallsByButtonIdAndMonth(String buttonId, Date date) {
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
+            String d = sdf.format(date); // skip hours, days
+            Date startDate = sdf.parse(d);
+            Calendar c = Calendar.getInstance();
+            c.setTime(startDate);
+            c.add(Calendar.MONTH, 1);
+            Date endDate = c.getTime();
+            Criteria criteria = getSession().createCriteria(CallConsolidatedEntry.class)
+                    .add(Restrictions.between("start", startDate, endDate))
+                    .add(Restrictions.eq("buttonId", buttonId)).addOrder(Order.asc("start"));
+
+            return criteria.list();
+        } catch (Exception e){
+            return null;
+        }
+    }
+
+    @Override
+    public List<ButtonEntry> getButtonList() {
+        return getSession().createQuery("from ButtonEntry").list();
     }
 
 }
