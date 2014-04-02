@@ -4,7 +4,7 @@
 var STUN_SERVER = "stun:stun.l.google.com:19302";
 var STUN_TIMEOUT = 3000;
 var FP_MIN_VERSION = "10.3";
-var STAT_SERVICE = "/stat/push/";
+var STAT_SERVICE = "http://localhost:8080/stat/push/";
 
 declare var LOG:any;
 declare var WARN:any;
@@ -313,7 +313,8 @@ class Mediator implements a3.ICommunicatorListener {
     }
 
     onCommunicatorFailed() {
-        this._toggleView('loading-failed');
+        //this._toggleView('loading-failed');
+        this._toggleView('callback');
     }
 
     onSessionStarting() {}
@@ -855,6 +856,26 @@ function parseIni(data){
 	});
 	return value;
 }
+
+
+var isMobile = {
+    Android: function() {
+        return navigator.userAgent.match(/Android/i) ? true : false;
+    },
+    BlackBerry: function() {
+        return navigator.userAgent.match(/BlackBerry/i) ? true : false;
+    },
+    iOS: function() {
+        return navigator.userAgent.match(/iPhone|iPad|iPod/i) ? true : false;
+    },
+    Windows: function() {
+        return navigator.userAgent.match(/IEMobile/i) ? true : false;
+    },
+    any: function() {
+        return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Windows());
+    }
+};
+
 
 debug = function(value:boolean){ document.cookie = 'debug=' + value +';path=/';}
 if(-1 != document.cookie.indexOf('debug=true')){ LOG = WARN = ERROR = console.log.bind(console); }
