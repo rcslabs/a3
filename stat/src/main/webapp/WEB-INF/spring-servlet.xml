@@ -8,17 +8,33 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-    <context:component-scan base-package="com.rcslabs.a3.stat"/>
-    <context:annotation-config/>
+    <context:component-scan base-package="com.rcslabs.a3.stat" />
+    <context:annotation-config />
 
-    <tx:annotation-driven/>
+    <tx:annotation-driven />
 
     <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="prefix" value="/WEB-INF/pages/"/>
+        <property name="prefix" value="/WEB-INF/jsp/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
 
-    <bean id="corsFilter" class="com.rcslabs.a3.stat.CorsFilter" />
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <ref bean="csvMessageConverter"/>
+                <ref bean="jacksonMessageConverter"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="jacksonMessageConverter"
+          class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
+
+    <bean id="csvMessageConverter"
+          class="com.rcslabs.a3.stat.CsvHttpMessageConverter"/>
+
+    <bean id="corsFilter"
+          class="com.rcslabs.a3.stat.CorsFilter" />
 
     <bean id="propertyConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"

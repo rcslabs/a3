@@ -16,6 +16,7 @@ public class CsvBuilder {
     private Map<String, Method> getters;
     private StringBuilder sb;
     private SimpleDateFormat sdf;
+    private String filename;
 
     public CsvBuilder(){
         this(',');
@@ -27,6 +28,14 @@ public class CsvBuilder {
         this.getters = new LinkedHashMap<String, Method>();
         this.sb = new StringBuilder();
         this.sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    }
+
+    public String getFilename(){
+        return this.filename;
+    }
+
+    public void setFilename(String value){
+        this.filename = value;
     }
 
     public void addColumn(String label, String getter){

@@ -6,6 +6,7 @@ import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.*;
 
 @Service
@@ -84,7 +85,7 @@ public class StatServiceImpl implements StatService {
     @Override
     public Map<String, String> getButtons() {
         List<ButtonEntry> list = dao.getButtonList();
-        HashMap<String, String> res = new HashMap<String, String>();
+        HashMap<String, String> res = new LinkedHashMap<String, String>();
         for(ButtonEntry be : list){
             res.put(be.getButtonId(), be.getTitle());
         }
@@ -99,5 +100,10 @@ public class StatServiceImpl implements StatService {
     @Override
     public List<CallConsolidatedEntry> findConsolidatedCalls(String buttonId, Date parsedDate) {
         return dao.findCallsByButtonIdAndMonth(buttonId, parsedDate);
+    }
+
+    @Override
+    public Map<String, BigInteger> countCallsByMonth(Date date){
+        return dao.countCallsByMonth(date);
     }
 }

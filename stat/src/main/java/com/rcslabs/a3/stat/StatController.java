@@ -1,7 +1,6 @@
 package com.rcslabs.a3.stat;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,12 +10,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Controller()
@@ -61,41 +57,13 @@ public class StatController {
         return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
     }
 
-    @ResponseBody
-    @RequestMapping("/flush")
-    public ResponseEntity<String> handleFlushRequest()
-    {
-        try{
-            service.flushClientsLog();
-            service.flushCallsLog();
-        } catch (Exception e) {
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+    @RequestMapping(value="/", method=RequestMethod.GET)
+    public String handleDefaultRequest() {
+        return "index";
     }
 
-    @ResponseBody
-    @RequestMapping("/consolidate")
-    public ResponseEntity<String> handleConsolidateRequest(){
-        try{
-            service.consolidateCalls();
-        } catch (Exception e) {
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
-    }
-
-    @ResponseBody
-    @RequestMapping(value="/details", method=RequestMethod.GET)
-    public ResponseEntity<String> handleDetailsRequestWithoutParameters(HttpServletResponse response){
-        SimpleDateFormat sdt = new SimpleDateFormat("yyyyMMdd");
-        response.addHeader("Location", "/details/"+sdt.format(new Date()));
-        return new ResponseEntity<String>(HttpStatus.MOVED_TEMPORARILY);
-    }
-
-    @ResponseBody
     @RequestMapping(value="/details/{date}", method=RequestMethod.GET)
-    public ResponseEntity<String> handleDetailsRequest(@PathVariable String date)
+    public @ResponseBody CsvBuilder handleDetailsRequest(@PathVariable String date)
     {
         CsvBuilder csv = new CsvBuilder();
         csv.addColumn("date", "getStart");
@@ -120,19 +88,15 @@ public class StatController {
             List<CallConsolidatedEntry> calls = service.findConsolidatedCalls(parsedDate);
             csv.buildFromList(calls);
 
-            String filename = "a3-stat-"+date+".csv";
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.add("Content-type", "text/csv");
-            responseHeaders.add("Content-Disposition", "attachment; filename=\""+filename+"\"");
-            return new ResponseEntity<String>(csv.getResult(), responseHeaders, HttpStatus.OK);
+            csv.setFilename("a3-stat-"+date+".csv");
+            return csv;
         } catch (Exception e) {
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return null;
         }
     }
 
-    @ResponseBody
     @RequestMapping(value="/summary/{buttonId}/{date}", method=RequestMethod.GET)
-    public ResponseEntity<String> handleSummaryRequest(@PathVariable String buttonId, @PathVariable String date)
+    public @ResponseBody CsvBuilder handleSummaryRequest(@PathVariable String buttonId, @PathVariable String date)
     {
         CsvBuilder csv = new CsvBuilder();
         csv.addColumn("day", "getDayOfMonth");
@@ -181,13 +145,37 @@ public class StatController {
             }
 
             Map<String, String> buttons = service.getButtons();
-            String filename = "a3-stat-"+date+"-"+buttons.get(buttonId)+".csv";
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.add("Content-type", "text/csv");
-            responseHeaders.add("Content-Disposition", "attachment; filename=\""+filename+"\"");
-            return new ResponseEntity<String>(csv.getResult(), responseHeaders, HttpStatus.OK);
+            csv.setFilename("a3-stat-"+date+"-"+buttons.get(buttonId)+".csv");
+            return csv;
         } catch (Exception e) {
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return null;
+        }
+    }
+
+
+    @RequestMapping(value="/count/{date}", method=RequestMethod.GET)
+    public @ResponseBody Map handleCountRequest(@PathVariable String date){
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
+            Date parsedDate =  sdf.parse(date);
+
+            service.flushClientsLog();
+            service.flushCallsLog();
+            service.consolidateCalls();
+
+            Map<String, BigInteger> result = service.countCallsByMonth(parsedDate);
+            return result;
+        } catch (Exception e){
+            return new HashMap();
+        }
+    }
+
+    @RequestMapping(value="/buttons", method=RequestMethod.GET)
+    public @ResponseBody Map handleButtonsRequest(){
+        try {
+            return  service.getButtons();
+        } catch (Exception e){
+            return new HashMap();
         }
     }
 }

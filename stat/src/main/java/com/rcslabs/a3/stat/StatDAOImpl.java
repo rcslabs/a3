@@ -10,10 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Repository
 @Transactional
@@ -64,6 +63,23 @@ public class StatDAOImpl implements StatDAO {
     }
 
     @Override
+    public Map<String, BigInteger> countCallsByMonth(Date date) {
+        String q = "SELECT DISTINCT ON(date_trunc('day', start_ts)) date_trunc('day', start_ts) AS date, " +
+                "COUNT(date_trunc('day', start_ts)) FROM stat_consolidated_calls " +
+                "WHERE EXTRACT(MONTH FROM start_ts)=" + (1+date.getMonth()) + " " +
+                "GROUP BY date_trunc('day', start_ts)";
+        SQLQuery sql = getSession().createSQLQuery(q);
+        Iterator iter = sql.list().iterator();
+        Map<String, BigInteger> result = new HashMap<String, BigInteger>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        while( iter.hasNext() ){
+            Object[] tuple = (Object[]) iter.next();
+            result.put(sdf.format((Date)tuple[0]), (BigInteger)tuple[1]);
+        }
+        return result;
+    }
+
+    @Override
     public List<CallConsolidatedEntry> findCallsByDate(Date date) {
         try{
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -100,7 +116,7 @@ public class StatDAOImpl implements StatDAO {
 
     @Override
     public List<ButtonEntry> getButtonList() {
-        return getSession().createQuery("from ButtonEntry").list();
+        return getSession().createQuery("from ButtonEntry order by title").list();
     }
 
 }
