@@ -4,7 +4,8 @@
 var STUN_SERVER = "stun:stun.l.google.com:19302";
 var STUN_TIMEOUT = 3000;
 var FP_MIN_VERSION = "10.3";
-var STAT_SERVICE = "http://localhost:8080/stat/push/";
+var STAT_SERVICE = "//webrtc.v2chat.com/stat/push/";
+var CALLBACK_SERIVICE = '//webrtc.v2chat.com/service/callback';
 
 declare var LOG:any;
 declare var WARN:any;
@@ -385,7 +386,8 @@ class Mediator implements a3.ICommunicatorListener {
             formdata['label4date'] =    l['CALLBACK_FORM_DATE_LABEL'].replace(trim_re, "");
             formdata['label4subject'] = l['CALLBACK_FORM_SUBJECT_LABEL'].replace(trim_re, "");
             formdata['label4message'] = l['CALLBACK_FORM_MESSAGE_LABEL'].replace(trim_re, "");
-            $.post('//webrtc.v2chat.com/service/callback', formdata)
+            this._communicator.sendStat('SUBMIT_FORM');
+            $.post(CALLBACK_SERIVICE, formdata)
                 .done(() => { this._toggleView('callback-result'); })
                 .fail(() => { this._toggleView('callback-result'); });
         });
