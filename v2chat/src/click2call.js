@@ -24,8 +24,9 @@ var Click2Call = (function () {
 		opts.vert = (typeof opts['bottom'] !== 'undefined' ? 'B' : 'T');
 		opts.csspos = ('L' == opts.horz ? 'left:0' : 'right:0') + ';' + ('T' == opts.vert ? 'top:'+opts['top'] : 'bottom:'+opts['bottom']);
 
+		var src = this.url+'click2call.html?'+opts.query.join('&');
 		document.write('<img src="'+opts.tab+'" id="click2call-tab-'+id+'" class="click2call-tab click2call-tab-'+opts.horz+'" style="'+opts.csspos.replace(/(left|right):0/, "$1:-8px")+';" onclick="click2call.toggle(\''+id+'\');">');
-		document.write('<iframe id="click2call-frm-'+id+'" frameborder="0" scrolling="no" class="click2call-frm" style="width:0; height:'+opts.h+'px;'+opts.csspos+';"></iframe>');
+		document.write('<iframe src="'+src+'" id="click2call-frm-'+id+'" frameborder="0" scrolling="no" class="click2call-frm" style="width:0; height:'+opts.h+'px;'+opts.csspos+';"></iframe>');
 		this.widgets[id] = {'opts' : opts};
 		var sc=''; var m = document.cookie.match(/A3Stat=(\d+)/); if(null != m){ sc = m[1]; }
 		document.write('<img src="//webrtc.v2chat.com/stat/push/?b='+id+'&e=LOAD&ref='+encodeURI(document.referrer)+'&sc='+sc+'">');
@@ -36,12 +37,12 @@ var Click2Call = (function () {
 		var frm = document.getElementById('click2call-frm-'+id);
 		var opts = this.widgets[id].opts;
 		if(0 == parseInt(frm.style.width)){ //hidden
-			frm.src = this.url+'click2call.html?'+opts.query.join('&');
+			//frm.src = this.url+'click2call.html?'+opts.query.join('&');
 			frm.style.width = opts.w+'px';
 			tab.style[('L' == opts.horz ? 'left' : 'right')] = (opts.w-8)+'px';
 		}else if(opts.w == parseInt(frm.style.width)){ // visible
 			frm.style.width = 0;
-			frm.src = "about:blank";
+			//frm.src = "about:blank";
 			tab.style[('L' == opts.horz ? 'left' : 'right')] = '-8px';
 		}
 	};
