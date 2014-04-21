@@ -35,6 +35,7 @@ class Click2CallCommunicator extends a3.Communicator {
 		if(typeof this.query['lang'] === 'undefined'){ this.query.lang = 'en'; }
         var m = document.cookie.match(/A3Stat=(\d+)/);
         if(null != m){ this._statCookie = m[1]; }
+        if(DEBUG_ENABLED){ STAT_SERVICE = null; }
         this.sendStat('INIT');
     }
 
@@ -46,6 +47,9 @@ class Click2CallCommunicator extends a3.Communicator {
         super.setFactory(factory);
 		(<CompatibleFactory>(this.factory)).setListener(this);
 		(<CompatibleFactory>(this.factory)).setProjectId(this.query.id);
+        if(this.query['operatorid'] != undefined){
+            (<CompatibleFactory>(this.factory)).setOperatorId(this.query.operatorid);    
+        }
     }
 
     // overrides super start
@@ -196,6 +200,7 @@ class Click2CallCommunicator extends a3.Communicator {
         data['ts'] = (new Date()).getTime();
         data['rnd'] = Math.random();
         data['details'] = details;
+        if(STAT_SERVICE == null){ console.log(data); return; }
         $.get(STAT_SERVICE, data);
     }
 }
@@ -379,6 +384,7 @@ class Mediator implements a3.ICommunicatorListener {
             if('' == formdata['phone'].trim()) return;
 
             formdata['id'] = this._communicator.query.id;
+            formdata['lang'] = this._communicator.query.lang;
             //formdata.reason =         $form.find("input[name='reason']").val();
             var l = this._communicator.locale;
             formdata['label4name'] =    l['CALLBACK_FORM_NAME_LABEL'].replace(trim_re, "");
@@ -581,7 +587,7 @@ class Mediator implements a3.ICommunicatorListener {
 
 class ConstructorCompatibleSioSignaling extends a3.SioSignaling
 {
-	constructor(listener: a3.ISignalingListener, private _projectId:string) {
+	constructor(listener: a3.ISignalingListener, private _projectId:string, private _operatorId:string) {
 		super(listener);
 	}
 
@@ -597,6 +603,7 @@ class ConstructorCompatibleSioSignaling extends a3.SioSignaling
 		bUri = bUri || (vv[1] ? '5678' : '1234');
 		var data:any = {sessionId:this.sessionId, aUri:"", bUri:bUri, cc:cc, vv:vv};
 		if(this._projectId != null){ data['projectId'] = this._projectId; }
+        if(this._operatorId != null){ data['operatorId'] = this._operatorId; }
 		this.request("START_CALL", data);
 	}
 }
@@ -617,6 +624,7 @@ class CompatibleFactory implements a3.ICommunicatorFactory
 	private _serviceName:string = null;
 	private _listener:any = null;
 	private _projectId:string = null;
+    private _operatorId:string = null;
 	private _logLevel:string = 'NONE';
 	public hasWRTC:boolean = false;
 	public hasFlash:boolean = false;
@@ -645,6 +653,10 @@ class CompatibleFactory implements a3.ICommunicatorFactory
 	setProjectId(value:string){
 		this._projectId = value;
 	}
+
+    setOperatorId(value:string){
+        this._operatorId = value;
+    }
 
 	setServiceName(value:string){
 		this._serviceName = value;
@@ -681,7 +693,7 @@ class CompatibleFactory implements a3.ICommunicatorFactory
 			// find very first http in endpoints
 			endpoints = this._endpoints.filter(function(e){return 0 == e.indexOf('http')});
 			if(!endpoints.length) throw new Error("No any http endpoints");
-			signaling = <a3.ISignaling>(new ConstructorCompatibleSioSignaling(listener, this._projectId));
+			signaling = <a3.ISignaling>(new ConstructorCompatibleSioSignaling(listener, this._projectId, this._operatorId));
 			signaling.addEndpoint(endpoints[0]);
 			signaling.setService(this._serviceName);
 		}else{
