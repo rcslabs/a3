@@ -674,6 +674,12 @@ class CompatibleFactory implements a3.ICommunicatorFactory
 	}
 
 	checkCompatibility(){
+        // immediately set hardware failed if we are on a mobile platform
+        if(isMobile.any()){       
+            this._onWRTCCapabilityFailed();
+            return;
+        }
+
 		this.hasFlash = window['swfobject']['hasFlashPlayerVersion'](FP_MIN_VERSION);
 		var endpoints = this._endpoints.filter(function(e){return 0 == e.indexOf('http')});
 		if(endpoints.length){ // check WRTC compatibility only for http signaling
