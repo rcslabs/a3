@@ -5,7 +5,7 @@ var STUN_SERVER = "stun:stun.l.google.com:19302";
 var STUN_TIMEOUT = 3000;
 var FP_MIN_VERSION = "10.3";
 var STAT_SERVICE = "//webrtc.v2chat.com/stat/push/";
-var CALLBACK_SERIVICE = '//webrtc.v2chat.com/service/callback';
+var CALLBACK_SERVICE = '//webrtc.v2chat.com/service/callback';
 
 declare var LOG:any;
 declare var WARN:any;
@@ -35,7 +35,7 @@ class Click2CallCommunicator extends a3.Communicator {
 		if(typeof this.query['lang'] === 'undefined'){ this.query.lang = 'en'; }
         var m = document.cookie.match(/A3Stat=(\d+)/);
         if(null != m){ this._statCookie = m[1]; }
-        if(DEBUG_ENABLED){ STAT_SERVICE = null; }
+        if(DEBUG_ENABLED){ STAT_SERVICE = CALLBACK_SERVICE = null; }
         this.sendStat('INIT');
     }
 
@@ -200,8 +200,11 @@ class Click2CallCommunicator extends a3.Communicator {
         data['ts'] = (new Date()).getTime();
         data['rnd'] = Math.random();
         data['details'] = details;
-        if(STAT_SERVICE == null){ console.log(data); return; }
-        $.get(STAT_SERVICE, data);
+        if(STAT_SERVICE == null){ 
+            console.log(data);  
+        } else {
+            $.get(STAT_SERVICE, data);
+        }
     }
 }
 
@@ -393,9 +396,13 @@ class Mediator implements a3.ICommunicatorListener {
             formdata['label4subject'] = l['CALLBACK_FORM_SUBJECT_LABEL'].replace(trim_re, "");
             formdata['label4message'] = l['CALLBACK_FORM_MESSAGE_LABEL'].replace(trim_re, "");
             this._communicator.sendStat('SUBMIT_FORM');
-            $.post(CALLBACK_SERIVICE, formdata)
-                .done(() => { this._toggleView('callback-result'); })
-                .fail(() => { this._toggleView('callback-result'); });
+            if(CALLBACK_SERVICE == null){
+                console.log(formdata);
+            } else {
+                $.post(CALLBACK_SERVICE, formdata)
+                    .done(() => { this._toggleView('callback-result'); })
+                    .fail(() => { this._toggleView('callback-result'); });
+            }
         });
     }
 
