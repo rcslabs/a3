@@ -29,7 +29,7 @@ var Click2Call = (function () {
 		document.write('<iframe src="'+src+'" id="click2call-frm-'+id+'" frameborder="0" scrolling="no" class="click2call-frm" style="width:0; height:'+opts.h+'px;'+opts.csspos+';"></iframe>');
 		this.widgets[id] = {'opts' : opts};
 		var sc=''; var m = document.cookie.match(/A3Stat=(\d+)/); if(null != m){ sc = m[1]; }
-		document.write('<img src="//webrtc.v2chat.com/stat/push/?b='+id+'&e=LOAD&ref='+encodeURI(document.referrer)+'&sc='+sc+'">');
+		//document.write('<img src="//webrtc.v2chat.com/stat/push/?b='+id+'&e=LOAD&ref='+encodeURI(document.referrer)+'&sc='+sc+'">');
 	};
 
 	Click2Call.prototype.toggle = function (id) {
