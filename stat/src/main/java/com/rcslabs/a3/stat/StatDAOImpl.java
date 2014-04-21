@@ -57,7 +57,7 @@ public class StatDAOImpl implements StatDAO {
 
     @Override
     public List findNotConsolidatedCalls() {
-        String q = "select distinct on(call_id) button_id, call_id from stat_log_calls where consolidated = false";
+        String q = "SELECT DISTINCT ON(call_id) button_id, call_id FROM stat_log_calls WHERE consolidated = false";
         SQLQuery sql = getSession().createSQLQuery(q);
         return sql.list();
     }

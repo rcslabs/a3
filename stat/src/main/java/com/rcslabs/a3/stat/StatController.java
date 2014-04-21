@@ -17,7 +17,7 @@ import java.util.*;
 
 
 @Controller()
-@RequestMapping("/")
+@RequestMapping("/stat")
 public class StatController {
 
     private static final String USER_AGENT_HEADER = "User-Agent";
