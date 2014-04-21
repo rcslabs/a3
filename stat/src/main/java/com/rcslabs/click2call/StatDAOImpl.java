@@ -1,4 +1,4 @@
-package com.rcslabs.a3.stat;
+package com.rcslabs.click2call;
 
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
@@ -113,10 +113,4 @@ public class StatDAOImpl implements StatDAO {
             return null;
         }
     }
-
-    @Override
-    public List<ButtonEntry> getButtonList() {
-        return getSession().createQuery("from ButtonEntry order by title").list();
-    }
-
 }

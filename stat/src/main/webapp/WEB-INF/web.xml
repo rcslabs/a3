@@ -29,7 +29,7 @@
 
     <filter>
         <filter-name>corsFilter</filter-name>
-        <filter-class>com.rcslabs.a3.stat.CorsFilter</filter-class>
+        <filter-class>com.rcslabs.click2call.CorsFilter</filter-class>
     </filter>
 
     <filter-mapping>

@@ -1,4 +1,4 @@
-package com.rcslabs.a3.stat;
+package com.rcslabs.click2call;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -16,5 +16,4 @@ public interface StatDAO {
     Map<String, BigInteger> countCallsByMonth(Date date);
     List<CallConsolidatedEntry> findCallsByDate(Date date);
     List<CallConsolidatedEntry> findCallsByButtonIdAndMonth(String buttonId, Date date);
-    List<ButtonEntry> getButtonList();
 }

@@ -1,4 +1,4 @@
-package com.rcslabs.a3.stat;
+package com.rcslabs.click2call;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,16 +80,6 @@ public class StatServiceImpl implements StatService {
                 }
             }
         }
-    }
-
-    @Override
-    public Map<String, String> getButtons() {
-        List<ButtonEntry> list = dao.getButtonList();
-        HashMap<String, String> res = new LinkedHashMap<String, String>();
-        for(ButtonEntry be : list){
-            res.put(be.getButtonId(), be.getTitle());
-        }
-        return res;
     }
 
     @Override

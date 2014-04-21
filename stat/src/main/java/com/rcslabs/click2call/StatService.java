@@ -1,4 +1,4 @@
-package com.rcslabs.a3.stat;
+package com.rcslabs.click2call;
 
 
 import java.math.BigInteger;
@@ -12,7 +12,6 @@ public interface StatService {
     void flushCallsLog();
     void consolidateCalls();
 
-    Map<String, String> getButtons();
     List<CallConsolidatedEntry> findConsolidatedCalls(Date parsedDate);
     List<CallConsolidatedEntry> findConsolidatedCalls(String buttonId, Date parsedDate);
 

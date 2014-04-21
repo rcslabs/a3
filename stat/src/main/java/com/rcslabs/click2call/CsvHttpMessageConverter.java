@@ -1,4 +1,4 @@
-package com.rcslabs.a3.stat;
+package com.rcslabs.click2call;
 
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;

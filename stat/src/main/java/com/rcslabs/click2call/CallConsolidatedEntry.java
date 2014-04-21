@@ -1,4 +1,4 @@
-package com.rcslabs.a3.stat;
+package com.rcslabs.click2call;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -102,14 +102,14 @@ public class CallConsolidatedEntry implements Serializable {
         return null;
     }
 
-    public float getWaitDuration(){
+    public int getWaitDuration(){
         if(!isStarted()) return 0;
-        return (float) (0.001*(getStarted().getTime()-getStart().getTime()));
+        return (int) Math.ceil(0.001*(getStarted().getTime()-getStart().getTime()));
     }
 
-    public float getTalkDuration(){
+    public int getTalkDuration(){
         if(!isStarted()) return 0;
-        return (float) (0.001*(getFinished().getTime()-getStarted().getTime()));
+        return (int) Math.ceil(0.001*(getFinished().getTime()-getStarted().getTime()));
     }
 
     public Long getId() {

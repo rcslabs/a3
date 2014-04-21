@@ -1,4 +1,4 @@
-package com.rcslabs.a3.stat;
+package com.rcslabs.click2call;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +25,9 @@ public class StatController {
 
     @Autowired
     private StatService service;
+
+    @Autowired
+    private ButtonService buttonService;
 
     @ResponseBody
     @RequestMapping("/push")
@@ -92,7 +95,7 @@ public class StatController {
             service.flushCallsLog();
             service.consolidateCalls();
 
-            CallConsolidatedEntry.setButtons(service.getButtons());
+            CallConsolidatedEntry.setButtons(buttonService.getButtonsTitle());
             List<CallConsolidatedEntry> calls = service.findConsolidatedCalls(parsedDate);
             csv.buildFromList(calls);
 
@@ -152,7 +155,7 @@ public class StatController {
                 csv.buildEntryLine(row);
             }
 
-            Map<String, String> buttons = service.getButtons();
+            Map<String, String> buttons = buttonService.getButtonsTitle();
             csv.setFilename("a3-stat-"+date+"-"+buttons.get(buttonId)+".csv");
             return csv;
         } catch (Exception e) {
@@ -181,7 +184,7 @@ public class StatController {
     @RequestMapping(value="/buttons", method=RequestMethod.GET)
     public @ResponseBody Map handleButtonsRequest(){
         try {
-            return  service.getButtons();
+            return  buttonService.getButtonsTitle();
         } catch (Exception e){
             return new HashMap();
         }

@@ -10,14 +10,14 @@
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:component-scan base-package="com.rcslabs.a3.stat" />
+    <context:component-scan base-package="com.rcslabs.click2call" />
     <context:annotation-config />
 
     <mvc:resources mapping="/img/**" location="/WEB-INF/img/" />
 
     <mvc:annotation-driven>
         <mvc:message-converters>
-            <bean class="com.rcslabs.a3.stat.CsvHttpMessageConverter"/>
+            <bean class="com.rcslabs.click2call.CsvHttpMessageConverter"/>
             <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
         </mvc:message-converters>
     </mvc:annotation-driven>
@@ -27,23 +27,8 @@
         <property name="suffix" value=".jsp"/>
     </bean>
 
-    <!--bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
-    <property name="messageConverters">
-        <list>
-            <ref bean="csvMessageConverter"/>
-            <ref bean="jacksonMessageConverter"/>
-        </list>
-    </property>
-    </bean>
-
-    <bean id="jacksonMessageConverter"
-          class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
-
-    <bean id="csvMessageConverter"
-          class="com.rcslabs.a3.stat.CsvHttpMessageConverter"/-->
-
     <bean id="corsFilter"
-          class="com.rcslabs.a3.stat.CorsFilter" />
+          class="com.rcslabs.click2call.CorsFilter" />
 
     <bean id="propertyConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
@@ -60,7 +45,7 @@
           class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="packagesToScan">
             <list>
-                <value>com.rcslabs.a3.stat</value>
+                <value>com.rcslabs.click2call</value>
             </list>
         </property>
         <property name="dataSource" ref="dataSource" />
@@ -89,7 +74,7 @@
 
     <bean id="redisClientLogEntrySerializer"
           class="org.springframework.data.redis.serializer.JacksonJsonRedisSerializer">
-            <constructor-arg type="java.lang.Class" value="com.rcslabs.a3.stat.ClientLogEntry"/>
+            <constructor-arg type="java.lang.Class" value="com.rcslabs.click2call.ClientLogEntry"/>
     </bean>
 
     <bean id="redisClientLogEntryTemplate"
@@ -100,7 +85,7 @@
 
     <bean id="redisCallLogEntrySerializer"
           class="org.springframework.data.redis.serializer.JacksonJsonRedisSerializer">
-        <constructor-arg type="java.lang.Class" value="com.rcslabs.a3.stat.CallLogEntry"/>
+        <constructor-arg type="java.lang.Class" value="com.rcslabs.click2call.CallLogEntry"/>
     </bean>
 
     <bean id="redisCallLogEntryTemplate"
