@@ -36,7 +36,7 @@ task (build, type: Exec) {
 task (dist, type: Tar) {
     dependsOn 'build'
     extension = 'tar.gz'
-    baseName = 'v2chat-client-dist'
+    baseName = 'client'
     compression = Compression.GZIP
     exclude '**/.svn'
     exclude '**/.git'
