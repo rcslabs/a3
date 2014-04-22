@@ -10,7 +10,7 @@ task copyLibs(type: Copy) {
     dependsOn ':libraries:a3client:build'
     include 'a3.*'
     include '*.swf'
-    from('../libraries/a3client/build')
+    from('../../libraries/a3client/build')
     into(buildDir)
 }
 
@@ -36,7 +36,7 @@ task (build, type: Exec) {
 task (dist, type: Tar) {
     dependsOn 'build'
     extension = 'tar.gz'
-    baseName = 'v2chat-dist'
+    baseName = 'v2chat-client-dist'
     compression = Compression.GZIP
     exclude '**/.svn'
     exclude '**/.git'
