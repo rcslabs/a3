@@ -8,4 +8,5 @@ import java.util.List;
 public interface ButtonDAO {
     String getEmailByButtonId(String id);
     List<ButtonEntry> getButtonList();
+    ButtonEntry getButtonByTitle(String value);
 }

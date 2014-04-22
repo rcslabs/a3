@@ -36,4 +36,9 @@ public class ButtonServiceImpl implements ButtonService {
         }
         return res;
     }
+
+    @Override
+    public ButtonEntry getButtonByTitle(String value) {
+        return dao.getButtonByTitle(value);
+    }
 }

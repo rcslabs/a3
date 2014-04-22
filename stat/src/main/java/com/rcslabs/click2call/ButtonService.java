@@ -10,4 +10,5 @@ public interface ButtonService {
     String getEmailByButtonId(String id);
     List<ButtonEntry> getButtons();
     Map<String, String> getButtonsTitle();
+    ButtonEntry getButtonByTitle(String value);
 }

@@ -39,4 +39,12 @@ public class ButtonDAOImpl implements ButtonDAO {
     public List<ButtonEntry> getButtonList() {
         return getSession().createQuery("from ButtonEntry order by title").list();
     }
+
+    @Override
+    public ButtonEntry getButtonByTitle(String value) {
+        List rows = getSession().createQuery("from ButtonEntry where title=:title")
+                .setString("title", value).list();
+        if(0 == rows.size()){ return null; }
+        return (ButtonEntry)rows.get(0);
+    }
 }

@@ -6,6 +6,8 @@
 
 
     <http auto-config="true">
+        <intercept-url pattern="/click2call" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <intercept-url pattern="/click2call/" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <intercept-url pattern="/service/callback" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <intercept-url pattern="/service/callback/" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <intercept-url pattern="/stat/push" access="IS_AUTHENTICATED_ANONYMOUSLY" />

@@ -6,8 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.HtmlUtils;
 
 import javax.net.ssl.KeyManager;
@@ -15,6 +18,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -25,6 +29,8 @@ import java.util.Map;
 @Controller()
 @RequestMapping("/")
 public class DefaultController {
+
+    private static final String HOSTNAME = "webrtc.v2chat.com";
 
     private static final String CALLBACK_FORM_ID = "id";
     private static final String CALLBACK_FORM_LANG = "lang";
@@ -48,6 +54,8 @@ public class DefaultController {
     private static final String EMAIL_BCC = "allfeedbacks@v2chat.com";
     private static final String EMAIL_SUBJECT = "click2call callback form";
 
+    private static final String HTTP_GET_ACCOUNT_NAME = "accountname";
+
     private SSLContext ssl;
 
     @Autowired
@@ -67,7 +75,22 @@ public class DefaultController {
         }
     }
 
-    @RequestMapping(value="/service/callback", method= RequestMethod.POST)
+    @RequestMapping(value="/click2call", method=RequestMethod.GET)
+    public String handleWebimRequest(HttpServletRequest request, ModelMap model)
+    {
+        String accountName = HtmlUtils.htmlEscape(request.getParameter(HTTP_GET_ACCOUNT_NAME));
+        if(null == accountName) throw new NullPointerException("Parameter accountname is a must.");
+
+        ButtonEntry button = buttonService.getButtonByTitle(accountName);
+        if(null == button) throw new NullPointerException("No any button for requested accountname.");
+
+        model.addAttribute("buttonId", button.getButtonId());
+        model.addAttribute("hostname", HOSTNAME);
+
+        return "click2call";
+    }
+
+    @RequestMapping(value="/service/callback", method=RequestMethod.POST)
     public ResponseEntity<String> handleCallbackForm(HttpServletRequest request){
         try {
             String id   = HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_ID));
@@ -140,6 +163,18 @@ public class DefaultController {
         } catch (Exception e){
             return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+    @ExceptionHandler(Exception.class)
+    public ModelAndView handleError(HttpServletRequest req, HttpServletResponse res, Exception exception) {
+        //logger.error("Request: " + req.getRequestURL() + " raised " + exception);
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("exception", exception);
+        mav.addObject("url", req.getRequestURL());
+        mav.setViewName("error");
+        res.setStatus(500);
+        return mav;
     }
 
 
