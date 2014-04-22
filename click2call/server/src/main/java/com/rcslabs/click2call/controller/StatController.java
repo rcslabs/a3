@@ -68,7 +68,7 @@ public class StatController {
         if(item.getType().equals("LOAD")){
             HttpHeaders headers = new HttpHeaders();
             headers.add("Location", "/stat/img/0.png");
-            return new ResponseEntity<String>(headers, HttpStatus.MOVED_TEMPORARILY);
+            return new ResponseEntity<String>(headers, HttpStatus.FOUND);
         }else{
             return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
         }

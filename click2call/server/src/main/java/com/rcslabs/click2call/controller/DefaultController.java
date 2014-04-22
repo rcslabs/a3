@@ -3,8 +3,11 @@ package com.rcslabs.click2call.controller;
 import com.rcslabs.click2call.entity.ButtonEntry;
 import com.rcslabs.click2call.service.ButtonService;
 import org.apache.commons.httpclient.contrib.ssl.EasyX509TrustManager;
+import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,6 +30,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Controller()
 @RequestMapping("/")
@@ -63,7 +69,12 @@ public class DefaultController {
     @Autowired
     private ButtonService buttonService;
 
+    private ExecutorService mailExecutor;
+
     public DefaultController(){
+
+        mailExecutor = Executors.newSingleThreadExecutor();
+
         try{
             ssl = SSLContext.getInstance("TLS");
             ssl.init(
@@ -78,7 +89,7 @@ public class DefaultController {
     }
 
     @RequestMapping(value="/click2call", method=RequestMethod.GET)
-    public String handleWebimRequest(HttpServletRequest request, ModelMap model)
+    public ResponseEntity<String> handleClickToCallRequest(HttpServletRequest request)
     {
         String accountName = HtmlUtils.htmlEscape(request.getParameter(HTTP_GET_ACCOUNT_NAME));
         if(null == accountName) throw new NullPointerException("Parameter accountname is a must.");
@@ -86,10 +97,9 @@ public class DefaultController {
         ButtonEntry button = buttonService.getButtonByTitle(accountName);
         if(null == button) throw new NullPointerException("No any button for requested accountname.");
 
-        model.addAttribute("buttonId", button.getButtonId());
-        model.addAttribute("hostname", HOSTNAME);
-
-        return "click2call";
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/a3/click2call.html?"+request.getQueryString()+"&id="+button.getButtonId());
+        return new ResponseEntity<String>(headers, HttpStatus.FOUND);
     }
 
     @RequestMapping(value="/service/callback", method=RequestMethod.POST)
@@ -145,7 +155,7 @@ public class DefaultController {
             msg.append("</table>")
                .append("</body></html>");
 
-            HtmlEmail em = new HtmlEmail();
+            final HtmlEmail em = new HtmlEmail();
             em.setHostName(SMTP_HOST);
             em.setSmtpPort(SMTP_PORT);
             em.setAuthentication(SMTP_ACCOUNT, SMTP_PASSWORD);
@@ -159,7 +169,16 @@ public class DefaultController {
             em.setSubject(EMAIL_SUBJECT);
             em.setHtmlMsg(msg.toString());
 
-            em.send();
+            mailExecutor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        em.send();
+                    } catch (EmailException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
 
             return new ResponseEntity<String>("OK", HttpStatus.OK);
         } catch (Exception e){
