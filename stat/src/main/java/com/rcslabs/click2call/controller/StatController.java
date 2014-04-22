@@ -1,5 +1,11 @@
-package com.rcslabs.click2call;
+package com.rcslabs.click2call.controller;
 
+import com.rcslabs.click2call.csv.CsvBuilder;
+import com.rcslabs.click2call.csv.CsvCallsSummaryRow;
+import com.rcslabs.click2call.entity.CallConsolidatedEntry;
+import com.rcslabs.click2call.entity.ClientLogEntry;
+import com.rcslabs.click2call.service.ButtonService;
+import com.rcslabs.click2call.service.StatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -74,7 +80,8 @@ public class StatController {
     }
 
     @RequestMapping(value="/details/{date}", method=RequestMethod.GET)
-    public @ResponseBody CsvBuilder handleDetailsRequest(@PathVariable String date)
+    public @ResponseBody
+    CsvBuilder handleDetailsRequest(@PathVariable String date)
     {
         CsvBuilder csv = new CsvBuilder();
         csv.addColumn("date", "getStart");

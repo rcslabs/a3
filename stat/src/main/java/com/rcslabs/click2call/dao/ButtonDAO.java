@@ -1,4 +1,6 @@
-package com.rcslabs.click2call;
+package com.rcslabs.click2call.dao;
+
+import com.rcslabs.click2call.entity.ButtonEntry;
 
 import java.util.List;
 

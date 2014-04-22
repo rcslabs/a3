@@ -1,6 +1,10 @@
-package com.rcslabs.click2call;
+package com.rcslabs.click2call.service;
 
 
+import com.rcslabs.click2call.dao.StatDAO;
+import com.rcslabs.click2call.entity.CallConsolidatedEntry;
+import com.rcslabs.click2call.entity.CallLogEntry;
+import com.rcslabs.click2call.entity.ClientLogEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;

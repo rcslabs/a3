@@ -74,7 +74,7 @@
 
     <bean id="redisClientLogEntrySerializer"
           class="org.springframework.data.redis.serializer.JacksonJsonRedisSerializer">
-            <constructor-arg type="java.lang.Class" value="com.rcslabs.click2call.ClientLogEntry"/>
+            <constructor-arg type="java.lang.Class" value="com.rcslabs.click2call.entity.ClientLogEntry"/>
     </bean>
 
     <bean id="redisClientLogEntryTemplate"
@@ -85,7 +85,7 @@
 
     <bean id="redisCallLogEntrySerializer"
           class="org.springframework.data.redis.serializer.JacksonJsonRedisSerializer">
-        <constructor-arg type="java.lang.Class" value="com.rcslabs.click2call.CallLogEntry"/>
+        <constructor-arg type="java.lang.Class" value="com.rcslabs.click2call.entity.CallLogEntry"/>
     </bean>
 
     <bean id="redisCallLogEntryTemplate"

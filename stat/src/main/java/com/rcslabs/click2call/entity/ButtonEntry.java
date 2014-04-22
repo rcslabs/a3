@@ -1,4 +1,4 @@
-package com.rcslabs.click2call;
+package com.rcslabs.click2call.entity;
 
 
 import javax.persistence.*;

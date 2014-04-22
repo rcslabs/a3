@@ -1,5 +1,8 @@
-package com.rcslabs.click2call;
+package com.rcslabs.click2call.dao;
 
+import com.rcslabs.click2call.entity.CallConsolidatedEntry;
+import com.rcslabs.click2call.entity.CallLogEntry;
+import com.rcslabs.click2call.entity.ClientLogEntry;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;

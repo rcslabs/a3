@@ -1,5 +1,6 @@
-package com.rcslabs.click2call;
+package com.rcslabs.click2call.dao;
 
+import com.rcslabs.click2call.entity.ButtonEntry;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -7,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Repository

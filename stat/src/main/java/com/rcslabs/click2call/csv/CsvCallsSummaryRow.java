@@ -1,4 +1,6 @@
-package com.rcslabs.click2call;
+package com.rcslabs.click2call.csv;
+
+import com.rcslabs.click2call.entity.CallConsolidatedEntry;
 
 public class CsvCallsSummaryRow {
 
