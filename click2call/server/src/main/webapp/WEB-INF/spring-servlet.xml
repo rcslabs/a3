@@ -35,9 +35,11 @@
           p:location="/WEB-INF/app.properties" />
 
     <bean id="dataSource"
-          class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-          p:driverClassName="${jdbc.driverClassName}"
-          p:url="${jdbc.url}" p:username="${jdbc.username}"
+          class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close"
+          p:driverClass="${jdbc.driverClassName}"
+          p:jdbcUrl="${jdbc.url}"
+          p:user="${jdbc.username}"
           p:password="${jdbc.password}" />
 
 
