@@ -64,6 +64,7 @@ task (build) {
 }
 
 task (dist, type: Tar) {
+    dependsOn ':client-handler:dist'
     dependsOn 'build'
 
     // TODO: remove hardcoded 'build' dir
