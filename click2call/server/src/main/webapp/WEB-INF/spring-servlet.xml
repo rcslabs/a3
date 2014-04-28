@@ -51,7 +51,7 @@
                 <prop key="hibernate.cache.provider_class">org.hibernate.cache.NoCacheProvider</prop>
 
                 <!-- start connection pool (C3P0) settings -->
-                <!-- https://community.jboss.org/wiki/HowToConfigureTheC3P0ConnectionPool -->
+                <!-- http://www.mchange.com/projects/c3p0/#javabeans-style-properties -->
                 <prop key="hibernate.connection_provider_class">org.hibernate.connection.C3P0ConnectionProvider</prop>
                 <prop key="hibernate.c3p0.min_size">2</prop>
                 <prop key="hibernate.c3p0.max_size">100</prop>
