@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Repository
-@Transactional
 public class ButtonDAOImpl implements ButtonDAO {
 
     @Autowired

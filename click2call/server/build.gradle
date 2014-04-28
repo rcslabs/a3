@@ -25,6 +25,7 @@ dependencies {
     compile 'commons-dbcp:commons-dbcp:1.4'
     compile 'com.mchange:c3p0:0.9.5-pre8'
     compile 'org.hibernate:hibernate-core:4.2.8.Final'
+    compile 'org.hibernate:hibernate-c3p0:4.1.1.Final'
     compile 'redis.clients:jedis:2.4.1'
     compile 'org.springframework.data:spring-data-redis:1.2.0.RELEASE'
     compile 'commons-io:commons-io:2.4'

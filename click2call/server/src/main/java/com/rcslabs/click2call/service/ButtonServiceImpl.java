@@ -4,6 +4,7 @@ import com.rcslabs.click2call.dao.ButtonDAO;
 import com.rcslabs.click2call.entity.ButtonEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -14,6 +15,7 @@ import java.util.Map;
  * Created by sx on 21.04.14.
  */
 @Service
+@Transactional
 public class ButtonServiceImpl implements ButtonService {
 
     @Autowired

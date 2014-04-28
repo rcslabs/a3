@@ -34,15 +34,6 @@
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
           p:location="/WEB-INF/app.properties" />
 
-    <bean id="dataSource"
-          class="com.mchange.v2.c3p0.ComboPooledDataSource"
-          destroy-method="close"
-          p:driverClass="${jdbc.driverClassName}"
-          p:jdbcUrl="${jdbc.url}"
-          p:user="${jdbc.username}"
-          p:password="${jdbc.password}" />
-
-
     <bean id="sessionFactory"
           class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="packagesToScan">
@@ -50,10 +41,27 @@
                 <value>com.rcslabs.click2call</value>
             </list>
         </property>
-        <property name="dataSource" ref="dataSource" />
+        <!--property name="dataSource" ref="dataSource" /-->
         <property name="hibernateProperties">
             <props>
                 <prop key="hibernate.dialect">${jdbc.dialect}</prop>
+                <prop key="hibernate.connection.driver_class">${jdbc.driverClassName}</prop>
+                <prop key="hibernate.connection.url">${jdbc.url}</prop>
+                <prop key="hibernate.connection.username">${jdbc.username}</prop>
+                <prop key="hibernate.connection.password">${jdbc.password}</prop>
+                <!--<prop key="hibernate.current_session_context_class">thread</prop>-->
+                <prop key="hibernate.cache.provider_class">org.hibernate.cache.NoCacheProvider</prop>
+
+                <!-- start connection pool (C3P0) settings -->
+                <!-- https://community.jboss.org/wiki/HowToConfigureTheC3P0ConnectionPool -->
+                <prop key="hibernate.connection_provider_class">org.hibernate.connection.C3P0ConnectionProvider</prop>
+                <prop key="hibernate.c3p0.min_size">2</prop>
+                <prop key="hibernate.c3p0.max_size">100</prop>
+                <prop key="hibernate.c3p0.max_statements">50</prop>
+                <prop key="hibernate.c3p0.timeout">1800</prop>
+                <prop key="hibernate.c3p0.testConnectionOnCheckout">true</prop>
+                <!-- end connection pool (C3P0) settings -->
+
                 <prop key="hibernate.show_sql">true</prop>
             </props>
         </property>

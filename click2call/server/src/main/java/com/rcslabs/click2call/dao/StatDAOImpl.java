@@ -18,7 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Repository
-@Transactional
 public class StatDAOImpl implements StatDAO {
 
     @Autowired
