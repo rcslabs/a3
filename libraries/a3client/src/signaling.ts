@@ -177,6 +177,7 @@ module a3 {
 			if(!opt) opt = {};
 			opt["type"] = type;
 			opt["service"] = this._service;
+			if(type != "START_SESSION") opt["sessionId"] = this.sessionId;
 			LOG("SENDING TO SOCKET.IO: ", type, opt);
 			this._socket.emit('message', opt);
 		}
