@@ -382,9 +382,19 @@ class Mediator implements a3.ICommunicatorListener {
             formdata['date'] =    $form.find("input[name='date']").val().replace(trim_re, "");
             formdata['subject'] = $form.find("input[name='subject']").val().replace(trim_re, "");
             formdata['message'] = $form.find("textarea[name='message']").val().replace(trim_re, "");
+
             // simple check
             if('' == formdata['name'].trim()) return;
-            if('' == formdata['phone'].trim()) return;
+
+            // add email change request 30.04.2014
+            if(0!=$form.find("input[name='email']").length){
+                formdata['email'] =   $form.find("input[name='email']").val().replace(trim_re, "");
+                formdata['label4email'] =   l['CALLBACK_FORM_EMAIL_LABEL'].replace(trim_re, "");
+            }
+
+            // continue check email | phone
+            if('' == formdata['phone'].trim()
+            &&(formdata['email'] !== undefined && '' == formdata['email'].trim())) return;
 
             formdata['id'] = this._communicator.query.id;
             formdata['lang'] = this._communicator.query.lang;

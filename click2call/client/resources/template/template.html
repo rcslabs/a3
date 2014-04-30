@@ -96,6 +96,7 @@ button:focus {outline: none;}
 			<input type="hidden" name="reason" value="CALL_FAILED">
 			<input placeholder="${CALLBACK_FORM_NAME_LABEL}" name="name"><br>
 			<input placeholder="${CALLBACK_FORM_PHONE_LABEL}" name="phone"><br>
+            <input placeholder="${CALLBACK_FORM_EMAIL_LABEL}" name="email"><br>
 			<input placeholder="${CALLBACK_FORM_DATE_LABEL}" name="date"><br>
 			<input placeholder="${CALLBACK_FORM_SUBJECT_LABEL}" name="subject"><br>
 			<textarea name="message" placeholder="${CALLBACK_FORM_MESSAGE_LABEL}"></textarea>
@@ -114,6 +115,7 @@ button:focus {outline: none;}
 			<input type="hidden" name="reason" value="USER_ACTION">
 			<input placeholder="${CALLBACK_FORM_NAME_LABEL}" name="name"><br>
 			<input placeholder="${CALLBACK_FORM_PHONE_LABEL}" name="phone"><br>
+            <input placeholder="${CALLBACK_FORM_EMAIL_LABEL}" name="email"><br>
 			<input placeholder="${CALLBACK_FORM_DATE_LABEL}" name="date"><br>
 			<input placeholder="${CALLBACK_FORM_SUBJECT_LABEL}" name="subject"><br>
 			<textarea name="message" placeholder="${CALLBACK_FORM_MESSAGE_LABEL}"></textarea>
@@ -130,21 +132,20 @@ button:focus {outline: none;}
 	<button class="a3-btn-help a3-footer-button btn-gradient">${HELP_LABEL}</button>
 </div>
 
-<!--script>
+<script>
 	/* working hours */
 	$('body').on('view-changed', function(e, v){ 
 		if('intro' == v){
-			var timeChecker = new TimeChecker('Israel');
-			timeChecker.addRuleForOpened('Mon', '10:30', '19:30');
-			timeChecker.addRuleForOpened('Tue', '10:30', '19:30');
-			timeChecker.addRuleForOpened('Wed', '10:30', '19:30');
-			timeChecker.addRuleForOpened('Thu', '10:30', '19:30');
-			timeChecker.addRuleForOpened('Fri', '10:30', '14:30');
-			timeChecker.addRuleForOpened('Sun', '10:30', '19:30');
+			var timeChecker = new TimeChecker('Europe/Moscow');
+			timeChecker.addRuleForOpened('Mon', '10:00', '19:00');
+			timeChecker.addRuleForOpened('Tue', '10:00', '19:00');
+			timeChecker.addRuleForOpened('Wed', '10:00', '19:00');
+			timeChecker.addRuleForOpened('Thu', '10:00', '19:00');
+			timeChecker.addRuleForOpened('Fri', '10:00', '19:00');
 			if(!timeChecker.check()){
 				$('#a3-intro-view').css('visibility', 'hidden');
 				$('#a3-callback-view').css('visibility', 'visible');
 			}		
 		} 
 	});	
-</script-->
+</script>

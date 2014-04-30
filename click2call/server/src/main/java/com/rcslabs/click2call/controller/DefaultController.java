@@ -3,7 +3,6 @@ package com.rcslabs.click2call.controller;
 import com.rcslabs.click2call.entity.ButtonEntry;
 import com.rcslabs.click2call.service.ButtonService;
 import org.apache.commons.httpclient.contrib.ssl.EasyX509TrustManager;
-import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,9 +26,8 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -45,12 +42,14 @@ public class DefaultController {
 
     private static final String CALLBACK_FORM_NAME = "name";
     private static final String CALLBACK_FORM_PHONE = "phone";
+    private static final String CALLBACK_FORM_EMAIL = "email";
     private static final String CALLBACK_FORM_DATE = "date";
     private static final String CALLBACK_FORM_SUBJECT = "subject";
     private static final String CALLBACK_FORM_MESSAGE = "message";
 
     private static final String CALLBACK_FORM_LABEL_FOR_NAME = "label4name";
     private static final String CALLBACK_FORM_LABEL_FOR_PHONE = "label4phone";
+    private static final String CALLBACK_FORM_LABEL_FOR_EMAIL = "label4email";
     private static final String CALLBACK_FORM_LABEL_FOR_DATE = "label4date";
     private static final String CALLBACK_FORM_LABEL_FOR_SUBJECT = "label4subject";
     private static final String CALLBACK_FORM_LABEL_FOR_MESSAGE = "label4message";
@@ -118,15 +117,25 @@ public class DefaultController {
             String lang = HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_LANG));
 
             // hashmap for sanitized parameters as label : value
-            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String> params = new LinkedHashMap<String, String>();
+
             params.put(HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_LABEL_FOR_NAME)),
                     HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_NAME)));
+
             params.put(HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_LABEL_FOR_PHONE)),
                     HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_PHONE)));
+
+            if(null != request.getParameter(CALLBACK_FORM_LABEL_FOR_EMAIL)){
+                params.put(HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_LABEL_FOR_EMAIL)),
+                        HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_EMAIL)));
+            }
+
             params.put(HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_LABEL_FOR_DATE)),
                     HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_DATE)));
+
             params.put(HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_LABEL_FOR_SUBJECT)),
                     HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_SUBJECT)));
+
             params.put(HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_LABEL_FOR_MESSAGE)),
                     HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_MESSAGE)));
 
