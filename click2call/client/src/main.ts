@@ -386,6 +386,8 @@ class Mediator implements a3.ICommunicatorListener {
             // simple check
             if('' == formdata['name'].trim()) return;
 
+            var l = this._communicator.locale;
+
             // add email change request 30.04.2014
             if(0!=$form.find("input[name='email']").length){
                 formdata['email'] =   $form.find("input[name='email']").val().replace(trim_re, "");
@@ -399,7 +401,7 @@ class Mediator implements a3.ICommunicatorListener {
             formdata['id'] = this._communicator.query.id;
             formdata['lang'] = this._communicator.query.lang;
             //formdata.reason =         $form.find("input[name='reason']").val();
-            var l = this._communicator.locale;
+
             formdata['label4name'] =    l['CALLBACK_FORM_NAME_LABEL'].replace(trim_re, "");
             formdata['label4phone'] =   l['CALLBACK_FORM_PHONE_LABEL'].replace(trim_re, "");
             formdata['label4date'] =    l['CALLBACK_FORM_DATE_LABEL'].replace(trim_re, "");
