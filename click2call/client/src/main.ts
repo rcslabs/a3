@@ -101,6 +101,14 @@ class Click2CallCommunicator extends a3.Communicator {
         this.sendStat('FAILED', 'connection');
     }
 
+	onSessionFailed() {
+		if(this._deferredCall != null){
+			this._mediator.onCallFailed(this._deferredCall);
+			this.sendStat('FAILED', 'session');
+			this._deferredCall = null;
+		}
+	}
+
     onSessionStarted() {
         if(this._deferredCall != null){
             this.media.checkHardware(this._deferredCall.vv[1]);
@@ -328,7 +336,8 @@ class Mediator implements a3.ICommunicatorListener {
 
     onSessionStarting() {}
     onSessionStarted() {}
-    onSessionFailed() {}
+	onSessionFailed() {}
+
     onIncomingCall(call:a3.Call) {}
 
     private _e(id:string){
