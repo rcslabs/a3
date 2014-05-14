@@ -416,10 +416,11 @@ class Mediator implements a3.ICommunicatorListener {
             formdata['label4date'] =    l['CALLBACK_FORM_DATE_LABEL'].replace(trim_re, "");
             formdata['label4subject'] = l['CALLBACK_FORM_SUBJECT_LABEL'].replace(trim_re, "");
             formdata['label4message'] = l['CALLBACK_FORM_MESSAGE_LABEL'].replace(trim_re, "");
-            this._communicator.sendStat('SUBMIT_FORM');
+            
             if(CALLBACK_SERVICE == null){
                 console.log(formdata);
             } else {
+                this._communicator.sendStat('SUBMIT_FORM');
                 $.post(CALLBACK_SERVICE, formdata)
                     .done(() => { this._toggleView('callback-result'); })
                     .fail(() => { this._toggleView('callback-result'); });

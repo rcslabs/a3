@@ -19,4 +19,8 @@ public interface StatService {
     List<CallConsolidatedEntry> findConsolidatedCalls(String buttonId, Date parsedDate);
 
     Map<String, BigInteger> countCallsByMonth(Date date);
+
+    void parseRed5Calls(String directoryPath);
+
+    Map<String, Integer> findClientSubmitFormEntries(String buttonId, Date parsedDate);
 }

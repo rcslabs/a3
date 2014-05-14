@@ -2,10 +2,13 @@ package com.rcslabs.click2call.controller;
 
 import com.rcslabs.click2call.csv.CsvBuilder;
 import com.rcslabs.click2call.csv.CsvCallsSummaryRow;
+import com.rcslabs.click2call.csv.CsvCallsSummaryRowTotal;
 import com.rcslabs.click2call.entity.CallConsolidatedEntry;
 import com.rcslabs.click2call.entity.ClientLogEntry;
 import com.rcslabs.click2call.service.ButtonService;
 import com.rcslabs.click2call.service.StatService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,6 +28,8 @@ import java.util.*;
 @Controller()
 @RequestMapping("/stat")
 public class StatController {
+
+    private static final Logger log = LoggerFactory.getLogger(StatController.class);
 
     private static final String USER_AGENT_HEADER = "User-Agent";
     private static final String X_FORWARDED_FOR_HEADER = "X-FORWARDED-FOR";
@@ -76,6 +81,9 @@ public class StatController {
 
     @RequestMapping(value="/", method=RequestMethod.GET)
     public String handleDefaultRequest() {
+        service.flushClientsLog();
+        service.flushCallsLog();
+        service.consolidateCalls();
         return "index";
     }
 
@@ -97,11 +105,6 @@ public class StatController {
         try{
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
             Date parsedDate =  sdf.parse(date);
-
-            service.flushClientsLog();
-            service.flushCallsLog();
-            service.consolidateCalls();
-
             CallConsolidatedEntry.setButtons(buttonService.getButtonsTitle());
             List<CallConsolidatedEntry> calls = service.findConsolidatedCalls(parsedDate);
             csv.buildFromList(calls);
@@ -109,6 +112,7 @@ public class StatController {
             csv.setFilename("a3-stat-"+date+".csv");
             return csv;
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return null;
         }
     }
@@ -123,17 +127,15 @@ public class StatController {
         csv.addColumn("talkMean", "getMeanDuration");
         csv.addColumn("waitSummary", "getSummaryWait");
         csv.addColumn("waitMean", "getMeanWait");
+        csv.addColumn("callbackForm", "getCallbackFormCount");
         csv.buildFirstLine();
 
         try{
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
             Date parsedDate =  sdf.parse(date);
-
-            service.flushClientsLog();
-            service.flushCallsLog();
-            service.consolidateCalls();
-
             List<CallConsolidatedEntry> calls = service.findConsolidatedCalls(buttonId, parsedDate);
+
+            // day by day rows in selected month
             Map<String, CsvCallsSummaryRow> result = new LinkedHashMap<String, CsvCallsSummaryRow>();
 
             SimpleDateFormat sdf2 = new SimpleDateFormat("d");
@@ -152,20 +154,48 @@ public class StatController {
                 row.addCallEntry(cce);
             }
 
+            // merge clients SUBMIT_FORM with day-by-day rows with summary calls
+            Map<String, Integer> submitForm = service.findClientSubmitFormEntries(buttonId, parsedDate);
+            for(String d : submitForm.keySet()){
+                if(!result.containsKey(d)){
+                    result.put(d, new CsvCallsSummaryRow(d));
+                }
+                result.get(d).setCallbackFormCount( submitForm.get(d) );
+            }
+
+            // sort by day and calculate total on result
+            List<CsvCallsSummaryRow> sorted = new ArrayList<>(result.values());
+            Collections.sort(sorted, new Comparator<CsvCallsSummaryRow>() {
+                public int compare(CsvCallsSummaryRow o1, CsvCallsSummaryRow o2) {
+                    if (Integer.parseInt(o1.getDayOfMonth())<Integer.parseInt(o2.getDayOfMonth())) {
+                        return -1;
+                    } else if (Integer.parseInt(o1.getDayOfMonth())>Integer.parseInt(o2.getDayOfMonth())) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
+            });
+
+            CsvCallsSummaryRowTotal totalRow = new CsvCallsSummaryRowTotal();
             boolean exg = false;
-            for(String key : result.keySet()){
-                row = result.get(key);
+
+            for(CsvCallsSummaryRow row2 : sorted){
                 if(!exg){
-                    csv.explicitGetters(row);
+                    csv.explicitGetters(row2);
                     exg = true;
                 }
-                csv.buildEntryLine(row);
+                csv.buildEntryLine(row2);
+                totalRow.addCsvCallsSummaryRow(row2);
             }
+
+            csv.buildEntryLine(totalRow);
 
             Map<String, String> buttons = buttonService.getButtonsTitle();
             csv.setFilename("a3-stat-"+date+"-"+buttons.get(buttonId)+".csv");
             return csv;
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return null;
         }
     }
@@ -176,14 +206,10 @@ public class StatController {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
             Date parsedDate =  sdf.parse(date);
-
-            service.flushClientsLog();
-            service.flushCallsLog();
-            service.consolidateCalls();
-
             Map<String, BigInteger> result = service.countCallsByMonth(parsedDate);
             return result;
         } catch (Exception e){
+            log.error(e.getMessage(), e);
             return new HashMap();
         }
     }
@@ -193,6 +219,7 @@ public class StatController {
         try {
             return  buttonService.getButtonsTitle();
         } catch (Exception e){
+            log.error(e.getMessage(), e);
             return new HashMap();
         }
     }

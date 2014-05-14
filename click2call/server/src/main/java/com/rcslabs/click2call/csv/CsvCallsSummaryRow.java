@@ -4,6 +4,14 @@ import com.rcslabs.click2call.entity.CallConsolidatedEntry;
 
 public class CsvCallsSummaryRow {
 
+    protected String dayOfMonth;
+    protected int callbackForm = 0;
+    protected int count = 0;
+    protected float summaryWait = 0F;
+    protected float meanWait = 0F;
+    protected float summaryDuration = 0F;
+    protected float meanDuration = 0F;
+
     public String getDayOfMonth(){
         return this.dayOfMonth;
     }
@@ -28,13 +36,6 @@ public class CsvCallsSummaryRow {
         return (int)(Math.ceil(meanWait));
     }
 
-    private String dayOfMonth;
-    private int count = 0;
-    private float summaryWait = 0F;
-    private float meanWait = 0F;
-    private float summaryDuration = 0F;
-    private float meanDuration = 0F;
-
     public CsvCallsSummaryRow(String dayOfMonth){
         this.dayOfMonth = dayOfMonth;
     }
@@ -45,5 +46,13 @@ public class CsvCallsSummaryRow {
         meanDuration = summaryDuration/count;
         summaryWait += entry.getWaitDuration();
         meanWait = summaryWait/count;
+    }
+
+    public void setCallbackFormCount(int cnt){
+        this.callbackForm = cnt;
+    }
+
+    public int getCallbackFormCount(){
+        return callbackForm;
     }
 }

@@ -5,6 +5,8 @@ import com.rcslabs.click2call.service.ButtonService;
 import org.apache.commons.httpclient.contrib.ssl.EasyX509TrustManager;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,6 +36,8 @@ import java.util.concurrent.Executors;
 @Controller()
 @RequestMapping("/")
 public class DefaultController {
+
+    private static final Logger log = LoggerFactory.getLogger(DefaultController.class);
 
     private static final String HOSTNAME = "webrtc.v2chat.com";
 
@@ -83,7 +87,7 @@ public class DefaultController {
             ssl.init(new KeyManager[0], new TrustManager[] {new DefaultTrustManager()}, new SecureRandom());
             SSLContext.setDefault(ssl);
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
-            System.out.println(e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -191,6 +195,7 @@ public class DefaultController {
 
             return new ResponseEntity<String>("OK", HttpStatus.OK);
         } catch (Exception e){
+            log.error(e.getMessage(), e);
             return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -199,6 +204,7 @@ public class DefaultController {
     @ExceptionHandler(Exception.class)
     public ModelAndView handleError(HttpServletRequest req, HttpServletResponse res, Exception exception) {
         //logger.error("Request: " + req.getRequestURL() + " raised " + exception);
+        log.error(exception.getMessage(), exception);
         ModelAndView mav = new ModelAndView();
         mav.addObject("exception", exception);
         mav.addObject("url", req.getRequestURL());

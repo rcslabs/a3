@@ -11,9 +11,9 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -82,37 +82,56 @@ public class StatDAOImpl implements StatDAO {
     }
 
     @Override
-    public List<CallConsolidatedEntry> findCallsByDate(Date date) {
-        try{
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-            String d = sdf.format(date); // skip hours
-            Date startDate = sdf.parse(d);
-            Date endDate = new Date(startDate.getTime()+(86400000));
-            Criteria criteria = getSession().createCriteria(CallConsolidatedEntry.class)
-                    .add(Restrictions.between("start", startDate, endDate));
-            return criteria.list();
-        } catch (Exception e){
-            return null;
-        }
+    public List<CallConsolidatedEntry> findCallsByDate(Date date) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String d = sdf.format(date); // skip hours
+        Date startDate = sdf.parse(d);
+        Date endDate = new Date(startDate.getTime()+(86400000));
+        Criteria criteria = getSession().createCriteria(CallConsolidatedEntry.class)
+                .add(Restrictions.between("start", startDate, endDate))
+                .addOrder(Order.asc("start"));;
+        return criteria.list();
     }
 
     @Override
-    public List<CallConsolidatedEntry> findCallsByButtonIdAndMonth(String buttonId, Date date) {
-        try{
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
-            String d = sdf.format(date); // skip hours, days
-            Date startDate = sdf.parse(d);
-            Calendar c = Calendar.getInstance();
-            c.setTime(startDate);
-            c.add(Calendar.MONTH, 1);
-            Date endDate = c.getTime();
-            Criteria criteria = getSession().createCriteria(CallConsolidatedEntry.class)
-                    .add(Restrictions.between("start", startDate, endDate))
-                    .add(Restrictions.eq("buttonId", buttonId)).addOrder(Order.asc("start"));
+    public List<CallConsolidatedEntry> findCallsByButtonIdAndMonth(String buttonId, Date date) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
+        String d = sdf.format(date); // skip hours, days
+        Date startDate = sdf.parse(d);
+        Calendar c = Calendar.getInstance();
+        c.setTime(startDate);
+        c.add(Calendar.MONTH, 1);
+        Date endDate = c.getTime();
+        Criteria criteria = getSession().createCriteria(CallConsolidatedEntry.class)
+                .add(Restrictions.between("start", startDate, endDate))
+                .add(Restrictions.eq("buttonId", buttonId))
+                .addOrder(Order.asc("start"));
 
-            return criteria.list();
-        } catch (Exception e){
-            return null;
-        }
+        return criteria.list();
+    }
+
+    @Override
+    public List<ClientLogEntry> findClientLogEntriesByButtonIdAndMonth(String buttonId, Date date) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
+        String d = sdf.format(date); // skip hours, days
+        Date startDate = sdf.parse(d);
+        Calendar c = Calendar.getInstance();
+        c.setTime(startDate);
+        c.add(Calendar.MONTH, 1);
+        Date endDate = c.getTime();
+        Criteria criteria = getSession().createCriteria(ClientLogEntry.class)
+                .add(Restrictions.between("timestamp", startDate, endDate))
+                .add(Restrictions.eq("buttonId", buttonId))
+                .addOrder(Order.asc("timestamp"));
+
+        return criteria.list();
+    }
+
+    @Override
+    public boolean isR5LogProcessed(String filename){
+        Criteria criteria = getSession().createCriteria(CallConsolidatedEntry.class)
+                .add(Restrictions.eq("details", filename))
+                .setMaxResults(1);
+        return (0 != criteria.list().size());
     }
 }
