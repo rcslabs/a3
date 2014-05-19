@@ -389,7 +389,7 @@ class Mediator implements a3.ICommunicatorListener {
             formdata['name'] =    $form.find("input[name='name']").val().replace(trim_re, "");
             formdata['phone'] =   $form.find("input[name='phone']").val().replace(trim_re, "");
             formdata['date'] =    $form.find("input[name='date']").val().replace(trim_re, "");
-            formdata['subject'] = $form.find("input[name='subject']").val().replace(trim_re, "");
+            //formdata['subject'] = $form.find("input[name='subject']").val().replace(trim_re, "");
             formdata['message'] = $form.find("textarea[name='message']").val().replace(trim_re, "");
 
             // simple check
@@ -414,7 +414,7 @@ class Mediator implements a3.ICommunicatorListener {
             formdata['label4name'] =    l['CALLBACK_FORM_NAME_LABEL'].replace(trim_re, "");
             formdata['label4phone'] =   l['CALLBACK_FORM_PHONE_LABEL'].replace(trim_re, "");
             formdata['label4date'] =    l['CALLBACK_FORM_DATE_LABEL'].replace(trim_re, "");
-            formdata['label4subject'] = l['CALLBACK_FORM_SUBJECT_LABEL'].replace(trim_re, "");
+            //formdata['label4subject'] = l['CALLBACK_FORM_SUBJECT_LABEL'].replace(trim_re, "");
             formdata['label4message'] = l['CALLBACK_FORM_MESSAGE_LABEL'].replace(trim_re, "");
             
             if(CALLBACK_SERVICE == null){
