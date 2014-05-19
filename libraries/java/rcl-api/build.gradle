@@ -1,0 +1,68 @@
+
+apply plugin: 'java'
+
+dependencies {
+	compile 'javax.sip:jain-sip-api:1.2'
+	compile 'javax.sip:jain-sip-ri:1.2.160'
+	compile 'javax.sdp:nist-sdp:1.0'
+	compile 'commons-lang:commons-lang:2.6'
+	compile 'ch.qos.logback:logback-classic:1.0.0'
+	compile 'commons-beanutils:commons-beanutils:1.8.3'
+	compile 'aopalliance:aopalliance:1.0'
+	compile 'com.rcslabs:nist-jaxb:1.0'
+    testCompile "junit:junit:4.10"
+}
+
+ext.sharedManifest = manifest {
+	attributes(
+		"Created-By": "Gradle " + gradle.gradleVersion,
+		"Built-By":  project.ext.builder,
+		"Build-Jdk": System.getProperty('java.version'),
+		"Implementation-Title": "Call library API", 
+		"Implementation-Version": version,
+		"Implementation-Vendor-Id": "RCSLabs",
+		"Implementation-Build": project.ext.revision,
+		"Implementation-Build-Timestamp": project.ext.datetime
+	)
+}
+
+jar {
+	manifest = project.manifest {
+    	from sharedManifest
+	}
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+	manifest = project.manifest {
+    	from sharedManifest
+	}   	
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+	manifest = project.manifest {
+    	from sharedManifest
+	}    
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+publishing {
+	publications {
+        mavenJava(MavenPublication) {
+            from components.java
+			artifact sourcesJar
+			artifact javadocJar
+	        pom.withXml {
+	        	def desc = 'Built by '+builder+' at '+datetime+' on rev. #'+revision
+                asNode().appendNode('description', desc)
+            }
+        }        
+    }
+}
