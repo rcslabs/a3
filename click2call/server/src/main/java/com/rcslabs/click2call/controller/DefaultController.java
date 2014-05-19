@@ -129,17 +129,17 @@ public class DefaultController {
             params.put(HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_LABEL_FOR_PHONE)),
                     HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_PHONE)));
 
-            if(null != request.getParameter(CALLBACK_FORM_LABEL_FOR_EMAIL)){
+            if(null != request.getParameter(CALLBACK_FORM_EMAIL)){
                 params.put(HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_LABEL_FOR_EMAIL)),
                     HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_EMAIL)));
             }
 
-            if(null != request.getParameter(CALLBACK_FORM_LABEL_FOR_DATE)){
+            if(null != request.getParameter(CALLBACK_FORM_DATE)){
                 params.put(HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_LABEL_FOR_DATE)),
                     HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_DATE)));
             }
 
-            if(null != request.getParameter(CALLBACK_FORM_LABEL_FOR_SUBJECT)){
+            if(null != request.getParameter(CALLBACK_FORM_SUBJECT)){
                 params.put(HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_LABEL_FOR_SUBJECT)),
                     HtmlUtils.htmlEscape(request.getParameter(CALLBACK_FORM_SUBJECT)));
             }
