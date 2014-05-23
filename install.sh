@@ -8,6 +8,9 @@ export CURRENT_DIR=`pwd`
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
 
+export GST_VERSION=1.2.4
+
+
 # FIXME:
 #if [ $(cat /etc/environment | grep ALENA_HOME) != "" ]; then
 #	echo $ALENA_HOME >> /etc/environment
@@ -77,15 +80,15 @@ if [ 1 == "$INSTALL_DEPS" ]; then
 	wget http://ftp.gnome.org/pub/gnome/sources/gobject-introspection/1.38/gobject-introspection-1.38.0.tar.xz
 	wget http://cairographics.org/releases/cairo-1.12.16.tar.xz
 	wget http://ftp.gnome.org/pub/GNOME/sources/pygobject/3.10/pygobject-3.10.2.tar.xz
-	wget http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.2.0.tar.xz
+	wget http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${GST_VERSION}.tar.xz
 	wget http://gstreamer.freedesktop.org/src/orc/orc-0.4.18.tar.gz
 	wget ftp://ftp.videolan.org/pub/videolan/x264/snapshots/last_stable_x264.tar.bz2
 	wget --no-check-certificate https://webm.googlecode.com/files/libvpx-v1.2.0.tar.bz2
-	wget http://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-1.2.0.tar.xz
-	wget http://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-1.2.0.tar.xz
-	wget http://gstreamer.freedesktop.org/src/gst-libav/gst-libav-1.2.0.tar.xz
-	wget http://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-1.2.0.tar.xz
-	wget http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-1.2.0.tar.xz
+	wget http://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${GST_VERSION}.tar.xz
+	wget http://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${GST_VERSION}.tar.xz
+	wget http://gstreamer.freedesktop.org/src/gst-libav/gst-libav-${GST_VERSION}.tar.xz
+	wget http://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-${GST_VERSION}.tar.xz
+	wget http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-${GST_VERSION}.tar.xz
 	wget http://gstreamer.freedesktop.org/src/gst-python/gst-python-1.1.90.tar.gz
 	wget ftp://mirrors.dk.telia.net/pub/mirrors/archive.debian.org/debian/pool/main/d/dpkg/dpkg_1.14.31.tar.gz
 	wget http://nginx.org/download/nginx-1.3.14.tar.gz
@@ -101,15 +104,15 @@ if [ 1 == "$INSTALL_DEPS" ]; then
 	tar xJf gobject-introspection-1.38.0.tar.xz
 	tar xJf cairo-1.12.16.tar.xz
 	tar xJf pygobject-3.10.2.tar.xz
-	tar xJf gstreamer-1.2.0.tar.xz 
+	tar xJf gstreamer-${GST_VERSION}.tar.xz 
 	tar xzf orc-0.4.18.tar.gz 
 	tar xjf last_stable_x264.tar.bz2
 	tar xjf libvpx-v1.2.0.tar.bz2
-	tar xJf gst-plugins-base-1.2.0.tar.xz 
-	tar xJf gst-plugins-good-1.2.0.tar.xz
-	tar xJf gst-libav-1.2.0.tar.xz
-	tar xJf gst-plugins-ugly-1.2.0.tar.xz
-	tar xJf gst-plugins-bad-1.2.0.tar.xz 
+	tar xJf gst-plugins-base-${GST_VERSION}.tar.xz 
+	tar xJf gst-plugins-good-${GST_VERSION}.tar.xz
+	tar xJf gst-libav-${GST_VERSION}.tar.xz
+	tar xJf gst-plugins-ugly-${GST_VERSION}.tar.xz
+	tar xJf gst-plugins-bad-${GST_VERSION}.tar.xz 
 	tar xzf gst-python-1.1.90.tar.gz 
 	tar xfz dpkg_1.14.31.tar.gz
 	tar xzf nginx-1.3.14.tar.gz
@@ -157,7 +160,7 @@ if [ 1 == "$INSTALL_DEPS" ]; then
 	make && make install
 
 	# install gstreamer
-	cd $BUILD_DIR/gstreamer-1.2.0
+	cd $BUILD_DIR/gstreamer-${GST_VERSION}
 	./configure --enable-introspection=yes
 	make && make install
 
@@ -178,25 +181,25 @@ if [ 1 == "$INSTALL_DEPS" ]; then
 	./configure --enable-realtime-only --enable-error-concealment --disable-examples --enable-vp8 --enable-shared --enable-pic --as=yasm
 	make && make install
 
-	cd $BUILD_DIR/gst-plugins-base-1.2.0
+	cd $BUILD_DIR/gst-plugins-base-${GST_VERSION}
 	./configure --enable-introspection=yes
 	make && make install
 
-	cd $BUILD_DIR/gst-plugins-good-1.2.0
+	cd $BUILD_DIR/gst-plugins-good-${GST_VERSION}
 	cp $CURRENT_DIR/gst-speex-flvmux.patch $BUILD_DIR/gst-plugins-good-1.2.0
 	patch -p1 < gst-speex-flvmux.patch
 	./configure
 	make && make install
 
-	cd $BUILD_DIR/gst-libav-1.2.0
+	cd $BUILD_DIR/gst-libav-${GST_VERSION}
 	./configure
 	make && make install
 
-	cd $BUILD_DIR/gst-plugins-ugly-1.2.0
+	cd $BUILD_DIR/gst-plugins-ugly-${GST_VERSION}
 	./configure
 	make && make install
 
-	cd $BUILD_DIR/gst-plugins-bad-1.2.0
+	cd $BUILD_DIR/gst-plugins-bad-${GST_VERSION}
 	./configure --enable-introspection=yes
 	make && make install
 

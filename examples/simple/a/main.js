@@ -121,11 +121,16 @@ var CommunicatorGraph = (function () {
     return CommunicatorGraph;
 })();
 
+var SCALE = 2;
+
 var flashVars = {
     micRate: 44,
     micCodec: "nellymoser",
     logLevel: "ALL",
-    camCodec: "h264"
+    camCodec: "h264",
+    camWidth: 352 * SCALE,
+    camHeight: 288 * SCALE,
+    checkMicVolume: false
 };
 
 var SimpleCommunicatorFactory = (function () {
