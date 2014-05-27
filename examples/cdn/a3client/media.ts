@@ -20,7 +20,7 @@ module a3 {
 	if(typeof LOG === "undefined") LOG = function() {};
 	if(typeof ERROR === "undefined") ERROR = function() {};
 
-	var MIN_FLASH_VERSION = '10.3.0';
+	var MIN_FLASH_VERSION = '11';
 	var DTMF_DURATION: number = 140;
 	var DTMF_INTERVAL: number = 200;
 	var VIDEO_WIDTH: number = 352;
@@ -45,13 +45,15 @@ module a3 {
 	export interface IMedia {
 		start();
 		getCc(): any;
-		checkHardware();
+		checkHardware(enableVideo: boolean);
 		setMicrophoneVolume(volume: number);
 		setSoundVolume(volume: number);
 		muteMicrophone(value: boolean);
 		muteSound(value: boolean);
 		setOfferSdp(callId: string, pointId: string, offerSdp: any);
 		playDtmf(dtmf: string);
+		playRBT();
+		stopRBT();
 		dispose();
 	}
 
@@ -89,10 +91,10 @@ module a3 {
 
 	export class FlashMedia implements IMedia
 	{
-		private _pubVoice: any = undefined;
-		private _pubVideo: any = undefined;
-		private _subVoice: any = undefined;
-		private _subVideo: any = undefined;
+		private _publishUrlVoice: any = undefined;
+		private _publishUrlVideo: any = undefined;
+		private _playUrlVoice: any = undefined;
+		private _playUrlVideo: any = undefined;
 		private _swf: any = null;
 
 		constructor(private _listener: IMediaListener, private _container:HTMLElement, private _flashVars: any) {
@@ -102,6 +104,7 @@ module a3 {
 			this._container = flashContainer;
 
 			this._flashVars = this._flashVars || {};
+			//this._flashVars['checkMicVolume'] = false;
 			var readyCallback = '__'+Math.round(Math.random()*Math.pow(10,16));
 			this._flashVars['cbReady'] = readyCallback;
 			window[readyCallback] = () => { this._listener.onMediaReady(this); }
@@ -131,9 +134,8 @@ module a3 {
 		getCc(): any {
 			return {
 				userAgent: "FlashPlayer",
-				audio: ["PCMA/8000"],
-				video: ["H264/90000"],
-				"profile" : "RTMP"
+				audio: ["speex/8000"],
+				video: ["H264/90000"]
 			};
 		}
 
@@ -153,7 +155,8 @@ module a3 {
 			this._swf.muteSound(value);
 		}
 
-		checkHardware() {
+		checkHardware(enableVideo: boolean) {
+			// TODO: implements this
 			this._swf.checkHardware();
 		}
 
@@ -165,44 +168,14 @@ module a3 {
 			//  publishUrlVideo: [...]
 			//  publishUrlVoice: [...]
 			//}
-			if(typeof offerSdp === "string") {
-				var lines: string[] = offerSdp.split("\r\n");
-				var state = 0;
-				for(var i=0; i<lines.length; i++) {
-					var line: string = lines[i];
-					if(line.match(/^m=audio/)) state = 1;
-					if(line.match(/^m=video/)) state = 2;
-					if(line) {
-						switch(state) {
-							case 0: break;
-							case 1:
-								if(line.match("^a=rtmp-sub:(.+)$")) this._pubVoice = RegExp.$1;
-								if(line.match("^a=rtmp-pub:(.+)$")) this._subVoice = RegExp.$1;
-								break;
-							case 2:
-								if(line.match("^a=rtmp-sub:(.+)$")) this._pubVideo = RegExp.$1;
-								if(line.match("^a=rtmp-pub:(.+)$")) this._subVideo = RegExp.$1;
-								break;
-						}
-					}
-				}
-			} else {
-				this._pubVoice = offerSdp.publishUrlVoice;
-				this._pubVideo = offerSdp.publishUrlVideo;
-				this._subVoice = offerSdp.playUrlVoice;
-				this._subVideo = offerSdp.playUrlVideo;
-			}
 
-			if(this._pubVoice || this._pubVideo) this._swf.publish(   this._pubVoice, this._pubVideo );
-			if(this._subVoice || this._subVideo) this._swf.subscribe( this._subVoice, this._subVideo );
+			this._publishUrlVoice = offerSdp.publishUrlVoice;
+			this._publishUrlVideo = offerSdp.publishUrlVideo;
+			this._playUrlVoice = offerSdp.playUrlVoice;
+			this._playUrlVideo = offerSdp.playUrlVideo;
 
-			if(typeof offerSdp === "string") {
-				this._listener.onMediaMessage(MediaEvent.SDP_ANSWER, {
-					callId: callId,
-					pointId: pointId,
-					sdp: offerSdp
-				});
-			}
+			this._swf.publish   ( this._publishUrlVoice, this._publishUrlVideo );
+			this._swf.subscribe ( this._playUrlVoice,    this._playUrlVideo    );
 		}
 
 	   	dispose(){
@@ -211,7 +184,15 @@ module a3 {
 		}
 
 		playDtmf(dtmf: string) {
+			this._swf.playDtmf(dtmf);
+		}
 
+		playRBT() {
+			this._swf.playRBT();
+		}
+
+		stopRBT() {
+			this._swf.stopRBT();
 		}
 	}
 
@@ -240,6 +221,7 @@ module a3 {
 		private _micVolume: number = 1;
 
 		private _dtmfPlayer: DtmfPlayer = new DtmfPlayer();
+		private _rbtPlayer: RBTPlayer = new RBTPlayer();
 
 		constructor(private _listener: IMediaListener, private _container) {
 			this._remoteVideo = document.createElement("video");
@@ -312,38 +294,43 @@ module a3 {
 			};
 		}
 
-	 	dispose(){
+	 	dispose(){ //debugger;
+			if(this.__pcVideo) this.__pcVideo.close();
+			this.__pcVideo = null;
+			if(this.__pc) this.__pc.close();
+			this.__pc = null;
+			try{ this._remoteStream.getVideoTracks()[0].stop(); } catch(e) { LOG("Trouble on dispose video"); }
+			try{ this._remoteStream.getAudioTracks()[0].stop(); } catch(e) { LOG("Trouble on dispose audio"); }
 			try{ this._localStream.getVideoTracks()[0].stop(); } catch(e) { LOG("Trouble on dispose video"); }
 			try{ this._localStream.getAudioTracks()[0].stop(); } catch(e) { LOG("Trouble on dispose audio"); }
-			this.__pcVideo = null;
-			this.__pc = null;
 		}
 
-		checkHardware() {
+		checkHardware(enableVideo: boolean) {
 			this._notify("HardwareEvent.HARDWARE_STATE", { data: {
 				microphone: { state: HardwareState.DISABLED },
 				camera: { state: HardwareState.DISABLED },
 				userDefined : false
 			}});
-			getUserMedia(
-				{
-					audio: true,
-					video: {
-						mandatory: {
-							"minWidth": "320",
-							"maxWidth": "1280",
-							"minHeight": "180",
-							"maxHeight": "720",
-							"minFrameRate": "5"
-						},
-						optional: [
-							{ width: VIDEO_WIDTH },
-							{ height: VIDEO_HEIGHT},
-							{ frameRate: VIDEO_FRAMERATE },
-							{ facingMode: "user" }
-						]
-					}
-				},
+
+			var opts:any = {audio: true};
+			if(enableVideo){
+				opts.video = {
+					mandatory: {
+						"minWidth": "320",
+						"maxWidth": "1280",
+						"minHeight": "180",
+						"maxHeight": "720",
+						"minFrameRate": "5"
+					},
+					optional: [
+						{ width: VIDEO_WIDTH },
+						{ height: VIDEO_HEIGHT},
+						{ frameRate: VIDEO_FRAMERATE },
+						{ facingMode: "user" }
+					]
+				};
+			}
+			getUserMedia(opts,
 				(stream) => {
 					var audioTracks = stream.getAudioTracks();
 					var videoTracks = stream.getVideoTracks();
@@ -532,6 +519,14 @@ module a3 {
 		playDtmf(dtmf: string) {
 			this._dtmfPlayer.playDtmf(dtmf);
 		}
+
+		playRBT() {
+			this._rbtPlayer.play();
+		}
+
+		stopRBT() {
+			this._rbtPlayer.stop();
+		}
 	}
 
 
@@ -547,7 +542,7 @@ module a3 {
 
 		constructor(private audioContext: any, private freq: number) {
 			var volume = audioContext.createGainNode();
-			volume.gain.value = 0.5;
+			volume.gain.value = 0.2;
 			volume.connect(audioContext.destination);
 			this.gainNode = volume;
 
@@ -561,6 +556,37 @@ module a3 {
 		}
 		pause() {
 			this.oscillator.disconnect();
+		}
+	}
+
+	/**
+	 * Ringback tone player
+	 */
+	class RBTPlayer {
+		private _oscillator: ToneGenerator = null;
+		private _cnt: number = 0;
+		private _intv: number;
+		constructor() {
+			if(window["webkitAudioContext"]) {
+				var audioContext = new window["webkitAudioContext"]();
+				this._oscillator = new ToneGenerator(audioContext, 425);
+			}
+		}
+
+		play() { // 425 hz play 1s / pause 4s
+			this._intv = setInterval(()=>{
+				if(!(this._cnt % 5)){ // next iteration
+					this._oscillator.play();
+				}else if(!((this._cnt-1) % 5)){ // 1 sec after play
+					this._oscillator.pause();
+				}
+				this._cnt++;
+			}, 1000);
+		}
+
+		stop() {
+			this._oscillator.pause();
+			clearInterval(this._intv);
 		}
 	}
 

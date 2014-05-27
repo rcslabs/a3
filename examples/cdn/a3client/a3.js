@@ -1,10 +1,3 @@
-//  BUILD INFO:
-//  Environment: dev
-//  Revision:    6364
-//  Builder:     esix
-//  Host:        jenny
-//  Date:        20.02.2014 15:02
-
 var a3;
 (function (a3) {
     if (typeof LOG === "undefined")
@@ -169,6 +162,35 @@ var a3;
                 opt = {};
             opt["type"] = type;
             opt["service"] = this._service;
+
+            switch (type) {
+                case 'START_SESSION':
+                case 'CLOSE_SESSION':
+                    opt["typz"] = 'AuthMessage';
+                    break;
+
+                case 'START_CALL':
+                case 'REJECT_CALL':
+                case 'ACCEPT_CALL':
+                case 'HANGUP_CALL':
+                case 'SEND_DTMF':
+                    opt["typz"] = 'CallMessage';
+                    break;
+
+                case 'SDP_OFFER':
+                case 'SDP_ANSWER':
+                    opt["typz"] = 'MediaMessage';
+                    break;
+
+                case 'JOIN_CHATROOM':
+                case 'UNJOIN_CHATROOM':
+                case 'CHAT_MESSAGE':
+                    opt["typz"] = 'ChatMessage';
+                    break;
+            }
+
+            if (type != "START_SESSION")
+                opt["sessionId"] = this.sessionId;
             LOG("SENDING TO SOCKET.IO: ", type, opt);
             this._socket.emit('message', opt);
         };
@@ -371,7 +393,7 @@ var a3;
         ERROR = function () {
         };
 
-    var MIN_FLASH_VERSION = '10.3.0';
+    var MIN_FLASH_VERSION = '11';
     var DTMF_DURATION = 140;
     var DTMF_INTERVAL = 200;
     var VIDEO_WIDTH = 352;
@@ -433,10 +455,10 @@ var a3;
             this._listener = _listener;
             this._container = _container;
             this._flashVars = _flashVars;
-            this._pubVoice = undefined;
-            this._pubVideo = undefined;
-            this._subVoice = undefined;
-            this._subVideo = undefined;
+            this._publishUrlVoice = undefined;
+            this._publishUrlVideo = undefined;
+            this._playUrlVoice = undefined;
+            this._playUrlVideo = undefined;
             this._swf = null;
             var flashContainer = document.createElement('div');
             flashContainer.id = 'this-div-will-replaced-by-swf';
@@ -444,6 +466,8 @@ var a3;
             this._container = flashContainer;
 
             this._flashVars = this._flashVars || {};
+
+            //this._flashVars['checkMicVolume'] = false;
             var readyCallback = '__' + Math.round(Math.random() * Math.pow(10, 16));
             this._flashVars['cbReady'] = readyCallback;
             window[readyCallback] = function () {
@@ -472,9 +496,8 @@ var a3;
         FlashMedia.prototype.getCc = function () {
             return {
                 userAgent: "FlashPlayer",
-                audio: ["PCMA/8000"],
-                video: ["H264/90000"],
-                "profile": "RTMP"
+                audio: ["speex/8000"],
+                video: ["H264/90000"]
             };
         };
 
@@ -494,58 +517,26 @@ var a3;
             this._swf.muteSound(value);
         };
 
-        FlashMedia.prototype.checkHardware = function () {
+        FlashMedia.prototype.checkHardware = function (enableVideo) {
+            // TODO: implements this
             this._swf.checkHardware();
         };
 
         FlashMedia.prototype.setOfferSdp = function (callId, pointId, offerSdp) {
-            if (typeof offerSdp === "string") {
-                var lines = offerSdp.split("\r\n");
-                var state = 0;
-                for (var i = 0; i < lines.length; i++) {
-                    var line = lines[i];
-                    if (line.match(/^m=audio/))
-                        state = 1;
-                    if (line.match(/^m=video/))
-                        state = 2;
-                    if (line) {
-                        switch (state) {
-                            case 0:
-                                break;
-                            case 1:
-                                if (line.match("^a=rtmp-sub:(.+)$"))
-                                    this._pubVoice = RegExp.$1;
-                                if (line.match("^a=rtmp-pub:(.+)$"))
-                                    this._subVoice = RegExp.$1;
-                                break;
-                            case 2:
-                                if (line.match("^a=rtmp-sub:(.+)$"))
-                                    this._pubVideo = RegExp.$1;
-                                if (line.match("^a=rtmp-pub:(.+)$"))
-                                    this._subVideo = RegExp.$1;
-                                break;
-                        }
-                    }
-                }
-            } else {
-                this._pubVoice = offerSdp.publishUrlVoice;
-                this._pubVideo = offerSdp.publishUrlVideo;
-                this._subVoice = offerSdp.playUrlVoice;
-                this._subVideo = offerSdp.playUrlVideo;
-            }
+            // currently offerSdp in form
+            //{
+            //  playUrlVideo: [...]
+            //  playUrlVoice: [...]
+            //  publishUrlVideo: [...]
+            //  publishUrlVoice: [...]
+            //}
+            this._publishUrlVoice = offerSdp.publishUrlVoice;
+            this._publishUrlVideo = offerSdp.publishUrlVideo;
+            this._playUrlVoice = offerSdp.playUrlVoice;
+            this._playUrlVideo = offerSdp.playUrlVideo;
 
-            if (this._pubVoice || this._pubVideo)
-                this._swf.publish(this._pubVoice, this._pubVideo);
-            if (this._subVoice || this._subVideo)
-                this._swf.subscribe(this._subVoice, this._subVideo);
-
-            if (typeof offerSdp === "string") {
-                this._listener.onMediaMessage(MediaEvent.SDP_ANSWER, {
-                    callId: callId,
-                    pointId: pointId,
-                    sdp: offerSdp
-                });
-            }
+            this._swf.publish(this._publishUrlVoice, this._publishUrlVideo);
+            this._swf.subscribe(this._playUrlVoice, this._playUrlVideo);
         };
 
         FlashMedia.prototype.dispose = function () {
@@ -554,6 +545,15 @@ var a3;
         };
 
         FlashMedia.prototype.playDtmf = function (dtmf) {
+            this._swf.playDtmf(dtmf);
+        };
+
+        FlashMedia.prototype.playRBT = function () {
+            this._swf.playRBT();
+        };
+
+        FlashMedia.prototype.stopRBT = function () {
+            this._swf.stopRBT();
         };
         return FlashMedia;
     })();
@@ -580,6 +580,7 @@ var a3;
             this._soundVolume = 0.8;
             this._micVolume = 1;
             this._dtmfPlayer = new DtmfPlayer();
+            this._rbtPlayer = new RBTPlayer();
             this._remoteVideo = document.createElement("video");
             this._remoteVideo.style.width = '100%';
             this._remoteVideo.style.height = '100%';
@@ -649,6 +650,22 @@ var a3;
         };
 
         WebrtcMedia.prototype.dispose = function () {
+            if (this.__pcVideo)
+                this.__pcVideo.close();
+            this.__pcVideo = null;
+            if (this.__pc)
+                this.__pc.close();
+            this.__pc = null;
+            try  {
+                this._remoteStream.getVideoTracks()[0].stop();
+            } catch (e) {
+                LOG("Trouble on dispose video");
+            }
+            try  {
+                this._remoteStream.getAudioTracks()[0].stop();
+            } catch (e) {
+                LOG("Trouble on dispose audio");
+            }
             try  {
                 this._localStream.getVideoTracks()[0].stop();
             } catch (e) {
@@ -659,11 +676,9 @@ var a3;
             } catch (e) {
                 LOG("Trouble on dispose audio");
             }
-            this.__pcVideo = null;
-            this.__pc = null;
         };
 
-        WebrtcMedia.prototype.checkHardware = function () {
+        WebrtcMedia.prototype.checkHardware = function (enableVideo) {
             var _this = this;
             this._notify("HardwareEvent.HARDWARE_STATE", {
                 data: {
@@ -672,9 +687,10 @@ var a3;
                     userDefined: false
                 }
             });
-            getUserMedia({
-                audio: true,
-                video: {
+
+            var opts = { audio: true };
+            if (enableVideo) {
+                opts.video = {
                     mandatory: {
                         "minWidth": "320",
                         "maxWidth": "1280",
@@ -688,8 +704,9 @@ var a3;
                         { frameRate: VIDEO_FRAMERATE },
                         { facingMode: "user" }
                     ]
-                }
-            }, function (stream) {
+                };
+            }
+            getUserMedia(opts, function (stream) {
                 var audioTracks = stream.getAudioTracks();
                 var videoTracks = stream.getVideoTracks();
                 _this._localStream = stream;
@@ -910,6 +927,14 @@ var a3;
         WebrtcMedia.prototype.playDtmf = function (dtmf) {
             this._dtmfPlayer.playDtmf(dtmf);
         };
+
+        WebrtcMedia.prototype.playRBT = function () {
+            this._rbtPlayer.play();
+        };
+
+        WebrtcMedia.prototype.stopRBT = function () {
+            this._rbtPlayer.stop();
+        };
         return WebrtcMedia;
     })();
     a3.WebrtcMedia = WebrtcMedia;
@@ -925,7 +950,7 @@ var a3;
             this.audioContext = audioContext;
             this.freq = freq;
             var volume = audioContext.createGainNode();
-            volume.gain.value = 0.5;
+            volume.gain.value = 0.2;
             volume.connect(audioContext.destination);
             this.gainNode = volume;
 
@@ -941,6 +966,37 @@ var a3;
             this.oscillator.disconnect();
         };
         return ToneGenerator;
+    })();
+
+    /**
+    * Ringback tone player
+    */
+    var RBTPlayer = (function () {
+        function RBTPlayer() {
+            this._oscillator = null;
+            this._cnt = 0;
+            if (window["webkitAudioContext"]) {
+                var audioContext = new window["webkitAudioContext"]();
+                this._oscillator = new ToneGenerator(audioContext, 425);
+            }
+        }
+        RBTPlayer.prototype.play = function () {
+            var _this = this;
+            this._intv = setInterval(function () {
+                if (!(_this._cnt % 5)) {
+                    _this._oscillator.play();
+                } else if (!((_this._cnt - 1) % 5)) {
+                    _this._oscillator.pause();
+                }
+                _this._cnt++;
+            }, 1000);
+        };
+
+        RBTPlayer.prototype.stop = function () {
+            this._oscillator.pause();
+            clearInterval(this._intv);
+        };
+        return RBTPlayer;
     })();
 
     var DtmfPlayer = (function () {
@@ -1164,20 +1220,25 @@ var a3;
         };
 
         Call.prototype.onEnterStateStarting = function () {
+            this.media.playRBT();
             this._notifyListener('onCallStarting');
         };
+
         Call.prototype.onEnterStateRinging = function () {
             this._notifyListener('onCallRinging');
         };
         Call.prototype.onEnterStateProgress = function () {
+            this.media.stopRBT();
             this._notifyListener('onCallStarted');
         };
 
         Call.prototype.onEnterStateFinished = function () {
+            this.media.stopRBT();
             this.media.dispose();
             this._notifyListener('onCallFinished');
         };
         Call.prototype.onEnterStateFailed = function () {
+            this.media.stopRBT();
             this.media.dispose();
             this._notifyListener('onCallFailed');
         };
@@ -1595,7 +1656,7 @@ var a3;
                     } else if (event === Event.HARDWARE_STATE_CHANGED) {
                         this._onHardwareStateChanged(opt);
                     } else if (event === Event.MEDIA_READY) {
-                        this.media.checkHardware();
+                        this.media.checkHardware(true);
                     } else {
                         this._unhandledEvent(event, opt);
                     }
@@ -1624,7 +1685,7 @@ var a3;
                     } else if (event === Event.HARDWARE_STATE_CHANGED) {
                         this._onHardwareStateChanged(opt);
                     } else if (event === Event.MEDIA_READY) {
-                        this.media.checkHardware();
+                        this.media.checkHardware(true);
                     } else {
                         this._unhandledEvent(event, opt);
                     }

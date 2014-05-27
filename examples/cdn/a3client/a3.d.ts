@@ -1,10 +1,3 @@
-//  BUILD INFO:
-//  Environment: dev
-//  Revision:    6364
-//  Builder:     esix
-//  Host:        jenny
-//  Date:        20.02.2014 15:02
-
 declare module a3 {
     class SessionEvent {
         static SESSION_STARTED: string;
@@ -111,23 +104,25 @@ declare module a3 {
     interface IMedia {
         start();
         getCc(): any;
-        checkHardware();
+        checkHardware(enableVideo: boolean);
         setMicrophoneVolume(volume: number);
         setSoundVolume(volume: number);
         muteMicrophone(value: boolean);
         muteSound(value: boolean);
         setOfferSdp(callId: string, pointId: string, offerSdp: any);
         playDtmf(dtmf: string);
+        playRBT();
+        stopRBT();
         dispose();
     }
     class FlashMedia implements IMedia {
         private _listener;
         private _container;
         private _flashVars;
-        private _pubVoice;
-        private _pubVideo;
-        private _subVoice;
-        private _subVideo;
+        private _publishUrlVoice;
+        private _publishUrlVideo;
+        private _playUrlVoice;
+        private _playUrlVideo;
         private _swf;
         constructor(_listener: IMediaListener, _container: HTMLElement, _flashVars: any);
         public start(): void;
@@ -136,10 +131,12 @@ declare module a3 {
         public setSoundVolume(value): void;
         public muteMicrophone(value: boolean): void;
         public muteSound(value: boolean): void;
-        public checkHardware(): void;
+        public checkHardware(enableVideo: boolean): void;
         public setOfferSdp(callId: string, pointId: string, offerSdp: any): void;
         public dispose(): void;
         public playDtmf(dtmf: string): void;
+        public playRBT(): void;
+        public stopRBT(): void;
     }
     /**
     * WebrtcMedia
@@ -161,6 +158,7 @@ declare module a3 {
         private _soundVolume;
         private _micVolume;
         private _dtmfPlayer;
+        private _rbtPlayer;
         constructor(_listener: IMediaListener, _container);
         public start(): void;
         public _notifyReady(): void;
@@ -181,11 +179,13 @@ declare module a3 {
             "bundle": boolean;
         };
         public dispose(): void;
-        public checkHardware(): void;
+        public checkHardware(enableVideo: boolean): void;
         public __getAudioPeerConnection();
         public __getVideoPeerConnection();
         public setOfferSdp(callId: string, pointId: string, offerSdp: any): void;
         public playDtmf(dtmf: string): void;
+        public playRBT(): void;
+        public stopRBT(): void;
     }
 }
 declare module a3 {

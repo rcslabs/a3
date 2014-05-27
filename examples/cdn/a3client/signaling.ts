@@ -177,6 +177,35 @@ module a3 {
 			if(!opt) opt = {};
 			opt["type"] = type;
 			opt["service"] = this._service;
+
+			// added 'typz' feature - quick fix
+			switch (type){
+				case 'START_SESSION':
+				case 'CLOSE_SESSION':
+					opt["typz"] = 'AuthMessage';
+					break;
+
+				case 'START_CALL':
+				case 'REJECT_CALL':
+				case 'ACCEPT_CALL':
+				case 'HANGUP_CALL':
+				case 'SEND_DTMF':
+					opt["typz"] = 'CallMessage';
+					break;
+
+				case 'SDP_OFFER':
+				case 'SDP_ANSWER':
+					opt["typz"] = 'MediaMessage';
+					break;
+
+				case 'JOIN_CHATROOM':
+				case 'UNJOIN_CHATROOM':
+				case 'CHAT_MESSAGE':
+					opt["typz"] = 'ChatMessage';
+					break;
+			}
+
+			if(type != "START_SESSION") opt["sessionId"] = this.sessionId;
 			LOG("SENDING TO SOCKET.IO: ", type, opt);
 			this._socket.emit('message', opt);
 		}

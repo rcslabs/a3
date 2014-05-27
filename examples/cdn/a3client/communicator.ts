@@ -152,15 +152,24 @@ module a3 {
 		setMicrophoneVolume(value) { this.media.setMicrophoneVolume(value); }
 		setSoundVolume(value) { this.media.setSoundVolume(value); }
 
-		onEnterStateStarting() { this._notifyListener('onCallStarting'); }
+		onEnterStateStarting() {
+			this.media.playRBT();
+			this._notifyListener('onCallStarting');
+		}
+
 		onEnterStateRinging() { this._notifyListener('onCallRinging'); } // incoming call starting
-		onEnterStateProgress() { this._notifyListener('onCallStarted'); }
+		onEnterStateProgress() {
+			this.media.stopRBT();
+			this._notifyListener('onCallStarted');
+		}
 
 		onEnterStateFinished() {
+			this.media.stopRBT();
 			this.media.dispose();
 			this._notifyListener('onCallFinished');
 		}
 		onEnterStateFailed() {
+			this.media.stopRBT();
 			this.media.dispose();
 			this._notifyListener('onCallFailed');
 		}
@@ -523,7 +532,7 @@ module a3 {
 					} else if (event === Event.HARDWARE_STATE_CHANGED) {
 						this._onHardwareStateChanged(opt);
 					} else if(event === Event.MEDIA_READY) { // Flash element is reloaded
-						this.media.checkHardware();
+						this.media.checkHardware(true);
 					} else {
 						this._unhandledEvent(event, opt);
 					}
@@ -553,7 +562,7 @@ module a3 {
 					} else if (event === Event.HARDWARE_STATE_CHANGED) {
 						this._onHardwareStateChanged(opt);
 					} else if(event === Event.MEDIA_READY) { // Flash element is reloaded
-						this.media.checkHardware();
+						this.media.checkHardware(true);
 					} else {
 						this._unhandledEvent(event, opt);
 					}
