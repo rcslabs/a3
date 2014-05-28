@@ -183,7 +183,7 @@ var SimpleCommunicator = (function (_super) {
     };
 
     SimpleCommunicator.prototype.checkHardware = function () {
-        this.media.checkHardware();
+        this.media.checkHardware(true);
     };
 
     // communicator subject

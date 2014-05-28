@@ -150,7 +150,7 @@ class SimpleCommunicator extends a3.Communicator {
 	}
 
 	checkHardware() {
-		this.media.checkHardware()
+		this.media.checkHardware(true)
 	}
 
 
