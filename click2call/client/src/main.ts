@@ -381,6 +381,7 @@ class Mediator implements a3.ICommunicatorListener {
         this._root.style.display = 'none';
 
         /* send callback form */
+        $('input, textarea').placeholder();
         $(".callback-form").submit((event) => {
             event.preventDefault();
             var $form = $(event.currentTarget);
