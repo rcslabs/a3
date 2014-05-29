@@ -186,7 +186,7 @@ if [ 1 == "$INSTALL_DEPS" ]; then
 	make && make install
 
 	cd $BUILD_DIR/gst-plugins-good-${GST_VERSION}
-	cp $CURRENT_DIR/gst-speex-flvmux.patch $BUILD_DIR/gst-plugins-good-1.2.0
+	cp $CURRENT_DIR/gst-speex-flvmux.patch $BUILD_DIR/gst-plugins-good-${GST_VERSION}
 	patch -p1 < gst-speex-flvmux.patch
 	./configure
 	make && make install
