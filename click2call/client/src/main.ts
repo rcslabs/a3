@@ -369,6 +369,11 @@ class Mediator implements a3.ICommunicatorListener {
 			this._initHardwareControls();
 		}
 
+		var l = this._communicator.locale;
+
+		/* close button */
+		$('#a3').append('<div style="width:100%;position:absolute;left:0;top:0;text-align:right"><button title="'+l['CLOSE_WINDOW']+'" class="btn-close a3-btn-frame-close">&#215;</button></div>');
+
         /* dialpad feature init */
         $('.a3-view[data-dialpad]').append('<div class="a3-dialpad noselect"><table><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="1">1</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="2">2</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="3">3</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="4">4</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="5">5</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="6">6</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="7">7</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="8">8</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="9">9</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="*">*</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="0">0</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="#">#</button></td></tr></table><button class="btn-close a3-btn-dialpad-close">&#215;</button></div>');
         $('.a3-dialpad').hide();
@@ -381,7 +386,7 @@ class Mediator implements a3.ICommunicatorListener {
         this._root.style.display = 'none';
 
         /* send callback form */
-        $('input, textarea').placeholder();
+		(<any>$('input, textarea')).placeholder();
         $(".callback-form").submit((event) => {
             event.preventDefault();
             var $form = $(event.currentTarget);
@@ -395,8 +400,6 @@ class Mediator implements a3.ICommunicatorListener {
 
             // simple check
             if('' == formdata['name'].trim()) return;
-
-            var l = this._communicator.locale;
 
             // add email change request 30.04.2014
             if(0!=$form.find("input[name='email']").length){
@@ -419,7 +422,7 @@ class Mediator implements a3.ICommunicatorListener {
             formdata['label4message'] = l['CALLBACK_FORM_MESSAGE_LABEL'].replace(trim_re, "");
             
             if(CALLBACK_SERVICE == null){
-                console.log(formdata);
+                LOG(formdata);
             } else {
                 this._communicator.sendStat('SUBMIT_FORM');
                 $.post(CALLBACK_SERVICE, formdata)
@@ -536,6 +539,10 @@ class Mediator implements a3.ICommunicatorListener {
             case 'btn-dialpad':
                 this._communicator.onClickDialpadChar(""+$(event.target).data('value'));
                 break;
+			case 'btn-frame-close':
+				parent.postMessage("click2callClose"+this._communicator.query.id, "*");
+				break;
+
 			default:
 				WARN("Unhandled click on elem ." + cls);
         }

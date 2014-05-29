@@ -11,6 +11,7 @@ var Click2Call = (function () {
 	Click2Call.prototype.init = function (id, opts) {
 		if(typeof this.widgets[id] !== 'undefined') throw new Error("You must create a widget with id="+id+" only once");
 		if(!this.styleready){ this.initcss(); }
+		var self = this;
 		var opts = opts || {};
 		if(typeof opts['w'] === 'undefined'){ opts.w = 410; /* default width */}
 		if(typeof opts['h'] === 'undefined'){ opts.h = 480; /* default height */}
@@ -29,7 +30,19 @@ var Click2Call = (function () {
 		document.write('<iframe src="'+src+'" id="click2call-frm-'+id+'" frameborder="0" scrolling="no" class="click2call-frm" style="width:0; height:'+opts.h+'px;'+opts.csspos+';"></iframe>');
 		this.widgets[id] = {'opts' : opts};
 		var sc=''; var m = document.cookie.match(/A3Stat=(\d+)/); if(null != m){ sc = m[1]; }
-		//document.write('<img src="//webrtc.v2chat.com/stat/push/?b='+id+'&e=LOAD&ref='+encodeURI(document.referrer)+'&sc='+sc+'">');
+
+		var postMessageListener = function(event){
+			// no origin check
+			if(typeof event.data === 'string' && 0 == event.data.indexOf('click2callClose')){
+				self.toggle(event.data.replace('click2callClose', ''));
+			}
+		};
+
+		if(window.addEventListener){
+			window.addEventListener("message", postMessageListener, false);
+		}else{
+			window.attachEvent("onmessage", postMessageListener);
+		}
 	};
 
 	Click2Call.prototype.toggle = function (id) {
