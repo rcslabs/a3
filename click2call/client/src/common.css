@@ -1,0 +1,74 @@
+body{font: 12px Arial, Verdana, Helvetica; color:#444444;}
+body, html{margin:0; padding:0;}
+
+h1 {margin:auto 15px; text-align:center; font-size:16px; font-weight:bold;}
+h2 {margin:auto 15px; text-align:center; font-size:12px; font-weight:normal;}
+button:focus {outline: none;}
+
+.btn-gradient {background: #d0e4f7;
+    background: -moz-linear-gradient(top,  #d0e4f7 0%, #73b1e7 14%, #0a77d5 36%, #539fe1 78%, #87bcea 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#d0e4f7), color-stop(14%,#73b1e7), color-stop(36%,#0a77d5), color-stop(78%,#539fe1), color-stop(100%,#87bcea));
+    background: -webkit-linear-gradient(top,  #d0e4f7 0%,#73b1e7 14%,#0a77d5 36%,#539fe1 78%,#87bcea 100%);
+    background: -o-linear-gradient(top,  #d0e4f7 0%,#73b1e7 14%,#0a77d5 36%,#539fe1 78%,#87bcea 100%);
+    background: -ms-linear-gradient(top,  #d0e4f7 0%,#73b1e7 14%,#0a77d5 36%,#539fe1 78%,#87bcea 100%);
+    background: linear-gradient(to bottom,  #d0e4f7 0%,#73b1e7 14%,#0a77d5 36%,#539fe1 78%,#87bcea 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d0e4f7', endColorstr='#87bcea',GradientType=0 );
+}
+.btn-gradient:active {background: #87bcea;
+    background: -moz-linear-gradient(top,  #87bcea 0%, #539fe1 22%, #0a77d5 64%, #73b1e7 86%, #d0e4f7 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#87bcea), color-stop(22%,#539fe1), color-stop(64%,#0a77d5), color-stop(86%,#73b1e7), color-stop(100%,#d0e4f7));
+    background: -webkit-linear-gradient(top,  #87bcea 0%,#539fe1 22%,#0a77d5 64%,#73b1e7 86%,#d0e4f7 100%);
+    background: -o-linear-gradient(top,  #87bcea 0%,#539fe1 22%,#0a77d5 64%,#73b1e7 86%,#d0e4f7 100%);
+    background: -ms-linear-gradient(top,  #87bcea 0%,#539fe1 22%,#0a77d5 64%,#73b1e7 86%,#d0e4f7 100%);
+    background: linear-gradient(to bottom,  #87bcea 0%,#539fe1 22%,#0a77d5 64%,#73b1e7 86%,#d0e4f7 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#87bcea', endColorstr='#d0e4f7',GradientType=0 );
+}
+
+.btn-close {background:#2c539e; border:2px solid white; color:white; font-size:14px; font-weight:bold; border-radius:12px; -moz-border-radius:12px; width:24px; height:24px; cursor:pointer;}
+
+
+#a3{ display:none; width:370px; height:100px; background-color: #f1f1f1; background-position:50% 10px; background-repeat:no-repeat;}
+.a3-view{position:absolute; left:0; top:0; padding-top:100px; width:370px;}
+
+/* z-index=70 above media z-index=50 TODO: help above flash, hmm??? */
+#a3-help{position:absolute;width:100%;top:0;bottom:70px;background:#f1f1f1;z-index:70;}
+#a3-help-frm{width:100%;height:100%;border:0;}
+
+/* applies to #a3-media-container */
+#a3-media-container{position:absolute; z-index:50;}
+.a3-settings-panel-proxy{height:140px;}
+.a3-settings-panel{width:220px; height:140px; left:50%; margin:auto auto auto -110px ;}
+.a3-remote-video-proxy{height:288px;}
+.a3-remote-video{width:352px; height:288px; left:50%; margin: auto auto auto -176px;}
+
+.a3-intro-btn{width:341px; height:61px; margin:14px; font-size:16px; font-weight:bold; border:none; text-decoration:none; cursor:pointer;}
+.a3-btn-voice-call {background-image: url('/tmpl/default/btn1.png');}
+.a3-btn-video-call {background-image: url('/tmpl/default/btn1.png');}
+.a3-btn-callback{ background-image: url('/tmpl/default/btn2.png');}
+.a3-btn-cancel, .a3-btn-hangup{width:130px; height:37px; margin:8px; background-image: url('/tmpl/default/btn3.png'); border:none; color:white; font-weight:bold; text-align:right; padding-right:14px;}
+.a3-hardware-controls{direction:ltr; margin: 10px auto;}
+.a3-call-buttons{width:100%; text-align: center;}
+
+.a3-footer{background-color:#d4e4f1;color:#444444;font-size:12px;font-weight:normal;}
+.a3-footer-button{-moz-border-radius:12px; border-radius:12px; font-size:16px; font-weight:bold; border:1px solid cadetblue; color:#ffffff; padding:2px 10px;}
+.a3-footer-button[disabled]{background: #f1f1f1 !important; border:1px dashed #96cbf3 !important; color:#e0e0e0 !important;}
+.a3-btn-back{position:absolute;bottom:32px;left:10px}
+.a3-btn-help{position:absolute;bottom:32px;right:10px;display:none;}
+
+.callback-form{margin:auto 18px;}
+.callback-form input, .callback-form textarea{ border:1px solid #96cbf3; width:320px; margin:6px 0; padding:4px;}
+.callback-form textarea{height:50px; resize: none; font: 12px Arial, Verdana, Helvetica; }
+.callback-form input[type=submit], .callback-result-btn{width:330px; margin:6px 0; padding:4px;}
+.callback-result-btn{position:absolute; top:120px; margin:auto 40px;}
+
+.noselect {-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
+.a3-stopwatch {color: deepskyblue; font-size: 32px; font-weight:bold; text-align: center; width: 100%;}
+
+.a3-dialpad{position:absolute; top:100px; left:48px;z-index:99;}
+.a3-dialpad table{background-color: #ffffff; border:1px solid #f0f0f0; box-shadow: 0 0 10px rgba(0,0,0,0.6);}
+.a3-dialpad td{padding:3px;}
+.a3-btn-dialpad-toggle{width:130px; height:37px; margin:8px; background-image: url('/tmpl/default/btn4.png'); border:none; color:#444444; font-weight:bold; text-align:right; padding-right:14px;}
+.a3-btn-dialpad{-moz-border-radius:12px; border-radius:12px; font-size:24px; font-weight:bold; border:1px solid cadetblue; color:#ffffff; width:80px; height:40px;}
+.a3-btn-dialpad-close{position: relative; left:-12px; top:-208px;}
+
+.a3-btn-frame-close{ margin:4px; }
