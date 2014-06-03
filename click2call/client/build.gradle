@@ -65,6 +65,7 @@ task (dist, type: Tar) {
     from('src'){
         include 'slider/*'
         include '*.png'
+        include '*.css'
         include 'click2call.js'
         include 'libs.js'
         into('www/a3')
