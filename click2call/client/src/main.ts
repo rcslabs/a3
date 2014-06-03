@@ -1,6 +1,4 @@
-/// <reference path="signaling.ts" />
-/// <reference path="communicator.ts" />
-/// <reference path="media.ts" />
+/// <reference path="a3.d.ts" />
 /// <reference path="jquery.d.ts" />
 
 var STUN_SERVER = "stun:stun.l.google.com:19302";
