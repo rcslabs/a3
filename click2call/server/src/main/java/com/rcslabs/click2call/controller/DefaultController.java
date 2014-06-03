@@ -63,7 +63,7 @@ public class DefaultController {
     private static final String SMTP_ACCOUNT = "click2call@v2chat.com";
     private static final String SMTP_PASSWORD = "pereklikali!";
     private static final String EMAIL_BCC = "allfeedbacks@v2chat.com";
-    private static final String EMAIL_SUBJECT = "click2call callback form";
+    private static final String EMAIL_SUBJECT = "New request from your website";
 
     private static final String HTTP_GET_ACCOUNT_NAME = "accountname";
 
