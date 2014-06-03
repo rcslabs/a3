@@ -45,7 +45,7 @@ module a3 {
 	export interface IMedia {
 		start();
 		getCc(): any;
-		checkHardware(enableVideo: boolean);
+		checkHardware(vv: boolean[]);
 		setMicrophoneVolume(volume: number);
 		setSoundVolume(volume: number);
 		muteMicrophone(value: boolean);
@@ -155,7 +155,7 @@ module a3 {
 			this._swf.muteSound(value);
 		}
 
-		checkHardware(enableVideo: boolean) {
+		checkHardware(vv: boolean[]) {
 			// TODO: implements this
 			this._swf.checkHardware();
 		}
@@ -305,15 +305,15 @@ module a3 {
 			try{ this._localStream.getAudioTracks()[0].stop(); } catch(e) { LOG("Trouble on dispose audio"); }
 		}
 
-		checkHardware(enableVideo: boolean) {
+		checkHardware(vv: boolean[]) {
 			this._notify("HardwareEvent.HARDWARE_STATE", { data: {
 				microphone: { state: HardwareState.DISABLED },
 				camera: { state: HardwareState.DISABLED },
 				userDefined : false
 			}});
 
-			var opts:any = {audio: true};
-			if(enableVideo){
+			var opts:any = {audio: vv[0]};
+			if(vv[1]){
 				opts.video = {
 					mandatory: {
 						"minWidth": "320",

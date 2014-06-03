@@ -12,21 +12,259 @@ var io="undefined"==typeof module?{}:module.exports;(function(){(function(a,b){v
 /*! http://mths.be/placeholder v2.0.8 by @mathias */
 (function(e,t,n){function c(e){var t={};var r=/^jQuery\d+$/;n.each(e.attributes,function(e,n){if(n.specified&&!r.test(n.name)){t[n.name]=n.value}});return t}function h(e,t){var r=this;var i=n(r);if(r.value==i.attr("placeholder")&&i.hasClass("placeholder")){if(i.data("placeholder-password")){i=i.hide().next().show().attr("id",i.removeAttr("id").data("placeholder-id"));if(e===true){return i[0].value=t}i.focus()}else{r.value="";i.removeClass("placeholder");r==d()&&r.select()}}}function p(){var e;var t=this;var r=n(t);var i=this.id;if(t.value==""){if(t.type=="password"){if(!r.data("placeholder-textinput")){try{e=r.clone().attr({type:"text"})}catch(s){e=n("<input>").attr(n.extend(c(this),{type:"text"}))}e.removeAttr("name").data({"placeholder-password":r,"placeholder-id":i}).bind("focus.placeholder",h);r.data({"placeholder-textinput":e,"placeholder-id":i}).before(e)}r=r.removeAttr("id").hide().prev().attr("id",i).show()}r.addClass("placeholder");r[0].value=r.attr("placeholder")}else{r.removeClass("placeholder")}}function d(){try{return t.activeElement}catch(e){}}var r=Object.prototype.toString.call(e.operamini)=="[object OperaMini]";var i="placeholder"in t.createElement("input")&&!r;var s="placeholder"in t.createElement("textarea")&&!r;var o=n.fn;var u=n.valHooks;var a=n.propHooks;var f;var l;if(i&&s){l=o.placeholder=function(){return this};l.input=l.textarea=true}else{l=o.placeholder=function(){var e=this;e.filter((i?"textarea":":input")+"[placeholder]").not(".placeholder").bind({"focus.placeholder":h,"blur.placeholder":p}).data("placeholder-enabled",true).trigger("blur.placeholder");return e};l.input=i;l.textarea=s;f={get:function(e){var t=n(e);var r=t.data("placeholder-password");if(r){return r[0].value}return t.data("placeholder-enabled")&&t.hasClass("placeholder")?"":e.value},set:function(e,t){var r=n(e);var i=r.data("placeholder-password");if(i){return i[0].value=t}if(!r.data("placeholder-enabled")){return e.value=t}if(t==""){e.value=t;if(e!=d()){p.call(e)}}else if(r.hasClass("placeholder")){h.call(e,true,t)||(e.value=t)}else{e.value=t}return r}};if(!i){u.input=f;a.value=f}if(!s){u.textarea=f;a.value=f}n(function(){n(t).delegate("form","submit.placeholder",function(){var e=n(".placeholder",this).each(h);setTimeout(function(){e.each(p)},10)})});n(e).bind("beforeunload.placeholder",function(){n(".placeholder").each(function(){this.value=""})})}})(this,document,jQuery);
 
-/* fix IE Array */
-if (!('filter' in Array.prototype)) {
-    Array.prototype.filter= function(filter, that /*opt*/) {
-        var other= [], v;
-        for (var i=0, n= this.length; i<n; i++)
-            if (i in this && filter.call(that, v= this[i], i, this))
-                other.push(v);
-        return other;
-    };
+/*
+ * ******************************************************************************
+ *  jquery.mb.components
+ *  file: jquery.mb.browser.js
+ *
+ *  Copyright (c) 2001-2014. Matteo Bicocchi (Pupunzi);
+ *  Open lab srl, Firenze - Italy
+ *  email: matteo@open-lab.com
+ *  site: 	http://pupunzi.com
+ *  blog:	http://pupunzi.open-lab.com
+ * 	http://open-lab.com
+ *
+ *  Licences: MIT, GPL
+ *  http://www.opensource.org/licenses/mit-license.php
+ *  http://www.gnu.org/licenses/gpl.html
+ *
+ *  last modified: 27/01/14 19.58
+ *  *****************************************************************************
+ */
+
+/*******************************************************************************
+ *
+ * jquery.mb.browser
+ * Author: pupunzi
+ * Creation date: 16/01/13
+ *
+ ******************************************************************************/
+/*Browser detection patch*/
+
+if(!jQuery.browser){
+
+	jQuery.browser = {};
+	jQuery.browser.mozilla = false;
+	jQuery.browser.webkit = false;
+	jQuery.browser.opera = false;
+	jQuery.browser.safari = false;
+	jQuery.browser.chrome = false;
+	jQuery.browser.msie = false;
+	jQuery.browser.android = false;
+	jQuery.browser.blackberry = false;
+	jQuery.browser.ios = false;
+	jQuery.browser.operaMobile = false;
+	jQuery.browser.windowsMobile = false;
+	jQuery.browser.mobile = false;
+
+	var nAgt = navigator.userAgent;
+	jQuery.browser.ua = nAgt;
+
+	jQuery.browser.name  = navigator.appName;
+	jQuery.browser.fullVersion  = ''+parseFloat(navigator.appVersion);
+	jQuery.browser.majorVersion = parseInt(navigator.appVersion,10);
+	var nameOffset,verOffset,ix;
+
+// In Opera, the true version is after "Opera" or after "Version"
+	if ((verOffset=nAgt.indexOf("Opera"))!=-1) {
+		jQuery.browser.opera = true;
+		jQuery.browser.name = "Opera";
+		jQuery.browser.fullVersion = nAgt.substring(verOffset+6);
+		if ((verOffset=nAgt.indexOf("Version"))!=-1)
+			jQuery.browser.fullVersion = nAgt.substring(verOffset+8);
+	}
+
+// In MSIE < 11, the true version is after "MSIE" in userAgent
+	else if ( (verOffset=nAgt.indexOf("MSIE"))!=-1) {
+		jQuery.browser.msie = true;
+		jQuery.browser.name = "MSIE";
+		jQuery.browser.fullVersion = nAgt.substring(verOffset+5);
+	}
+
+// In TRIDENT (IE11) => 11, the true version is after "rv:" in userAgent
+	else if (nAgt.indexOf("Trident")!=-1 ) {
+		jQuery.browser.msie = true;
+		jQuery.browser.name = "MSIE";
+		var start = nAgt.indexOf("rv:")+3;
+		var end = start+4;
+		jQuery.browser.fullVersion = nAgt.substring(start,end);
+	}
+
+// In Chrome, the true version is after "Chrome"
+	else if ((verOffset=nAgt.indexOf("Chrome"))!=-1) {
+		jQuery.browser.webkit = true;
+		jQuery.browser.chrome = true;
+		jQuery.browser.name = "Chrome";
+		jQuery.browser.fullVersion = nAgt.substring(verOffset+7);
+	}
+// In Safari, the true version is after "Safari" or after "Version"
+	else if ((verOffset=nAgt.indexOf("Safari"))!=-1) {
+		jQuery.browser.webkit = true;
+		jQuery.browser.safari = true;
+		jQuery.browser.name = "Safari";
+		jQuery.browser.fullVersion = nAgt.substring(verOffset+7);
+		if ((verOffset=nAgt.indexOf("Version"))!=-1)
+			jQuery.browser.fullVersion = nAgt.substring(verOffset+8);
+	}
+// In Safari, the true version is after "Safari" or after "Version"
+	else if ((verOffset=nAgt.indexOf("AppleWebkit"))!=-1) {
+		jQuery.browser.webkit = true;
+		jQuery.browser.name = "Safari";
+		jQuery.browser.fullVersion = nAgt.substring(verOffset+7);
+		if ((verOffset=nAgt.indexOf("Version"))!=-1)
+			jQuery.browser.fullVersion = nAgt.substring(verOffset+8);
+	}
+// In Firefox, the true version is after "Firefox"
+	else if ((verOffset=nAgt.indexOf("Firefox"))!=-1) {
+		jQuery.browser.mozilla = true;
+		jQuery.browser.name = "Firefox";
+		jQuery.browser.fullVersion = nAgt.substring(verOffset+8);
+	}
+// In most other browsers, "name/version" is at the end of userAgent
+	else if ( (nameOffset=nAgt.lastIndexOf(' ')+1) < (verOffset=nAgt.lastIndexOf('/')) ){
+		jQuery.browser.name = nAgt.substring(nameOffset,verOffset);
+		jQuery.browser.fullVersion = nAgt.substring(verOffset+1);
+		if (jQuery.browser.name.toLowerCase()==jQuery.browser.name.toUpperCase()) {
+			jQuery.browser.name = navigator.appName;
+		}
+	}
+
+	/*Check all mobile environments*/
+	jQuery.browser.android = (/Android/i).test(nAgt);
+	jQuery.browser.blackberry = (/BlackBerry/i).test(nAgt);
+	jQuery.browser.ios = (/iPhone|iPad|iPod/i).test(nAgt);
+	jQuery.browser.operaMobile = (/Opera Mini/i).test(nAgt);
+	jQuery.browser.windowsMobile = (/IEMobile/i).test(nAgt);
+	jQuery.browser.mobile = jQuery.browser.android || jQuery.browser.blackberry || jQuery.browser.ios || jQuery.browser.windowsMobile || jQuery.browser.operaMobile;
+
+
+// trim the fullVersion string at semicolon/space if present
+	if ((ix=jQuery.browser.fullVersion.indexOf(";"))!=-1)
+		jQuery.browser.fullVersion=jQuery.browser.fullVersion.substring(0,ix);
+	if ((ix=jQuery.browser.fullVersion.indexOf(" "))!=-1)
+		jQuery.browser.fullVersion=jQuery.browser.fullVersion.substring(0,ix);
+
+	jQuery.browser.majorVersion = parseInt(''+jQuery.browser.fullVersion,10);
+	if (isNaN(jQuery.browser.majorVersion)) {
+		jQuery.browser.fullVersion  = ''+parseFloat(navigator.appVersion);
+		jQuery.browser.majorVersion = parseInt(navigator.appVersion,10);
+	}
+	jQuery.browser.version = jQuery.browser.majorVersion;
 }
 
+
+// Add ECMA262-5 method binding if not supported natively
+//
+if (!('bind' in Function.prototype)) {
+	Function.prototype.bind= function(owner) {
+		var that= this;
+		if (arguments.length<=1) {
+			return function() {
+				return that.apply(owner, arguments);
+			};
+		} else {
+			var args= Array.prototype.slice.call(arguments, 1);
+			return function() {
+				return that.apply(owner, arguments.length===0? args : args.concat(Array.prototype.slice.call(arguments)));
+			};
+		}
+	};
+}
+
+// Add ECMA262-5 string trim if not supported natively
+//
+if (!('trim' in String.prototype)) {
+	String.prototype.trim= function() {
+		return this.replace(/^\s+/, '').replace(/\s+$/, '');
+	};
+}
+
+// Add ECMA262-5 Array methods if not supported natively
+//
+if (!('indexOf' in Array.prototype)) {
+	Array.prototype.indexOf= function(find, i /*opt*/) {
+		if (i===undefined) i= 0;
+		if (i<0) i+= this.length;
+		if (i<0) i= 0;
+		for (var n= this.length; i<n; i++)
+			if (i in this && this[i]===find)
+				return i;
+		return -1;
+	};
+}
+if (!('lastIndexOf' in Array.prototype)) {
+	Array.prototype.lastIndexOf= function(find, i /*opt*/) {
+		if (i===undefined) i= this.length-1;
+		if (i<0) i+= this.length;
+		if (i>this.length-1) i= this.length-1;
+		for (i++; i-->0;) /* i++ because from-argument is sadly inclusive */
+			if (i in this && this[i]===find)
+				return i;
+		return -1;
+	};
+}
 if (!('forEach' in Array.prototype)) {
-    Array.prototype.forEach= function(action, that /*opt*/) {
-        for (var i= 0, n= this.length; i<n; i++)
-            if (i in this)
-                action.call(that, this[i], i, this);
-    };
+	Array.prototype.forEach= function(action, that /*opt*/) {
+		for (var i= 0, n= this.length; i<n; i++)
+			if (i in this)
+				action.call(that, this[i], i, this);
+	};
+}
+if (!('map' in Array.prototype)) {
+	Array.prototype.map= function(mapper, that /*opt*/) {
+		var other= new Array(this.length);
+		for (var i= 0, n= this.length; i<n; i++)
+			if (i in this)
+				other[i]= mapper.call(that, this[i], i, this);
+		return other;
+	};
+}
+if (!('filter' in Array.prototype)) {
+	Array.prototype.filter= function(filter, that /*opt*/) {
+		var other= [], v;
+		for (var i=0, n= this.length; i<n; i++)
+			if (i in this && filter.call(that, v= this[i], i, this))
+				other.push(v);
+		return other;
+	};
+}
+if (!('every' in Array.prototype)) {
+	Array.prototype.every= function(tester, that /*opt*/) {
+		for (var i= 0, n= this.length; i<n; i++)
+			if (i in this && !tester.call(that, this[i], i, this))
+				return false;
+		return true;
+	};
+}
+if (!('some' in Array.prototype)) {
+	Array.prototype.some= function(tester, that /*opt*/) {
+		for (var i= 0, n= this.length; i<n; i++)
+			if (i in this && tester.call(that, this[i], i, this))
+				return true;
+		return false;
+	};
+}
+
+if (!Function.prototype.bind) {
+	Function.prototype.bind = function (oThis) {
+		if (typeof this !== "function") {
+			// closest thing possible to the ECMAScript 5 internal IsCallable function
+			throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+		}
+
+		var aArgs = Array.prototype.slice.call(arguments, 1),
+			fToBind = this,
+			fNOP = function () {},
+			fBound = function () {
+				return fToBind.apply(this instanceof fNOP && oThis
+					? this
+					: oThis,
+					aArgs.concat(Array.prototype.slice.call(arguments)));
+			};
+
+		fNOP.prototype = this.prototype;
+		fBound.prototype = new fNOP();
+
+		return fBound;
+	};
 }

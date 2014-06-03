@@ -1,4 +1,6 @@
-/// <reference path="a3.d.ts" />
+/// <reference path="signaling.ts" />
+/// <reference path="communicator.ts" />
+/// <reference path="media.ts" />
 /// <reference path="jquery.d.ts" />
 
 var STUN_SERVER = "stun:stun.l.google.com:19302";
@@ -59,7 +61,12 @@ class Click2CallCommunicator extends a3.Communicator {
     }
 
     onCommunicatorFactoryReady() {
-        super.start()
+		var err = (<CompatibleFactory>(this.factory)).compatibilityError;
+		if(err != null){
+			this.onCommunicatorFailed(err);
+		}else{
+			super.start();
+		}
     }
 
     setDestination(value:string){
@@ -82,8 +89,8 @@ class Click2CallCommunicator extends a3.Communicator {
         this.connect();
     }
 
-    onCommunicatorFailed() {
-        this._mediator.onCommunicatorFailed();
+    onCommunicatorFailed(reason:string = null) {
+        this._mediator.onCommunicatorFailed(reason);
         this.sendStat('FAILED', 'application');
     }
 
@@ -111,7 +118,7 @@ class Click2CallCommunicator extends a3.Communicator {
 
     onSessionStarted() {
         if(this._deferredCall != null){
-            this.media.checkHardware(this._deferredCall.vv[1]);
+            this.media.checkHardware(this._deferredCall.vv);
         }
     }
 
@@ -174,7 +181,7 @@ class Click2CallCommunicator extends a3.Communicator {
         if(this.getState() !== a3.State.SESSION_STARTED){
             this.open(this._username, this._password, '', '');
         }else{
-            this.media.checkHardware(vv[1]);
+            this.media.checkHardware(vv);
         }
     }
 
@@ -209,7 +216,7 @@ class Click2CallCommunicator extends a3.Communicator {
         data['rnd'] = Math.random();
         data['details'] = details;
         if(STAT_SERVICE == null){ 
-            console.log(data);  
+            LOG(data);
         } else {
             $.get(STAT_SERVICE, data);
         }
@@ -224,30 +231,32 @@ class MediaContainer {
 		//$(this._elem).css('visibility', 'visible');
 	}
 
-    isFlash():boolean{
+    isFlash():boolean {
         return ((<HTMLElement>(this._elem.firstChild)).id == "a3-swf-media");
     }
 
 	showSettingsPanel(){
 		if(!this.isFlash()) return; // no matter if media is not flash
-		var $el = $(this._elem);
+		var $el:any = $(this._elem);
 		$el.removeClass('a3-remote-video');
-		$el.removeClass('a3-remote-video-hidden');
 		$el.addClass('a3-settings-panel');
+		var off = $('.a3-settings-panel-proxy').offset();
+		$el.offset({'top':off.top});
 	}
 
     show(){
-		var $el = $(this._elem);
-		$el.removeClass('a3-remote-video-hidden');
+		var $el:any = $(this._elem);
 		$el.removeClass('a3-settings-panel');
 		$el.addClass('a3-remote-video');
+		var off = $('.a3-remote-video-proxy').offset();
+		$el.offset({'top':off.top});
     }
 
     hide(){
-		var $el = $(this._elem);
+		var $el:any = $(this._elem);
 		$el.removeClass('a3-settings-panel');
 		$el.removeClass('a3-remote-video');
-		$el.addClass('a3-remote-video-hidden');
+		$el.offset({'top':-9999});
     }
 }
 
@@ -309,10 +318,12 @@ class Mediator implements a3.ICommunicatorListener {
     }
 
     onCallStarted(call:a3.Call) {
-        this._toggleView('talking');
         if(call.isVideo()){
+			this._toggleView('talking-video');
             this._media.show();
-        }
+        }else{
+			this._toggleView('talking-voice');
+		}
     }
 
     onCallFinished(call:a3.Call) {
@@ -322,16 +333,30 @@ class Mediator implements a3.ICommunicatorListener {
 
     onCallFailed(call:a3.Call) {
         this._media.hide();
-        this._toggleView('call-failed');
+		var l = this._communicator.locale;
+		if(this._views['call-failed'] != null){
+			$('h1', this._views['call-failed']).after('<h2>'+l['CALL_FAILED']+'</h2>');
+        	this._toggleView('call-failed');
+		} else if (this._views['callback'] != null){
+			$('h1', this._views['callback']).after('<h2>'+l['CALL_FAILED']+'</h2>');
+			this._toggleView('callback');
+		} else {
+			this._toggleView('intro');
+		}
     }
 
     onCommunicatorStarted() {
         this._media = new MediaContainer((<CompatibleFactory>(this._communicator.factory)).mediaContainer, this._root);
     }
 
-    onCommunicatorFailed() {
-        //this._toggleView('loading-failed');
+    onCommunicatorFailed(reason:string = null) {
+		var msg = this._communicator.locale['COMMUNICATOR_FAILED'];
+		if(reason != null && (reason == 'mobile' || reason == 'ie8')){
+			msg = this._communicator.locale['BROWSER_COMPATIBILITY_FAILED'];
+		}
+		$('h1', this._views['callback']).after('<h2>'+msg+'</h2>');
         this._toggleView('callback');
+		$('.a3-btn-back').hide();
     }
 
     onSessionStarting() {}
@@ -352,7 +377,8 @@ class Mediator implements a3.ICommunicatorListener {
         this._views['hw-failed']      = this._e('a3-hw-failed-view');
         this._views['start-call']     = this._e('a3-start-call-view');
         this._views['calling']        = this._e('a3-calling-view');
-        this._views['talking']        = this._e('a3-talking-view');
+        this._views['talking-video']  = this._e('a3-talking-video-view');
+		this._views['talking-voice']  = this._e('a3-talking-voice-view');
         this._views['call-failed']    = this._e('a3-call-failed-view');
         this._views['call-finished']  = this._e('a3-call-finished-view');
 		this._views['callback']       = this._e('a3-callback-view');
@@ -374,19 +400,15 @@ class Mediator implements a3.ICommunicatorListener {
 		/* close button */
 		$('#a3').append('<div style="width:100%;position:absolute;left:0;top:0;text-align:right"><button title="'+l['CLOSE_WINDOW']+'" class="btn-close a3-btn-frame-close">&#215;</button></div>');
 
-        /* dialpad feature init */
-        $('.a3-view[data-dialpad]').append('<div class="a3-dialpad noselect"><table><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="1">1</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="2">2</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="3">3</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="4">4</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="5">5</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="6">6</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="7">7</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="8">8</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="9">9</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="*">*</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="0">0</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="#">#</button></td></tr></table><button class="btn-close a3-btn-dialpad-close">&#215;</button></div>');
-        $('.a3-dialpad').hide();
-
+		this._initDialpad();
 		this._initHelpContainer();
 		this._initFooter();
 
 		if('he' == this._communicator.query.lang){ this._root.style.direction = 'rtl'; }
-        this._root.addEventListener('click', (e) => {this._onClick(<MouseEvent>e)});
+        $(this._root).click((e) => {this._onClick(e)});
         this._root.style.display = 'none';
 
         /* send callback form */
-		(<any>$('input, textarea')).placeholder();
         $(".callback-form").submit((event) => {
             event.preventDefault();
             var $form = $(event.currentTarget);
@@ -441,14 +463,18 @@ class Mediator implements a3.ICommunicatorListener {
         return a;
     }
 
-	_initHelpContainer(){
-		var e = document.createElement('style');
-		// TODO: help above flash, hmm???
-		var c = '#a3-help{position:absolute;width:100%;top:0;bottom:70px;background:#f1f1f1;z-index:70;}\n'; // z-index=70 above media z-index=50
-		    c+= '#a3-help-frm{width:100%;height:100%;border:0;}\n';
-		e.innerHTML = c;
-		document.head.appendChild(e);
+	_initDialpad(){
+		/* dialpad feature init */
+		var $dialpad = $('.a3-dialpad');
+		if($dialpad.length != 0){
+			$('.a3-dialpad').append('<table><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="1">1</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="2">2</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="3">3</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="4">4</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="5">5</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="6">6</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="7">7</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="8">8</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="9">9</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="*">*</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="0">0</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="#">#</button></td></tr></table><button class="btn-close a3-btn-dialpad-close">&#215;</button>');
+			$('.a3-dialpad').hide();
+		}else{
+			$('.a3-btn-dialpad-toggle').remove();
+		}
+	}
 
+	_initHelpContainer(){
 		var h = '<div id="a3-help" data-visible="false" data-pending="false"><iframe id="a3-help-frm"></iframe></div>';
 		$('body').append(h);
 		this._$helpContainer = $('#a3-help');
@@ -465,21 +491,14 @@ class Mediator implements a3.ICommunicatorListener {
 	_initHardwareControls(){
 		// TODO: hardcoded default slider value is not good!
 		var h = '<table align="center" cellspacing="0"><tr>' +
-			'<td style="background-image: url(\'bg-alpha.png\')"><button style="margin:4px 6px auto 6px;width:25px;height:30px;background: url(\'sprite.png\') -25px 0;border: none;" class="a3-btn-mic-mute"></button></td>' +
+			'<td style="background-image: url(\'bg-alpha.png\'); border-radius:4px"><button style="margin:4px 6px auto 6px;width:25px;height:30px;background: url(\'sprite.png\') -25px 0;border: none;" class="a3-btn-mic-mute"></button></td>' +
 			'<td>&nbsp;</td>' +
-			'<td style="background-image: url(\'bg-alpha.png\')"><button class="a3-btn-sound-mute" style="margin-top:4px;width:30px; height:30px; background: url(\'sprite.png\') -80px 0; border: none;"></button></td>' +
-			'<td style="background-image: url(\'bg-alpha.png\');padding:0 8px;"><input class="sound-volume-slider" data-slider="true" value="0.8" data-slider-highlight="true" data-slider-theme="volume" data-slider-range="0,1" data-slider-step="0.1" type="text"></td>' +
+			'<td style="background-image: url(\'bg-alpha.png\'); border-radius:4px 0 0 4px"><button class="a3-btn-sound-mute" style="margin-top:4px;width:30px; height:30px; background: url(\'sprite.png\') -80px 0; border: none;"></button></td>' +
+			'<td style="background-image: url(\'bg-alpha.png\'); border-radius:0 4px 4px 0; padding:0 8px;"><input class="sound-volume-slider" data-slider="true" value="0.8" data-slider-highlight="true" data-slider-theme="volume" data-slider-range="0,1" data-slider-step="0.1" type="text"></td>' +
 			'</tr></table>';
 
 		$('.a3-hardware-controls').css('width', '99%').html(h);
-
-		// $(document.head).append('<link href="slider/simple-slider.css" rel="stylesheet" type="text/css" />');
-		// workaround below for pretty rendering
-		$.get("slider/simple-slider.css", function(_) {
-			$(document.head).append($('<style></style>').html(_));
-			$(document.body).append('<script src="slider/simple-slider.js"></script>');
-		});
-
+		(<any>$(".sound-volume-slider")).simpleSlider({'theme':'volume'});
 		$('#a3').on('slider:changed', (e, data) => { this._communicator.setSoundVolume(data.value); });
 
 		$('.a3-btn-mic-mute, .a3-btn-sound-mute').attr('data-toggle', 'true');
@@ -496,7 +515,7 @@ class Mediator implements a3.ICommunicatorListener {
 		});
 	}
 
-    _onClick(event:MouseEvent){
+    _onClick(event:any){
         //LOG(event);
         var cls = event.target['className'];
         if(cls === undefined){ return; }
@@ -540,7 +559,7 @@ class Mediator implements a3.ICommunicatorListener {
                 this._communicator.onClickDialpadChar(""+$(event.target).data('value'));
                 break;
 			case 'btn-frame-close':
-				parent.postMessage("click2callClose"+this._communicator.query.id, "*");
+				parent.postMessage(JSON.stringify({'cmd':'close', 'id':this._communicator.query.id}), "*");
 				break;
 
 			default:
@@ -569,7 +588,7 @@ class Mediator implements a3.ICommunicatorListener {
 		if($stopwatch.length){
             this._stopwatchValue = 0;
             $stopwatch.html(this._toMMSS(0));
-			if('talking' == this._currentView){
+			if(-1 != this._currentView.indexOf('talking')){
 				this._stopwatchIntv = setInterval(() => {
 					$stopwatch.html(this._toMMSS(++this._stopwatchValue));
 				}, 1000);
@@ -579,13 +598,26 @@ class Mediator implements a3.ICommunicatorListener {
 		}
 
         /* dialpad feature */
-        $('.a3-dialpad').hide();
+		var $dialpad = $('.a3-dialpad');
+		$dialpad.hide();
         var $view = $(this._views[this._currentView]);
-        if($view.data('dialpad') === 'show'){  // auto show on view
-            $('.a3-dialpad', this._views[this._currentView]).show();
+        if($dialpad.data('dialpad') === 'show'){  // auto show on view
+			$dialpad.show();
         }
 
         $('body').trigger('view-changed', this._currentView);
+
+		if(this._currentView == 'callback' || this._currentView == 'call-failed'){
+			(<any>$('input, textarea')).placeholder();
+		}
+		
+		// if explicit height was in url string - we shoudn't resize frame
+		if(this._communicator.query['h'] === undefined){
+			var h = 180+$view.height();
+			if(h < 256){ h = 256; }
+			if(h > 600){ h = 600; }
+			parent.postMessage(JSON.stringify({'cmd':'resize', 'id':this._communicator.query.id, 'w':0, 'h':h}), "*");
+		}
     }
 
 	_toMMSS(value:number) {
@@ -654,7 +686,6 @@ class ConstructorCompatibleFlashSignaling extends a3.FlashSignaling {
 	}
 }
 
-
 class CompatibleFactory implements a3.ICommunicatorFactory
 {
 	private _endpoints:string[] = [];
@@ -663,22 +694,15 @@ class CompatibleFactory implements a3.ICommunicatorFactory
 	private _projectId:string = null;
     private _operatorId:string = null;
 	private _logLevel:string = 'NONE';
+
+	public compatibilityError:string = null;
 	public hasWRTC:boolean = false;
 	public hasFlash:boolean = false;
 	public mediaContainer:HTMLElement;
 
 	constructor(){
-		var e = document.createElement('style');
-		var h = '.a3-settings-panel{width:220px;height:140px;left:50%;top:50%;margin:-70px auto auto -110px}\n';
-		h+= '.a3-remote-video-hidden{left:-999px}';
-		e.innerHTML = h;
-		document.head.appendChild(e);
 		this.mediaContainer = document.createElement('div');
 		this.mediaContainer.id = 'a3-media-container';
-		this.mediaContainer.style.position = 'absolute';
-		this.mediaContainer.style.zIndex = '50';
-		this.mediaContainer.className = 'a3-remote-video-hidden';
-		//this.mediaContainer.style.visibility = 'hidden';
 		document.body.appendChild(this.mediaContainer);
 		if(DEBUG_ENABLED) this._logLevel = 'ALL';
 	}
@@ -704,11 +728,21 @@ class CompatibleFactory implements a3.ICommunicatorFactory
 	}
 
 	checkCompatibility(){
-        // immediately set hardware failed if we are on a mobile platform
-        if(isMobile.any()){       
-            this._onWRTCCapabilityFailed();
-            return;
+        if((<any>$).browser.mobile){
+			// chrome on Android works ok!
+			if(!navigator['webkitGetUserMedia'] || !window['webkitRTCPeerConnection']){
+				// immediately set hardware failed if we are on a mobile platform
+				this.compatibilityError = 'mobile';
+				this._onWRTCCapabilityFailed();
+				return;
+			}
         }
+
+		if((<any>$).browser.msie && (<any>$).browser.majorVersion <= 8){
+			this.compatibilityError ='ie'+(<any>$).browser.majorVersion;
+			this._onWRTCCapabilityFailed();
+			return;
+		}
 
 		this.hasFlash = window['swfobject']['hasFlashPlayerVersion'](FP_MIN_VERSION);
 		var endpoints = this._endpoints.filter(function(e){return 0 == e.indexOf('http')});
@@ -829,30 +863,12 @@ class Resources {
 			}).fail(() => { cb.call(null, false); });
 	}
 
-	saveTemplate(tmpl:string) {
-		$.ajax({
-			type: "PUT",
-			url: this._tmplUrl,
-			contentType: "text/html",
-			data: tmpl
-		}).fail((e) => { alert("Error "+ e.status); });
-	}
-
 	loadLocale(cb:any, parse:boolean=false) {
 		$.ajax({url: this._localeUrl})
 			.done((data) => {
 				this.locale = (parse ? parseIni(data) : data);
 				cb.call(null, this.locale);
 			}).fail(() => { cb.call(null, false); });
-	}
-
-	saveLocale(locale:string) {
-		$.ajax({
-			type: "PUT",
-			url: this._localeUrl,
-			contentType: "text/plain",
-			data: locale
-		}).fail((e) => { alert("Error "+ e.status); });
 	}
 
 	// load all resources and prepare template with locale if any
@@ -913,26 +929,6 @@ function parseIni(data){
 	});
 	return value;
 }
-
-
-var isMobile = {
-    Android: function() {
-        return navigator.userAgent.match(/Android/i) ? true : false;
-    },
-    BlackBerry: function() {
-        return navigator.userAgent.match(/BlackBerry/i) ? true : false;
-    },
-    iOS: function() {
-        return navigator.userAgent.match(/iPhone|iPad|iPod/i) ? true : false;
-    },
-    Windows: function() {
-        return navigator.userAgent.match(/IEMobile/i) ? true : false;
-    },
-    any: function() {
-        return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Windows());
-    }
-};
-
 
 debug = function(value:boolean){ document.cookie = 'debug=' + value +';path=/';}
 if(-1 != document.cookie.indexOf('debug=true')){ LOG = WARN = ERROR = console.log.bind(console); }
