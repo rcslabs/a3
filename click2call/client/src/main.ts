@@ -1,8 +1,8 @@
-/// <reference path="a3.d.ts" />
+/// <reference path="a3.ts" />
 /// <reference path="jquery.d.ts" />
 
 var STUN_SERVER = "stun:stun.l.google.com:19302";
-var STUN_TIMEOUT = 3000;
+var STUN_TIMEOUT = 6000;
 var FP_MIN_VERSION = "10.3";
 var STAT_SERVICE = "//webrtc.v2chat.com/stat/push/";
 var CALLBACK_SERVICE = '//webrtc.v2chat.com/service/callback';
@@ -12,6 +12,7 @@ declare var WARN:any;
 declare var ERROR:any;
 declare var debug:any;
 declare var DEBUG_ENABLED:boolean;
+declare var worldTime:any;
 
 class Click2CallCommunicator extends a3.Communicator {
 
@@ -21,6 +22,10 @@ class Click2CallCommunicator extends a3.Communicator {
     private _password:string = null;
     private _deferredCall:any = null;
     private _statCookie:string = null;
+	// business hours feature
+	private _timezone:string = null;
+	private _rules = {};
+	private _weekdays = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
 	public query:any = {};
 	public locale:any = null;
@@ -55,7 +60,12 @@ class Click2CallCommunicator extends a3.Communicator {
     // overrides super start
     start(){
 		this._mediator = new Mediator(this, document.getElementById('a3'));
-		(<CompatibleFactory>(this.factory)).checkCompatibility();
+		// if hours out of business we have no reason to start communicator
+		if(!this.checkBusinessHours()){ // closed
+			this._mediator.showCallbackForm(this.locale['OFFLINE_HOURS']);
+		}else{
+			(<CompatibleFactory>(this.factory)).checkCompatibility();
+		}
     }
 
     onCommunicatorFactoryReady() {
@@ -219,6 +229,51 @@ class Click2CallCommunicator extends a3.Communicator {
             $.get(STAT_SERVICE, data);
         }
     }
+
+	// business hours feature
+
+	addRuleForOpened(dayOfWeek:string, timeToOpen:string, timeToClose:string)
+	{
+		if('*' == dayOfWeek){ // add rules for all weekdays
+			this._weekdays.forEach((wd) => {
+				// an existing rule for this day has high priority
+				if(this._rules[wd] === undefined){
+					this._rules[wd] = [timeToOpen, timeToClose];
+				}
+			});
+		}else{
+			this._rules[dayOfWeek] = [timeToOpen, timeToClose];
+		}
+	}
+
+	setTimezone(timezone:string) {
+		this._timezone = timezone;
+	}
+
+	checkBusinessHours()
+	{
+		// no problem, man. continue ok
+		if(this._timezone == null){ return true; }
+		var tz = this._timezone;
+		// worldTime must define in time.js injected above this script
+		var nowWday = worldTime[tz].substring(0, 3);
+		var nowTime = worldTime[tz].substring(16, 21);
+		var hhmmToAbsMinutes = function(hhmm){
+			hhmm = hhmm.split(':');
+			return 60*parseInt(hhmm[0], 10)+parseInt(hhmm[1], 10);
+		};
+		var ruleForToday = this._rules[nowWday];
+		if(ruleForToday === undefined){
+			return false;
+		}
+		var openAt =  hhmmToAbsMinutes(ruleForToday[0]);
+		var closeAt = hhmmToAbsMinutes(ruleForToday[1]);
+		var now =     hhmmToAbsMinutes(nowTime);
+		var result =  (now >= openAt) && (now <= closeAt);
+		//console.log(worldTime[this.tz], ruleForToday, nowTime, openAt, now, closeAt, result);
+		//listener.call(null, result);
+		return result;
+	}
 }
 
 class MediaContainer {
@@ -333,10 +388,10 @@ class Mediator implements a3.ICommunicatorListener {
         this._media.hide();
 		var l = this._communicator.locale;
 		if(this._views['call-failed'] != null){
-			$('h1', this._views['call-failed']).after('<h2>'+l['CALL_FAILED']+'</h2>');
+			$('h1', this._views['call-failed']).after("<h2>"+l['CALL_FAILED']+"</h2>");
         	this._toggleView('call-failed');
 		} else if (this._views['callback'] != null){
-			$('h1', this._views['callback']).after('<h2>'+l['CALL_FAILED']+'</h2>');
+			$('h1', this._views['callback']).after("<h2>"+l['CALL_FAILED']+"</h2>");
 			this._toggleView('callback');
 		} else {
 			this._toggleView('intro');
@@ -349,12 +404,10 @@ class Mediator implements a3.ICommunicatorListener {
 
     onCommunicatorFailed(reason:string = null) {
 		var msg = this._communicator.locale['COMMUNICATOR_FAILED'];
-		if(reason != null && (reason == 'mobile' || reason == 'ie8')){
+		if(reason == 'mobile' || reason == 'ie8'){
 			msg = this._communicator.locale['BROWSER_COMPATIBILITY_FAILED'];
 		}
-		$('h1', this._views['callback']).after('<h2>'+msg+'</h2>');
-        this._toggleView('callback');
-		$('.a3-btn-back').hide();
+		this.showCallbackForm(msg);
     }
 
     onSessionStarting() {}
@@ -363,7 +416,16 @@ class Mediator implements a3.ICommunicatorListener {
 
     onIncomingCall(call:a3.Call) {}
 
-    private _e(id:string){
+	showCallbackForm(message:string=null) {
+		$('h2', this._views['callback']).remove();
+		if(message != null){
+			$('h1', this._views['callback']).after("<h2>"+message+"</h2>");
+		}
+		this._toggleView('callback');
+		$('.a3-btn-back').hide();
+	}
+
+    private _e(id:string) {
         return document.getElementById(id);
     }
 
@@ -396,7 +458,7 @@ class Mediator implements a3.ICommunicatorListener {
 		var l = this._communicator.locale;
 
 		/* close button */
-		$('#a3').append('<div style="width:100%;position:absolute;left:0;top:0;text-align:right"><button title="'+l['CLOSE_WINDOW']+'" class="btn-close a3-btn-frame-close">&#215;</button></div>');
+		$('#a3').append('<div style="width:100%;position:absolute;left:0;top:0;text-align:right"><button title="'+l['CLOSE_WINDOW']+'" class="btn-close a3-btn-frame-close">&#x2715;</button></div>');
 
 		this._initDialpad();
 		this._initHelpContainer();
@@ -465,7 +527,7 @@ class Mediator implements a3.ICommunicatorListener {
 		/* dialpad feature init */
 		var $dialpad = $('.a3-dialpad');
 		if($dialpad.length != 0){
-			$('.a3-dialpad').append('<table><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="1">1</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="2">2</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="3">3</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="4">4</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="5">5</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="6">6</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="7">7</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="8">8</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="9">9</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="*">*</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="0">0</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="#">#</button></td></tr></table><button class="btn-close a3-btn-dialpad-close">&#215;</button>');
+			$('.a3-dialpad').append('<table><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="1">1</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="2">2</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="3">3</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="4">4</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="5">5</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="6">6</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="7">7</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="8">8</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="9">9</button></td></tr><tr><td><button class="a3-btn-dialpad btn-gradient" data-value="*">*</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="0">0</button></td><td><button class="a3-btn-dialpad btn-gradient" data-value="#">#</button></td></tr></table><button class="btn-close a3-btn-dialpad-close">&#x2715;</button>');
 			$('.a3-dialpad').hide();
 		}else{
 			$('.a3-btn-dialpad-toggle').remove();
@@ -608,7 +670,7 @@ class Mediator implements a3.ICommunicatorListener {
 		if(this._currentView == 'callback' || this._currentView == 'call-failed'){
 			(<any>$('input, textarea')).placeholder();
 		}
-		
+
 		// if explicit height was in url string - we shoudn't resize frame
 		if(this._communicator.query['h'] === undefined){
 			var h = 180+$view.height();

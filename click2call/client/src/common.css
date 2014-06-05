@@ -1,4 +1,4 @@
-body{font: 12px Arial, Verdana, Helvetica; color:#444444; background-color: #f1f1f1; }
+body{font: 12px Arial, Verdana, Helvetica; color:#444444;}
 body, html{margin:0; padding:0;}
 
 h1 {margin:auto 15px; text-align:center; font-size:16px; font-weight:bold;}
@@ -24,10 +24,10 @@ button:focus {outline: none;}
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#87bcea', endColorstr='#d0e4f7',GradientType=0 );
 }
 
-.btn-close {background:#2c539e; border:2px solid white; color:white; font-size:14px; font-weight:bold; border-radius:12px; -moz-border-radius:12px; width:24px; height:24px; cursor:pointer;}
+.btn-close {background:#2c539e; border:2px solid white; color:white; font-size:12px; line-height:12px; padding:0; font-weight:bold; border-radius:12px; -moz-border-radius:12px; width:24px; height:24px; cursor:pointer;}
 
 
-#a3{ display:none; width:370px; height:100px; background-position:50% 10px; background-repeat:no-repeat;}
+#a3{ display:none; width:370px; height:100px; background-color: #f1f1f1; background-position:50% 10px; background-repeat:no-repeat;}
 .a3-view{position:absolute; left:0; top:0; padding-top:100px; width:370px;}
 
 /* z-index=70 above media z-index=50 TODO: help above flash, hmm??? */

@@ -93,21 +93,11 @@
 	<button class="a3-btn-help a3-footer-button btn-gradient">${HELP_LABEL}</button>
 </div>
 
-<!--script>
-	/* working hours */
-	$('body').on('view-changed', function(e, v){ 
-		if('intro' == v){
-			var timeChecker = new TimeChecker('Europe/Moscow');
-			timeChecker.addRuleForOpened('Mon', '10:00', '19:00');
-			timeChecker.addRuleForOpened('Tue', '10:00', '19:00');
-			timeChecker.addRuleForOpened('Wed', '10:00', '19:00');
-			timeChecker.addRuleForOpened('Thu', '10:00', '19:00');
-			timeChecker.addRuleForOpened('Fri', '10:00', '19:00');
-			if(!timeChecker.check()){
-				$('#a3-intro-view').css('visibility', 'hidden');
-				$('#a3-callback-view').css('visibility', 'visible');
-				$('#a3-callback-view h1').after("<h2>${OFFLINE_HOURS}</h2>");
-			}		
-		} 
-	});	
-</script-->
+<script>
+// communicator.setTimezone('Europe/Moscow');
+communicator.addRuleForOpened('Mon', '10:00', '19:00');
+communicator.addRuleForOpened('Tue', '10:00', '19:00');
+communicator.addRuleForOpened('Wed', '10:00', '19:00');
+communicator.addRuleForOpened('Thu', '10:00', '19:00');
+communicator.addRuleForOpened('Fri', '10:00', '19:00');
+</script>
