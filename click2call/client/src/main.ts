@@ -2,7 +2,7 @@
 /// <reference path="jquery.d.ts" />
 
 var STUN_SERVER = "stun:stun.l.google.com:19302";
-var STUN_TIMEOUT = 6000;
+var STUN_TIMEOUT = 4000;
 var FP_MIN_VERSION = "10.3";
 var STAT_SERVICE = "//webrtc.v2chat.com/stat/push/";
 var CALLBACK_SERVICE = '//webrtc.v2chat.com/service/callback';
@@ -60,6 +60,7 @@ class Click2CallCommunicator extends a3.Communicator {
     // overrides super start
     start(){
 		this._mediator = new Mediator(this, document.getElementById('a3'));
+		this.onCommunicatorStarting();
 		// if hours out of business we have no reason to start communicator
 		if(!this.checkBusinessHours()){ // closed
 			this._mediator.showCallbackForm(this.locale['OFFLINE_HOURS']);
@@ -334,7 +335,9 @@ class Mediator implements a3.ICommunicatorListener {
         this._initTemplate();
     }
 
-    onCommunicatorStarting() {}
+    onCommunicatorStarting() {
+		this._toggleView('loading');
+	}
 
     onConnecting() {}
 
