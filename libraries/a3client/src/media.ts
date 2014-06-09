@@ -541,7 +541,9 @@ module a3 {
 		private gainNode: any;
 
 		constructor(private audioContext: any, private freq: number) {
-			var volume = audioContext.createGainNode();
+			var volume = audioContext['createGainNode'] != undefined 
+			           ? audioContext.createGainNode() 
+			           : audioContext.createGain();
 			volume.gain.value = 0.2;
 			volume.connect(audioContext.destination);
 			this.gainNode = volume;
@@ -549,7 +551,12 @@ module a3 {
 			this.oscillator = this.audioContext.createOscillator();
 			this.oscillator.type = 0;
 			this.oscillator.frequency.value = freq;
-			this.oscillator.noteOn(0);
+
+			if(this.oscillator['noteOn'] != undefined){
+				this.oscillator.noteOn(0);	
+			}else{
+				this.oscillator.start(0);			
+			}			
 		}
 		play() {
 			this.oscillator.connect(this.gainNode);
