@@ -44,7 +44,7 @@ var Click2Call = (function () {
 		var sc=''; var m = document.cookie.match(/A3Stat=(\d+)/); if(null != m){ sc = m[1]; }
 
 		var postMessageListener = function(event){
-			if(0 != self.url.indexOf(event.origin)) return;
+			// TODO: check it right if(0 != self.url.indexOf(event.origin)) return;
 			var obj = JSON.parse(event.data);
 			if(obj['cmd'] === undefined) return;
 			switch (obj.cmd){
