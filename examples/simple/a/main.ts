@@ -150,7 +150,7 @@ class SimpleCommunicator extends a3.Communicator {
 	}
 
 	checkHardware() {
-		this.media.checkHardware(true)
+		this.media.checkHardware([true, true]);
 	}
 
 
@@ -181,10 +181,16 @@ class SimpleCommunicator extends a3.Communicator {
 
 	// hardware
 	onCheckHardwareSettings() {
+		console.log("onCheckHardwareSettings");
+
+
+
+
 		$("#hardware-status").text("checking")[0].className = "working";
 		this._graph.onCheckHardwareSettings();
 	}
 	onCheckHardwareReady() {
+		console.log("onCheckHardwareReady");
 		$("#hardware-status").text("ready")[0].className = "done";
 		this._graph.onCheckHardwareReady();
 	}

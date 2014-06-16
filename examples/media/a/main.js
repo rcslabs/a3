@@ -14,7 +14,7 @@ var MediaListener = (function () {
         console.log("Media ready", o);
         $start.prop("disabled", false);
         window.setTimeout(function () {
-            media.checkHardware();
+            media.checkHardware([true, true]);
         }, 10);
     };
     MediaListener.prototype.onMediaMessage = function (type, opt) {

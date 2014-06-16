@@ -375,14 +375,10 @@ var a3;
 })(a3 || (a3 = {}));
 /*
 a3client Media
-
 * webrtc media module
 * DTMF beeper
-
-
 TODO:
 create Sdp parser and builer
-
 */
 var a3;
 (function (a3) {
@@ -422,7 +418,7 @@ var a3;
     // adapter.js
     //
     var RTCPeerConnection = null;
-    var RTCSessionDescription = (window).RTCSessionDescription;
+    var RTCSessionDescription = window.RTCSessionDescription;
     var getUserMedia = null;
     var attachMediaStream = null;
 
@@ -517,7 +513,7 @@ var a3;
             this._swf.muteSound(value);
         };
 
-        FlashMedia.prototype.checkHardware = function (enableVideo) {
+        FlashMedia.prototype.checkHardware = function (vv) {
             // TODO: implements this
             this._swf.checkHardware();
         };
@@ -629,7 +625,7 @@ var a3;
         };
 
         WebrtcMedia.prototype.muteMicrophone = function (value) {
-            this.getLocalAudioTrack().enabled = !value;
+            this.getLocalAudioTrack().enabled = !value; //(value ? 0 : this._micVolume/100);
         };
 
         WebrtcMedia.prototype.muteSound = function (value) {
@@ -678,18 +674,16 @@ var a3;
             }
         };
 
-        WebrtcMedia.prototype.checkHardware = function (enableVideo) {
+        WebrtcMedia.prototype.checkHardware = function (vv) {
             var _this = this;
-            this._notify("HardwareEvent.HARDWARE_STATE", {
-                data: {
+            this._notify("HardwareEvent.HARDWARE_STATE", { data: {
                     microphone: { state: HardwareState.DISABLED },
                     camera: { state: HardwareState.DISABLED },
                     userDefined: false
-                }
-            });
+                } });
 
-            var opts = { audio: true };
-            if (enableVideo) {
+            var opts = { audio: vv[0] };
+            if (vv[1]) {
                 opts.video = {
                     mandatory: {
                         "minWidth": "320",
@@ -710,8 +704,7 @@ var a3;
                 var audioTracks = stream.getAudioTracks();
                 var videoTracks = stream.getVideoTracks();
                 _this._localStream = stream;
-                _this._listener.onMediaMessage("HardwareEvent.HARDWARE_STATE", {
-                    data: {
+                _this._listener.onMediaMessage("HardwareEvent.HARDWARE_STATE", { data: {
                         microphone: {
                             state: audioTracks.length ? HardwareState.ENABLED : HardwareState.ABSENT,
                             wtfName: audioTracks.length ? audioTracks[0].label : ""
@@ -721,18 +714,15 @@ var a3;
                             wtfName: videoTracks.length ? videoTracks[0].label : ""
                         },
                         userDefined: true
-                    }
-                });
+                    } });
             }, function (err) {
                 LOG("error getting mediastream", err);
                 _this._localStream = undefined;
-                _this._notify("HardwareEvent.HARDWARE_STATE", {
-                    data: {
+                _this._notify("HardwareEvent.HARDWARE_STATE", { data: {
                         microphone: { state: HardwareState.DISABLED },
                         camera: { state: HardwareState.DISABLED },
                         userDefined: true
-                    }
-                });
+                    } });
             });
         };
 
@@ -949,7 +939,7 @@ var a3;
         function ToneGenerator(audioContext, freq) {
             this.audioContext = audioContext;
             this.freq = freq;
-            var volume = audioContext.createGainNode();
+            var volume = audioContext['createGainNode'] != undefined ? audioContext.createGainNode() : audioContext.createGain();
             volume.gain.value = 0.2;
             volume.connect(audioContext.destination);
             this.gainNode = volume;
@@ -957,7 +947,12 @@ var a3;
             this.oscillator = this.audioContext.createOscillator();
             this.oscillator.type = 0;
             this.oscillator.frequency.value = freq;
-            this.oscillator.noteOn(0);
+
+            if (this.oscillator['noteOn'] != undefined) {
+                this.oscillator.noteOn(0);
+            } else {
+                this.oscillator.start(0);
+            }
         }
         ToneGenerator.prototype.play = function () {
             this.oscillator.connect(this.gainNode);
@@ -1091,6 +1086,8 @@ var a3;
         };
 
     var STARTING_TIMEOUT = 10000;
+
+    
 
     var Event = (function () {
         function Event() {
@@ -1656,7 +1653,7 @@ var a3;
                     } else if (event === Event.HARDWARE_STATE_CHANGED) {
                         this._onHardwareStateChanged(opt);
                     } else if (event === Event.MEDIA_READY) {
-                        this.media.checkHardware(true);
+                        this.media.checkHardware([true, true]);
                     } else {
                         this._unhandledEvent(event, opt);
                     }
@@ -1667,6 +1664,7 @@ var a3;
                         assert(call);
                         call.event(event, opt);
                     } else if (event === a3.CallEvent.CALL_FAILED || event === a3.CallEvent.CALL_FINISHED || event === a3.CallEvent.CALL_ERROR) {
+                        //assert(call);
                         if (call) {
                             call.event(event, opt);
                             this._removeCall(call);
@@ -1685,7 +1683,7 @@ var a3;
                     } else if (event === Event.HARDWARE_STATE_CHANGED) {
                         this._onHardwareStateChanged(opt);
                     } else if (event === Event.MEDIA_READY) {
-                        this.media.checkHardware(true);
+                        this.media.checkHardware([true, true]);
                     } else {
                         this._unhandledEvent(event, opt);
                     }
@@ -1713,7 +1711,12 @@ var a3;
         Communicator.prototype._onHardwareStateChanged = function (opt) {
             if (opt.data.microphone.state === a3.HardwareState.ENABLED) {
                 this._setHardwareState(opt.data.microphone.state, opt.data.camera.state);
-                this.onCheckHardwareReady();
+                if (opt.data.userDefined) {
+                    // user declined microphone
+                    this.onCheckHardwareReady();
+                } else {
+                    this.onCheckHardwareSettings();
+                }
             } else if (opt.data.microphone.state === a3.HardwareState.DISABLED) {
                 if (opt.data.userDefined) {
                     // user declined microphone

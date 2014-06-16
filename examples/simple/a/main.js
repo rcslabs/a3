@@ -183,7 +183,7 @@ var SimpleCommunicator = (function (_super) {
     };
 
     SimpleCommunicator.prototype.checkHardware = function () {
-        this.media.checkHardware(true);
+        this.media.checkHardware([true, true]);
     };
 
     // communicator subject
@@ -217,10 +217,13 @@ var SimpleCommunicator = (function (_super) {
 
     // hardware
     SimpleCommunicator.prototype.onCheckHardwareSettings = function () {
+        console.log("onCheckHardwareSettings");
+
         $("#hardware-status").text("checking")[0].className = "working";
         this._graph.onCheckHardwareSettings();
     };
     SimpleCommunicator.prototype.onCheckHardwareReady = function () {
+        console.log("onCheckHardwareReady");
         $("#hardware-status").text("ready")[0].className = "done";
         this._graph.onCheckHardwareReady();
     };

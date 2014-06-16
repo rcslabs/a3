@@ -16,24 +16,24 @@ declare module a3 {
         static SDP_ANSWER: string;
     }
     interface ISignalingListener {
-        onSignalingReady(o: ISignaling);
-        onSignalingFailed(o: ISignaling);
-        onSignalingConnected(o: ISignaling);
-        onSignalingConnectionFailed(o: ISignaling);
-        onSignalingMessage(type: string, opt: any);
+        onSignalingReady(o: ISignaling): any;
+        onSignalingFailed(o: ISignaling): any;
+        onSignalingConnected(o: ISignaling): any;
+        onSignalingConnectionFailed(o: ISignaling): any;
+        onSignalingMessage(type: string, opt: any): any;
     }
     interface ISignaling {
-        start();
-        addEndpoint(url: string);
-        connect();
-        request(type: string, opt: Object);
-        setService(value: string);
-        setClientInfo(prop: string, value: string);
-        open(username: string, password: string, challenge: string, code: string);
-        startCall(bUri: string, cc: Object, vv: boolean[]);
-        hangup(callId: string);
-        sdpAnswer(callId: string, pointId: string, sdp: any);
-        dtmf(callId: string, dtmf: string);
+        start(): any;
+        addEndpoint(url: string): any;
+        connect(): any;
+        request(type: string, opt: Object): any;
+        setService(value: string): any;
+        setClientInfo(prop: string, value: string): any;
+        open(username: string, password: string, challenge: string, code: string): any;
+        startCall(bUri: string, cc: Object, vv: boolean[]): any;
+        hangup(callId: string): any;
+        sdpAnswer(callId: string, pointId: string, sdp: any): any;
+        dtmf(callId: string, dtmf: string): any;
     }
     class SioSignaling implements ISignaling {
         private _url;
@@ -50,7 +50,7 @@ declare module a3 {
         public connect(): void;
         public open(username: string, password: string, challenge: string, code: string): void;
         public startCall(bUri: string, cc: Object, vv: boolean[]): void;
-        public dtmf(callId, dtmf): void;
+        public dtmf(callId: any, dtmf: any): void;
         public hangup(callId: string): void;
         public sdpAnswer(callId: string, pointId: string, sdp: any): void;
         public request(type: string, opt: Object): void;
@@ -70,7 +70,7 @@ declare module a3 {
         public setService(value: string): void;
         public connect(): void;
         public close(): void;
-        public setClientInfo(prop, value): void;
+        public setClientInfo(prop: any, value: any): void;
         public request(type: string, opt: Object): void;
         public _createOfferFromFlashSignaling(data: any): {
             playUrlVideo: any;
@@ -82,10 +82,10 @@ declare module a3 {
         public open(username: string, password: string, challenge: string, code: string): void;
         public startCall(bUri: string, cc: Object, vv: boolean[]): void;
         public hangup(callId: string): void;
-        public dtmf(callId, dtmf): void;
+        public dtmf(callId: any, dtmf: any): void;
         public sdpAnswer(callId: string, pointId: string, sdp: any): void;
-        public accept(callId, av_params): void;
-        public decline(callId): void;
+        public accept(callId: any, av_params: any): void;
+        public decline(callId: any): void;
     }
 }
 declare module a3 {
@@ -98,22 +98,22 @@ declare module a3 {
         static ENABLED: string;
     }
     interface IMediaListener {
-        onMediaReady(o: IMedia);
-        onMediaMessage(type: string, opt: any);
+        onMediaReady(o: IMedia): any;
+        onMediaMessage(type: string, opt: any): any;
     }
     interface IMedia {
-        start();
+        start(): any;
         getCc(): any;
-        checkHardware(enableVideo: boolean);
-        setMicrophoneVolume(volume: number);
-        setSoundVolume(volume: number);
-        muteMicrophone(value: boolean);
-        muteSound(value: boolean);
-        setOfferSdp(callId: string, pointId: string, offerSdp: any);
-        playDtmf(dtmf: string);
-        playRBT();
-        stopRBT();
-        dispose();
+        checkHardware(vv: boolean[]): any;
+        setMicrophoneVolume(volume: number): any;
+        setSoundVolume(volume: number): any;
+        muteMicrophone(value: boolean): any;
+        muteSound(value: boolean): any;
+        setOfferSdp(callId: string, pointId: string, offerSdp: any): any;
+        playDtmf(dtmf: string): any;
+        playRBT(): any;
+        stopRBT(): any;
+        dispose(): any;
     }
     class FlashMedia implements IMedia {
         private _listener;
@@ -127,11 +127,11 @@ declare module a3 {
         constructor(_listener: IMediaListener, _container: HTMLElement, _flashVars: any);
         public start(): void;
         public getCc(): any;
-        public setMicrophoneVolume(value): void;
-        public setSoundVolume(value): void;
+        public setMicrophoneVolume(value: any): void;
+        public setSoundVolume(value: any): void;
         public muteMicrophone(value: boolean): void;
         public muteSound(value: boolean): void;
-        public checkHardware(enableVideo: boolean): void;
+        public checkHardware(vv: boolean[]): void;
         public setOfferSdp(callId: string, pointId: string, offerSdp: any): void;
         public dispose(): void;
         public playDtmf(dtmf: string): void;
@@ -159,11 +159,11 @@ declare module a3 {
         private _micVolume;
         private _dtmfPlayer;
         private _rbtPlayer;
-        constructor(_listener: IMediaListener, _container);
+        constructor(_listener: IMediaListener, _container: any);
         public start(): void;
         public _notifyReady(): void;
-        public _notify(type, data): void;
-        public getLocalAudioTrack();
+        public _notify(type: any, data: any): void;
+        public getLocalAudioTrack(): any;
         public setMicrophoneVolume(value: number): void;
         public setSoundVolume(value: number): void;
         public muteMicrophone(value: boolean): void;
@@ -179,9 +179,9 @@ declare module a3 {
             "bundle": boolean;
         };
         public dispose(): void;
-        public checkHardware(enableVideo: boolean): void;
-        public __getAudioPeerConnection();
-        public __getVideoPeerConnection();
+        public checkHardware(vv: boolean[]): void;
+        public __getAudioPeerConnection(): any;
+        public __getVideoPeerConnection(): any;
         public setOfferSdp(callId: string, pointId: string, offerSdp: any): void;
         public playDtmf(dtmf: string): void;
         public playRBT(): void;
@@ -194,34 +194,34 @@ declare module a3 {
         createSignaling(listener: a3.ISignalingListener): a3.ISignaling;
     }
     interface ICall {
-        setListener(listener: ICallListener);
+        setListener(listener: ICallListener): any;
     }
     interface ICallListener {
-        onIncomingCall(call: Call);
-        onCallStarting(call: Call);
-        onCallStarted(call: Call);
-        onCallFinished(call: Call);
-        onCallFailed(call: Call);
-        onDurationChanged(call: Call, duration: number);
+        onIncomingCall(call: Call): any;
+        onCallStarting(call: Call): any;
+        onCallStarted(call: Call): any;
+        onCallFinished(call: Call): any;
+        onCallFailed(call: Call): any;
+        onDurationChanged(call: Call, duration: number): any;
     }
     interface ICommunicator extends ICommunicatorListener {
-        connect();
-        setSoundVolume(value: number);
+        connect(): any;
+        setSoundVolume(value: number): any;
     }
     interface ICommunicatorListener {
-        onCommunicatorStarting();
-        onCommunicatorStarted();
-        onCommunicatorFailed();
-        onConnecting();
-        onConnected();
-        onConnectionFailed();
-        onCheckHardwareSettings();
-        onCheckHardwareReady();
-        onCheckHardwareFailed();
-        onSoundVolumeChanged(value: number);
-        onSessionStarting();
-        onSessionStarted();
-        onSessionFailed();
+        onCommunicatorStarting(): any;
+        onCommunicatorStarted(): any;
+        onCommunicatorFailed(): any;
+        onConnecting(): any;
+        onConnected(): any;
+        onConnectionFailed(): any;
+        onCheckHardwareSettings(): any;
+        onCheckHardwareReady(): any;
+        onCheckHardwareFailed(): any;
+        onSoundVolumeChanged(value: number): any;
+        onSessionStarting(): any;
+        onSessionStarted(): any;
+        onSessionFailed(): any;
     }
     class Event {
         static START: string;
@@ -276,10 +276,10 @@ declare module a3 {
         private _duration;
         private _durationTimerHandle;
         private _listener;
-        constructor(_vv, media: a3.IMedia, signaling: a3.ISignaling);
+        constructor(_vv: any, media: a3.IMedia, signaling: a3.ISignaling);
         public setListener(listener: ICallListener): void;
         public getId(): string;
-        public setId(id): void;
+        public setId(id: any): void;
         public isAudio(): boolean;
         public isVideo(): boolean;
         public accept(): void;
@@ -290,20 +290,20 @@ declare module a3 {
         public getState(): string;
         public hangup(): void;
         public remove(): void;
-        public setMicrophoneVolume(value): void;
-        public setSoundVolume(value): void;
+        public setMicrophoneVolume(value: any): void;
+        public setSoundVolume(value: any): void;
         public onEnterStateStarting(): void;
         public onEnterStateRinging(): void;
         public onEnterStateProgress(): void;
         public onEnterStateFinished(): void;
         public onEnterStateFailed(): void;
         public _notifyListener(callback: string): void;
-        public _setState(newState): void;
-        public _unhandledEvent(event, opt): void;
+        public _setState(newState: any): void;
+        public _unhandledEvent(event: any, opt: any): void;
         public _startTimer(): void;
         public _stopTimer(): void;
         public event(event: string, opt: any): void;
-        public __onSdpOffer(opt): void;
+        public __onSdpOffer(opt: any): void;
     }
     class Communicator implements ICommunicator, ICallListener, a3.IMediaListener, a3.ISignalingListener {
         public factory: ICommunicatorFactory;
@@ -338,18 +338,18 @@ declare module a3 {
         public onDurationChanged(call: Call, duration: number): void;
         public start(): void;
         public connect(): void;
-        public open(phone, password, challenge, code): void;
+        public open(phone: any, password: any, challenge: any, code: any): void;
         public close(): void;
-        public startCall(destination, vv): void;
+        public startCall(destination: any, vv: any): void;
         public setSoundVolume(value: number): void;
         public getMicrophoneState(): string;
         public getCameraState(): string;
         public _createCallInstance(vv: boolean[]): Call;
-        public _getCallById(id): Call;
-        public _addCall(call): void;
-        public _removeCall(call): void;
-        public _setState(newState): void;
-        public _setHardwareState(microphoneState, cameraState): void;
+        public _getCallById(id: any): Call;
+        public _addCall(call: any): void;
+        public _removeCall(call: any): void;
+        public _setState(newState: any): void;
+        public _setHardwareState(microphoneState: any, cameraState: any): void;
         public getState(): string;
         public _unhandledEvent(event: string, opt: any): void;
         public event(event: string, opt: any): void;
@@ -359,7 +359,7 @@ declare module a3 {
         public onSignalingConnected(o: a3.ISignaling): void;
         public onSignalingConnectionFailed(o: a3.ISignaling): void;
         public onSignalingMessage(type: string, opt: any): void;
-        public onMediaReady(opt): void;
-        public onMediaMessage(type, opt): void;
+        public onMediaReady(opt: any): void;
+        public onMediaMessage(type: any, opt: any): void;
     }
 }

@@ -58,7 +58,7 @@ module a3 {
 		onSessionFailed();
 	}
 
-    export class Event {
+	export class Event {
 		//
 		// a custom set of user-events
 		//
@@ -79,7 +79,7 @@ module a3 {
 
 		public static START_INCOMING: string = "e:START_INCOMING";
 		public static ACCEPT_CALL: string = "e:ACCEPT_CALL";
-	    public static DECLINE_CALL: string = "e:DECLINE_CALL";
+		public static DECLINE_CALL: string = "e:DECLINE_CALL";
 	}
 
 
@@ -184,11 +184,11 @@ module a3 {
 			if(this._state !== newState) {
 				this._state = newState;
 				switch(this._state) {
-					case CallState.RINGING: this.onEnterStateRinging(); break;
+					case CallState.RINGING:  this.onEnterStateRinging();  break;
 					case CallState.STARTING: this.onEnterStateStarting(); break;
 					case CallState.PROGRESS: this.onEnterStateProgress(); break;
 					case CallState.FINISHED: this.onEnterStateFinished(); break;
-					case CallState.FAILED: this.onEnterStateFailed(); break;
+					case CallState.FAILED:   this.onEnterStateFailed();   break;
 				}
 			}
 		}
@@ -532,7 +532,7 @@ module a3 {
 					} else if (event === Event.HARDWARE_STATE_CHANGED) {
 						this._onHardwareStateChanged(opt);
 					} else if(event === Event.MEDIA_READY) { // Flash element is reloaded
-						this.media.checkHardware(true);
+						this.media.checkHardware([true, true]);
 					} else {
 						this._unhandledEvent(event, opt);
 					}
@@ -562,7 +562,7 @@ module a3 {
 					} else if (event === Event.HARDWARE_STATE_CHANGED) {
 						this._onHardwareStateChanged(opt);
 					} else if(event === Event.MEDIA_READY) { // Flash element is reloaded
-						this.media.checkHardware(true);
+						this.media.checkHardware([true, true]);
 					} else {
 						this._unhandledEvent(event, opt);
 					}
@@ -590,7 +590,12 @@ module a3 {
 		_onHardwareStateChanged(opt:any) {
 			if ( opt.data.microphone.state === HardwareState.ENABLED) {
 				this._setHardwareState(opt.data.microphone.state, opt.data.camera.state);
-				this.onCheckHardwareReady();
+				if(opt.data.userDefined){
+					// user declined microphone
+					this.onCheckHardwareReady();
+				} else {
+					this.onCheckHardwareSettings();
+				}
 			} else if(opt.data.microphone.state === HardwareState.DISABLED) {
 				if(opt.data.userDefined){
 					// user declined microphone

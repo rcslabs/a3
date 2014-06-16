@@ -13,7 +13,7 @@ class MediaListener implements a3.IMediaListener {
 		console.log("Media ready", o);
 		$start.prop("disabled", false);
 		window.setTimeout(() => {
-			media.checkHardware();
+			media.checkHardware([true, true]);
 		},10);
 	}
 	onMediaMessage(type: string, opt: any) {
