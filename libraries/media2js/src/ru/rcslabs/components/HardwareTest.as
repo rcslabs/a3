@@ -8,14 +8,15 @@ package ru.rcslabs.components
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.media.Microphone;
-	import ru.rcslabs.webcall.AppConfig;
-	import ru.rcslabs.webcall.MediaTransport;
+	import flash.utils.setTimeout;
 	
 	import flashx.textLayout.formats.TextAlign;
 	
 	import ru.rcslabs.utils.monitor.IMicMonitorDelegate;
 	import ru.rcslabs.utils.monitor.IMonitorDelegate;
 	import ru.rcslabs.utils.monitor.MicMonitor;
+	import ru.rcslabs.webcall.AppConfig;
+	import ru.rcslabs.webcall.MediaTransport;
 	
 	public class HardwareTest extends Sprite implements IMicMonitorDelegate
 	{		
@@ -27,7 +28,7 @@ package ru.rcslabs.components
 		public  var micState:String = "absent";
 		private var delegate:IMonitorDelegate;
 		private var mic:Microphone;
-		
+
 		// sprite size on testing hardware should be 220x140
 		public function HardwareTest(delegate:IMonitorDelegate)
 		{
@@ -104,7 +105,10 @@ package ru.rcslabs.components
 						delegate.onMonitorStateChanged(value);
 						showMeter();
 					} else { 
-						onMonitorStateChanged(MicMonitor.OK_LEVEL_STATE);
+						// Thanks Jenya!
+						setTimeout(function():void{
+							onMonitorStateChanged(MicMonitor.OK_LEVEL_STATE);
+						}, 33);
 					}
 					break;	
 				
