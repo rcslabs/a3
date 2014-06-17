@@ -89,6 +89,55 @@ module a3 {
 		LOG("Browser does not appear to be WebRTC-capable");
 	}
 
+	//
+	// Sdp Parser
+	//
+	module sdp {
+		class SdpBlock {
+			private lines: string[];
+			constructor(block: string) { this.lines = block.split("\r\n"); }
+			public toString(): string { return this.lines.join("\r\n"); }
+			public getLines(lineStart: string): string[] {
+				for(var i: number = 0, result: string[] = []; i < this.lines.length; i++) if(this.lines[i].indexOf(lineStart) === 0) result.push(this.lines[i]);
+				return result;
+			}
+			public removeLines(lineStart: string): void {
+				for(var i: number = 0, lines: string[] = []; i < this.lines.length; i++) if(this.lines[i].indexOf(lineStart) !== 0) lines.push(this.lines[i]);
+				this.lines = lines;
+			}
+		}
+		export class Media extends SdpBlock {
+			private type: string;
+			constructor(mediaBlock: string) {
+				super(mediaBlock);
+				var mLine: string = this.getLines("m=")[0];
+				this.type = (mLine.match(/^m=(\w+)/) ? RegExp.$1 : null);
+			}
+			public getType(): string { return this.type; }
+			public clone(): Media { return new Media(this.toString()) }
+		}
+		export class Sdp extends SdpBlock {
+			public medias: Media[] = [];
+			constructor(private sdpText:string) {
+				super((blocks = sdpText.split(/(?=^m=)/m)).shift());
+				var blocks: string[];
+				for(var i: number = 0; i < blocks.length; i++) {
+					this.medias.push(new Media(blocks[i]));
+				}
+			}
+			public clone(): Sdp { return new Sdp(this.toString()) }
+			public cloneWithoutMedias(): Sdp { return new Sdp(super.toString()) }
+			public addMedia(media: Media): Sdp { this.medias.push(media); return this; }
+			public toString() {
+				var result : string = super.toString();
+				for(var i: number = 0; i < this.medias.length; i++) result += this.medias[i].toString();
+				return result;
+			}
+		}
+	}
+
+
+
 	export class FlashMedia implements IMedia
 	{
 		private _publishUrlVoice: any = undefined;
@@ -168,17 +217,25 @@ module a3 {
 			//  publishUrlVideo: [...]
 			//  publishUrlVoice: [...]
 			//}
+			if(typeof offerSdp === "string") {
+				// TODO: parse offer sdp and
+				// extract pub/sub urls
 
-			this._publishUrlVoice = offerSdp.publishUrlVoice;
-			this._publishUrlVideo = offerSdp.publishUrlVideo;
-			this._playUrlVoice = offerSdp.playUrlVoice;
-			this._playUrlVideo = offerSdp.playUrlVideo;
+			} else {
+				//
+				// simple way of setting rtmp pub/sub
+				//
+				this._publishUrlVoice = offerSdp.publishUrlVoice;
+				this._publishUrlVideo = offerSdp.publishUrlVideo;
+				this._playUrlVoice = offerSdp.playUrlVoice;
+				this._playUrlVideo = offerSdp.playUrlVideo;
+			}
 
 			this._swf.publish   ( this._publishUrlVoice, this._publishUrlVideo );
 			this._swf.subscribe ( this._playUrlVoice,    this._playUrlVideo    );
 		}
 
-	   	dispose(){
+		dispose(){
 			this._swf.unpublish();
 			this._swf.unsubscribe();
 		}
@@ -294,7 +351,7 @@ module a3 {
 			};
 		}
 
-	 	dispose(){ //debugger;
+	 	dispose(){
 			if(this.__pcVideo) this.__pcVideo.close();
 			this.__pcVideo = null;
 			if(this.__pc) this.__pc.close();
@@ -391,109 +448,48 @@ module a3 {
 
 		setOfferSdp(callId: string, pointId: string, offerSdp: any) {
 			LOG("Offer Sdp=\n" + offerSdp);
-			var headLines: string[] = [], audioLines: string[] = [], videoLines: string[] = [];
-			var lines: string[] = offerSdp.split("\r\n");
-			var state = 0;
-			for(var i=0; i<lines.length; i++) {
-				var line: string = lines[i];
-				if(line.match(/^m=audio/)) state = 1;
-				if(line.match(/^m=video/)) state = 2;
-				if(line) {
-					switch(state) {
-						case 0: headLines.push(line); break;
-						case 1: audioLines.push(line); break;
-						case 2: videoLines.push(line); break;
-					}
-				}
-			}
-			var head: string = headLines.join("\r\n") + "\r\n",
-			    audio: string = audioLines.length ? audioLines.join("\r\n") + "\r\n" : "",
-			    video: string = videoLines.length ? videoLines.join("\r\n") + "\r\n" : "";
+			var i: number;
+			var offerSdpObject: sdp.Sdp = new sdp.Sdp(<string>offerSdp);
 
-			var audioAnswerSdp: string = "";
-			var videoAnswerSdp: string = "";
+			var audioOffer: sdp.Sdp = null, videoOffer: sdp.Sdp = null, audioAnswer: sdp.Sdp = null, videoAnswer: sdp.Sdp = null;
+			for(i = 0; i < offerSdpObject.medias.length; i++) {
+				var media: sdp.Media = offerSdpObject.medias[i];
+				if(media.getType() === "audio" && !audioOffer) audioOffer = offerSdpObject.cloneWithoutMedias().addMedia(media);
+				if(media.getType() === "video" && !videoOffer) videoOffer = offerSdpObject.cloneWithoutMedias().addMedia(media);
+			}
 
 			var answerReady = () => {
-				if(audio && !audioAnswerSdp || video && !videoAnswerSdp) {
+				if(audioOffer && !audioAnswer || videoOffer && !videoAnswer) {
 					return;
 				}
+				var resultSdp: sdp.Sdp = (audioAnswer || videoAnswer).cloneWithoutMedias();
+				if(audioAnswer) resultSdp.addMedia(audioAnswer.medias[0]);
+				if(videoAnswer) resultSdp.addMedia(videoAnswer.medias[0]);
+				resultSdp.removeLines("a=msid-semantic");
 
-				var answerLines: string[] = [];
-				var headSdp = audioAnswerSdp || videoAnswerSdp;
-
-				var lines = headSdp.split("\r\n");
-				var state = 0;
-				for(var i=0; i < lines.length; i++) {
-					var line = lines[i];
-					if(line.match(/^m=audio/)) state = 1;
-					if(line.match(/^m=video/)) state = 2;
-					if(line) {
-						switch(state){
-							case 0: if(!line.match(/^a=msid-semantic/)) answerLines.push(line); break;
-							case 1: break;
-							case 2: break;
-						}
-					}
-				}
-
-				if(audioAnswerSdp) {
-					var lines = audioAnswerSdp.split("\r\n");
-					var state = 0;
-					for(var i=0; i < lines.length; i++) {
-						var line = lines[i];
-						if(line.match(/^m=audio/)) state = 1;
-						if(line.match(/^m=video/)) state = 2;
-						if(line) {
-							switch(state){
-								case 0: break;
-								case 1: answerLines.push(line); break;
-								case 2: break;
-							}
-						}
-					}
-				}
-
-				if(videoAnswerSdp) {
-					var lines = videoAnswerSdp.split("\r\n");
-					var state = 0;
-					for(var i=0; i < lines.length; i++) {
-						var line = lines[i];
-						if(line.match(/^m=audio/)) state = 1;
-						if(line.match(/^m=video/)) state = 2;
-						if(line) {
-							switch(state){
-								case 0: break;
-								case 1: break;
-								case 2: answerLines.push(line); break;
-							}
-						}
-					}
-				}
-
-				var answerSdp = answerLines.join("\r\n") + "\r\n";
-				LOG("We have FINISHED building answer SDP\n"+ answerSdp);
+				LOG("We have FINISHED building answer SDP\n"+ resultSdp.toString());
 				this._listener.onMediaMessage(MediaEvent.SDP_ANSWER, {
 					callId: callId,
 					pointId: pointId,
-					sdp: answerSdp
+					sdp: resultSdp.toString()
 				});
 			};
 
-			var audioAnswerReady = (sdp) => {
-				audioAnswerSdp = sdp;
+			var audioAnswerReady = (sdpText: string) => {
+				audioAnswer = new sdp.Sdp(sdpText);
 				answerReady();
 			};
 
-			var videoAnswerReady = (sdp) => {
-				videoAnswerSdp = sdp;
+			var videoAnswerReady = (sdpText: string) => {
+				videoAnswer = new sdp.Sdp(sdpText);
 				answerReady();
 			};
 
 
-			if(audio) {
+			if(audioOffer) {
 				var pcAudio = this.__getAudioPeerConnection();
 				var mediaConstraints = {'mandatory': {'OfferToReceiveAudio': true, 'OfferToReceiveVideo': false}};
-				var remoteSDP = new RTCSessionDescription({sdp:/*offerSdp*/ head+audio, type: 'offer'});
+				var remoteSDP = new RTCSessionDescription({sdp: audioOffer.toString(), type: 'offer'});
 				pcAudio.setRemoteDescription(remoteSDP);
 				LOG("pc.CreatingAnswer: AUDIO", pcAudio);
 				pcAudio.createAnswer((localSDP) => {
@@ -503,10 +499,10 @@ module a3 {
 				}, null, mediaConstraints);
 			}
 
-			if(video) {
+			if(videoOffer) {
 				var pcVideo = this.__getVideoPeerConnection();
 				var mediaConstraints = {'mandatory': {'OfferToReceiveAudio': false, 'OfferToReceiveVideo': true}};
-				var remoteSDP = new RTCSessionDescription({sdp:/*offerSdp*/ head+video, type: 'offer'});
+				var remoteSDP = new RTCSessionDescription({sdp: videoOffer.toString(), type: 'offer'});
 				pcVideo.setRemoteDescription(remoteSDP);
 				LOG("pc.CreatingAnswer: VIDEO", pcVideo);
 				pcVideo.createAnswer((localSDP) => {
