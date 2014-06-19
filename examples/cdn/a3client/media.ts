@@ -182,8 +182,9 @@ module a3 {
 
 		getCc(): any {
 			return {
+				profile: "RTMP",
 				userAgent: "FlashPlayer",
-				audio: ["speex/8000"],
+				audio: ["PCMA/8000"],
 				video: ["H264/90000"]
 			};
 		}
@@ -218,13 +219,26 @@ module a3 {
 			//  publishUrlVoice: [...]
 			//}
 			if(typeof offerSdp === "string") {
-				// TODO: parse offer sdp and
 				// extract pub/sub urls
+				var sdpObj: sdp.Sdp = new sdp.Sdp(offerSdp);
+				var audio: sdp.Media = null, video: sdp.Media = null;
+				for(var i: number = 0; i < sdpObj.medias.length; i++) {
+					var media: sdp.Media = sdpObj.medias[i];
+					if(media.getType() === "audio" && !audio) audio = media;
+					if(media.getType() === "video" && !video) video = media;
+				}
+
+				if(audio) {
+					this._publishUrlVoice = audio.getLines("a=rtmp-sub:")[0].replace("a=rtmp-sub:", "");
+					this._playUrlVoice = audio.getLines("a=rtmp-pub:")[0].replace("a=rtmp-pub:", "");
+				}
+				if(video) {
+					this._publishUrlVideo = video.getLines("a=rtmp-sub:")[0].replace("a=rtmp-sub:", "");
+					this._playUrlVideo = video.getLines("a=rtmp-pub:")[0].replace("a=rtmp-pub:", "");
+				}
 
 			} else {
-				//
 				// simple way of setting rtmp pub/sub
-				//
 				this._publishUrlVoice = offerSdp.publishUrlVoice;
 				this._publishUrlVideo = offerSdp.publishUrlVideo;
 				this._playUrlVoice = offerSdp.playUrlVoice;
@@ -233,6 +247,14 @@ module a3 {
 
 			this._swf.publish   ( this._publishUrlVoice, this._publishUrlVideo );
 			this._swf.subscribe ( this._playUrlVoice,    this._playUrlVideo    );
+
+			if(typeof offerSdp === "string") {
+				this._listener.onMediaMessage(MediaEvent.SDP_ANSWER, {
+					callId: callId,
+					pointId: pointId,
+					sdp: offerSdp              // currently send offerSdp back as answer
+				});
+			}
 		}
 
 		dispose(){
