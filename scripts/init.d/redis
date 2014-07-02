@@ -38,7 +38,7 @@ case "$1" in
         chown $RUN_AS $PIDFILE
         touch $LOGFILE
         chown $RUN_AS $LOGFILE
-        if start-stop-daemon --start --quiet --umask 007 --pidfile $PIDFILE --chuid $RUN_AS --exec $DAEMON -- $DAEMON_ARGS
+        if start-stop-daemon --start --quiet --pidfile $PIDFILE --chuid $RUN_AS --exec $DAEMON -- $DAEMON_ARGS
         then
                 echo "$NAME."
         else
