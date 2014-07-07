@@ -391,9 +391,11 @@ class Mediator implements a3.ICommunicatorListener {
         this._media.hide();
 		var l = this._communicator.locale;
 		if(this._views['call-failed'] != null){
+            $('h2', this._views['call-failed']).remove();
 			$('h1', this._views['call-failed']).after("<h2>"+l['CALL_FAILED']+"</h2>");
         	this._toggleView('call-failed');
 		} else if (this._views['callback'] != null){
+            $('h2', this._views['callback']).remove();
 			$('h1', this._views['callback']).after("<h2>"+l['CALL_FAILED']+"</h2>");
 			this._toggleView('callback');
 		} else {
