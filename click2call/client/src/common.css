@@ -45,7 +45,7 @@ button:focus {outline: none;}
 .a3-btn-voice-call {background-image: url('/tmpl/default/btn1.png');}
 .a3-btn-video-call {background-image: url('/tmpl/default/btn1.png');}
 .a3-btn-callback{ background-image: url('/tmpl/default/btn2.png');}
-.a3-btn-cancel, .a3-btn-hangup{width:130px; height:37px; margin:8px; background-image: url('/tmpl/default/btn3.png'); border:none; color:white; font-weight:bold; text-align:right; padding-right:14px;}
+.a3-btn-cancel, .a3-btn-hangup{width:130px; height:37px; margin:8px; background-image: url('/tmpl/default/btn3.png'); border:none; color:white; font-weight:bold; text-align:right; padding-right:8px;}
 .a3-hardware-controls{direction:ltr; margin: 10px auto;}
 .a3-call-buttons{width:100%; text-align: center;}
 
