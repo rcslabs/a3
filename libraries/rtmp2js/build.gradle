@@ -2,24 +2,12 @@ apply plugin: 'gradlefx'
 
 buildscript {
     dependencies {
-        classpath 'org.gradlefx:gradlefx:0.8.1'
-    }
-}
-
-repositories {
-    ivy {
-        name 'Apache'
-        artifactPattern 'http://apache.cu.be/flex/[revision]/binaries/[module]-[revision]-bin.[ext]'
+        classpath 'org.gradlefx:gradlefx:0.8.3'
     }
 }
 
 dependencies {
-    flexSDK 'org.apache:apache-flex-sdk:4.11.0@tar.gz'
     internal 'ru.rcslabs.webcall:client-core-swc:2.2.0-SNAPSHOT@swc'
-}
-
-sdkAutoInstall {
-    showPrompts	= false
 }
 
 type = 'swf'
