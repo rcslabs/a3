@@ -1,11 +1,11 @@
-/// <reference path="a3.d.ts" />
+/// <reference path="communicator.ts" />
 /// <reference path="jquery.d.ts" />
 
 var STUN_SERVER = "stun:stun.l.google.com:19302";
 var STUN_TIMEOUT = 4000;
 var FP_MIN_VERSION = "10.3";
-var STAT_SERVICE = "//webrtc.v2chat.com/stat/push/";
-var CALLBACK_SERVICE = '//webrtc.v2chat.com/service/callback';
+var STAT_SERVICE = "https://webrtc.v2chat.com/stat/push/";
+var CALLBACK_SERVICE = 'https://webrtc.v2chat.com/service/callback';
 
 declare var LOG:any;
 declare var WARN:any;
@@ -921,7 +921,7 @@ class Resources {
 	}
 
 	loadTemplate(cb:any) {
-		$.ajax({ url: this._tmplUrl })
+		$.ajax({ url: this._tmplUrl, crossDomain : true })
 			.done((data) => {
 				this.tmpl = data;
 				cb.call(null, this.tmpl);

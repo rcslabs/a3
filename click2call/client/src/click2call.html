@@ -5,10 +5,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" type="text/css" rel="stylesheet" href="common.css" />
     <link rel="stylesheet" type="text/css" rel="stylesheet" href="slider/simple-slider.css" />
-    <script src="libs.js"></script>
-    <script src="a3.js"></script>
-    <script src="main.js"></script>
-    <script src="time.js"></script>
+    <script src="https://webrtc.v2chat.com/a3/libs.js"></script>
+    <script src="https://webrtc.v2chat.com/a3/a3.js"></script>
+    <script src="https://webrtc.v2chat.com/a3/main.js"></script>
+    <script src="https://webrtc.v2chat.com/a3/time.js"></script>
     <script src="slider/simple-slider.js"></script>
 </head>
 <body>
@@ -20,9 +20,10 @@
     factory.addEndpoint("rtmp://be1.v2chat.com/webcall2/"+communicator.query.id);
     factory.addEndpoint("rtmp://be1b.v2chat.com:80/webcall2/"+communicator.query.id);
     factory.addEndpoint("rtmpt://be1.v2chat.com/webcall2/"+communicator.query.id);
-    factory.addEndpoint(document.location.protocol+"//localhost");
+    factory.addEndpoint("https://webrtc.v2chat.com");
     factory.setServiceName("constructor");
     communicator.setFactory(factory);
+
     var resources = new Resources('//localhost/tmpl/'+communicator.query.id);
     resources.load( function(res){
         if(res === false){
