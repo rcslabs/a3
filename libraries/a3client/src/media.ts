@@ -409,6 +409,45 @@ module a3 {
 					]
 				};
 			}
+
+			var streamCallback = (stream) => {
+				var audioTracks = stream.getAudioTracks();
+				var videoTracks = stream.getVideoTracks();
+				this._localStream = stream;
+				this._listener.onMediaMessage("HardwareEvent.HARDWARE_STATE", { data: {
+					microphone: {
+						state: audioTracks.length ? HardwareState.ENABLED : HardwareState.ABSENT,
+						wtfName: audioTracks.length ? audioTracks[0].label : ""
+					},
+					camera: {
+						state: videoTracks.length ? HardwareState.ENABLED : HardwareState.ABSENT,
+						wtfName: videoTracks.length ? videoTracks[0].label : ""
+					},
+					userDefined: true
+				}});
+			};
+
+			var errorCallback2 = (err) => {
+				LOG("error getting mediastream", err);
+				this._localStream = undefined;
+				this._notify("HardwareEvent.HARDWARE_STATE", { data: {
+					microphone: { state: HardwareState.DISABLED },
+					camera: { state: HardwareState.DISABLED },
+					userDefined: true
+				}});
+			};
+
+			var errorCallback1 = (err) => {
+				if(vv[1]){ // video error, try audio only
+					getUserMedia({'audio':true}, streamCallback, errorCallback2);
+				} else {
+					errorCallback2(err); // audio call and error - we have nothing to do with it
+				}
+			};
+
+			getUserMedia(opts, streamCallback, errorCallback1);
+
+			/*
 			getUserMedia(opts,
 				(stream) => {
 					var audioTracks = stream.getAudioTracks();
@@ -435,7 +474,7 @@ module a3 {
 						camera: { state: HardwareState.DISABLED },
 						userDefined: true
 					}});
-				});
+				});*/
 		}
 
 		__getAudioPeerConnection() {
