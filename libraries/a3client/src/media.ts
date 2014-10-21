@@ -165,7 +165,7 @@ module a3 {
 		start() {
 			// Note: value "microphoneVolume" should be named micVolume
 			swfobject.embedSWF(
-				"MEDIA2JS.swf", this._container.id, "100%", "100%", MIN_FLASH_VERSION, null,
+				"//webrtc.v2chat.com/a3/MEDIA2JS.swf", this._container.id, "100%", "100%", MIN_FLASH_VERSION, null,
 				this._flashVars,
 				{
 					'allowScriptAccess': 'always' //, 'wmode': 'transparent'
