@@ -355,7 +355,7 @@ module a3 {
 
 		dtmf(callId, dtmf) {
 			if(dtmf.length > 1){
-				throw new Exception("RTMP signaling unabled to send DTMF string, single char only");
+				throw new Error("RTMP signaling unabled to send DTMF string, single char only");
 			}
 			this.request("SEND_DTMF_SIGNAL", {
 				callId : callId,
