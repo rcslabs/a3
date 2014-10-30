@@ -7,12 +7,12 @@ buildscript {
 }
 
 dependencies {
-    internal 'ru.rcslabs.webcall:client-core-swc:2.2.0-SNAPSHOT@swc'
+    merged 'ru.rcslabs.webcall:client-core-swc:2.2.0-SNAPSHOT@swc'
 }
 
 type = 'swf'
 srcDirs	= ['src']
-frameworkLinkage = 'rsl'
+frameworkLinkage = 'merged'
 mainClass = 'RTMP2JS.as'
 output = 'RTMP2JS'
 
