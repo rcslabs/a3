@@ -29,7 +29,6 @@ MC:stop
 [c:"After_the_ICE_transaction_starts_an_RTP_streams"]
 A:MC.RTP media stream
 MC:A.RTP media stream
-MC:stop
 
 [c:"ICE_periodically_action_during_a_call"]
 A:MC.ICE binding request
