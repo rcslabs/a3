@@ -131,6 +131,7 @@ if [ 1 == "$INSTALL_DEPS" ]; then
 	# install modules for python
 	easy_install typecheck
 	easy_install redis
+	easy_install enum34
 
 	# install yasm >= 1.2.0
 	cd $BUILD_DIR/yasm-1.2.0
