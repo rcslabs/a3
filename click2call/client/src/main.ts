@@ -918,6 +918,7 @@ class Resources {
 	constructor(private _baseUrl: string){
 		this._tmplUrl = this._baseUrl+"/template.html";
 		this._localeUrl = this._baseUrl+"/locale.ini";
+        $.support.cors = true; // http://stackoverflow.com/questions/9160123/no-transport-error-w-jquery-ajax-call-in-ie
 	}
 
 	loadTemplate(cb:any) {
