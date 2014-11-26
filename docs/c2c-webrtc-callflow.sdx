@@ -3,10 +3,11 @@
 <source><![CDATA[#!>>
 #!cc is object described a client information on codecs/capabilities.
 #!vv is boolean array as [voice, video]
+#! internal, external are network interfaces for SIP GW and web clients RTP.
 #!<<
 
 A:Actor "WebRTC browser"
-APP:WebRTC gateway
+APP:call application
 DB:button config
 MC:media-controller
 SIP:SIP gateway
@@ -16,7 +17,7 @@ APP:DB.get config (SIP register info etc)
 APP:A.CALL_STARTING
 
 [c:"create_media_point_for_WebRTC"]
-APP:>MC.CREATE_MEDIA_POINT (A, profile=external)
+APP:>MC.CREATE_MEDIA_POINT (A, external)
 MC:>APP.SDP_OFFER
 APP:stop
 
@@ -27,12 +28,12 @@ APP:stop
 APP:>MC.SDP_ANSWER
 MC:stop
 
-MC:>APP.CREATE_MEDIA_POINT_OK (A)
+MC:>APP.CREATE_MEDIA_POINT_OK (A, external)
 APP:stop
 [/c]
 
 [c:"create_media_point_for_SIP"]
-APP:>MC.CREATE_MEDIA_POINT (A, profile=internal)
+APP:>MC.CREATE_MEDIA_POINT (A, internal)
 MC:stop
 
 MC:>APP.SDP_OFFER
@@ -56,15 +57,15 @@ SIP:stop
 APP:>MC.SDP_ANSWER
 MC:stop
 
-MC:>APP.CREATE_MEDIA_POINT_OK (A)
+MC:>APP.CREATE_MEDIA_POINT_OK (A, internal)
 APP:stop
 
 [/c]
 
-APP:>MC.JOIN_ROOM (A)
+APP:>MC.JOIN_ROOM (A, internal)
 MC:stop
 
-APP:>MC.JOIN_ROOM (B)
+APP:>MC.JOIN_ROOM (A, external)
 MC:stop
 
 APP:A.CALL_STARTED
@@ -73,13 +74,13 @@ APP:A.CALL_STARTED
 A:APP.HANGUP
 APP:stop
 APP:A.CALL_FINISHED
-APP:>MC.UNJOIN_ROOM (A)
+APP:>MC.UNJOIN_ROOM (A, internal)
 MC:stop
-APP:>MC.UNJOIN_ROOM (B)
+APP:>MC.UNJOIN_ROOM (A, external)
 MC:stop
-APP:>MC.REMOVE_MEDIA_POINT (A)
+APP:>MC.REMOVE_MEDIA_POINT (A, internal)
 MC:stop
-APP:>MC.REMOVE_MEDIA_POINT (B)
+APP:>MC.REMOVE_MEDIA_POINT (A, external)
 MC:stop
 
 APP:>SIP.BYE

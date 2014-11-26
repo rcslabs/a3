@@ -1,4 +1,5 @@
 include 'libraries:java:rcl-api'
+include 'libraries:java:redis-client'
 include 'libraries:a3client'
 include 'libraries:media2js'
 include 'libraries:rtmp2js'

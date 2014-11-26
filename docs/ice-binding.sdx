@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram>
 <source><![CDATA[A:Actor "WebRTC browser"
-APP:WebRTC gateway
+APP:call application
 MC:media-controller
 
 [c:"exchange_the_ICE_before_call_starts"]

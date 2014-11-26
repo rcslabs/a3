@@ -58,6 +58,7 @@ task (build) {
     dependsOn ':libraries:a3client:build'
     dependsOn ':client-handler:build'
     dependsOn ':libraries:java:rcl-api:build'
+    dependsOn ':libraries:java:redis-client:build'
     dependsOn ':webcall-app:build'
     dependsOn ':click2call:client:build'
     dependsOn ':click2call:server:build'
