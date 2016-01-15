@@ -40,17 +40,17 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 	}
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
+/*task javadocJar(type: Jar, dependsOn: javadoc) {
 	classifier = 'javadoc'
 	from javadoc.destinationDir
 	manifest = project.manifest {
     	from sharedManifest
 	}    
-}
+}*/
 
 artifacts {
     archives sourcesJar
-    archives javadocJar
+    //archives javadocJar
 }
 
 publishing {
@@ -58,7 +58,7 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
 			artifact sourcesJar
-			artifact javadocJar
+			//artifact javadocJar
 	        pom.withXml {
 	        	def desc = 'Built by '+builder+' at '+datetime+' on rev. #'+revision
                 asNode().appendNode('description', desc)
