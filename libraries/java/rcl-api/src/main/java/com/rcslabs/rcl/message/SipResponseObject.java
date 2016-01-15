@@ -108,7 +108,8 @@ public abstract class SipResponseObject extends SipMessageObject {
 			case Response.TRYING:
 				doTrying(event);
 				break;
-			
+
+			case Response.CALL_IS_BEING_FORWARDED: // Quick fix			
 			case Response.RINGING:
 				doRinging(event);
 				break;
