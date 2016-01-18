@@ -1,9 +1,12 @@
-[submodule "webcall-app"]
-	path = webcall-app
-	url = git@gito.luxms.com:rcslabs/a3-webcall-app.git
-[submodule "media-controller"]
-	path = media-controller
-	url = git@gito.luxms.com:rcslabs/a3-media-controller.git
 [submodule "client-handler"]
 	path = client-handler
 	url = git@gito.luxms.com:rcslabs/a3-client-handler.git
+	branch = master
+[submodule "media-controller"]
+	path = media-controller
+	url = git@gito.luxms.com:rcslabs/a3-media-controller.git
+	branch = master
+[submodule "webcall-app"]
+	path = webcall-app
+	url = git@gito.luxms.com:rcslabs/a3-webcall-app.git
+	branch = master
