@@ -1,0 +1,3 @@
+.gradle/
+libraries/java/rcl-api/build/
+libraries/java/redis-client/build/
